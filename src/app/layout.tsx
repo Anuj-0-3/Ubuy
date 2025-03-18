@@ -1,10 +1,8 @@
-import type { Metadata } from "next";
+'use client'
 import "./globals.css";
+import { SessionProvider } from "next-auth/react";
 
-export const metadata: Metadata = {
-  title: "Ubuy",
-  description: "Compete and win amazing deals. The auction game just got better!",
-};
+
 
 export default function RootLayout({
   children,
@@ -14,7 +12,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+      {children}
       </body>
     </html>
   );
