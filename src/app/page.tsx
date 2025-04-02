@@ -3,9 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { TimerIcon, HammerIcon, UserIcon, ShieldCheckIcon } from "lucide-react";
 
+
 export default function HomePage() {
   return (<>
     <Navbar/>
+    
     <div className="min-h-screen bg-emerald-100">
       {/* Hero Section */}
       <div className="relative bg-cover bg-center h-[60vh] flex flex-col justify-center items-center text-white text-center px-4 bg-gradient-to-b from-emerald-700 to-emerald-500 shadow-lg">
