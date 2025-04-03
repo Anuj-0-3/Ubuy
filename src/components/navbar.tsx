@@ -16,9 +16,9 @@ function Navbar() {
   return (
     <nav className="p-6 shadow-md bg-emerald-600 text-white">
       <div className="container mx-auto flex justify-between items-center">
-        <a href="" className="text-xl font-bold">
+        <Link href="/" className="text-xl font-bold">
           <h1 className='text-3xl font-bold text-slate-100 font-sans'>U-Buy</h1>
-        </a>
+        </Link>
         {/* Mobile Menu Button */}
         <button className="md:hidden text-white" onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? <X size={24} /> : <Menu size={24} />}

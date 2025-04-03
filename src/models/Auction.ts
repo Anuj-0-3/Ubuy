@@ -10,7 +10,7 @@ export interface IAuction extends Document {
   startTime: Date;
   endTime: Date;
   status: "active" | "closed";
-  createdBy: mongoose.Types.ObjectId;
+  createdBy: string;
 }
 
 const AuctionSchema: Schema = new Schema({
@@ -23,7 +23,7 @@ const AuctionSchema: Schema = new Schema({
   startTime: { type: Date, required: true },
   endTime: { type: Date, required: true },
   status: { type: String, enum: ["active", "closed"], default: "active" },
-  createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  createdBy: { type: String, required: true },
 });
 
 export default mongoose.model<IAuction>("Auction", AuctionSchema);

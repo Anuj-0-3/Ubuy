@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 
-const AuctionImageUploader = () => {
+interface AuctionImageUploaderProps {
+  onUpload: (imageUrl: string) => void;
+}
+
+const AuctionImageUploader: React.FC<AuctionImageUploaderProps> = ({ onUpload }) => {
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState<boolean>(false);
-  const [imageUrl, setImageUrl] = useState<string>("");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -18,7 +21,6 @@ const AuctionImageUploader = () => {
 
   const handleUpload = async () => {
     if (!image) return;
-
     setUploading(true);
 
     const formData = new FormData();
@@ -32,7 +34,7 @@ const AuctionImageUploader = () => {
 
       const data = await res.json();
       if (res.ok) {
-        setImageUrl(data.url);
+        onUpload(data.url); // ✅ Pass uploaded image URL to parent
       } else {
         alert("Upload failed: " + data.error);
       }
@@ -54,9 +56,6 @@ const AuctionImageUploader = () => {
       >
         {uploading ? "Uploading..." : "Upload"}
       </button>
-      {imageUrl && (
-        <p className="mt-2 text-green-500">Uploaded: {imageUrl}</p>
-      )}
     </div>
   );
 };

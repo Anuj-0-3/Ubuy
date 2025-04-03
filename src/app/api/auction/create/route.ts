@@ -1,44 +1,40 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Auction from "@/models/Auction";
-import { getServerSession, User } from "next-auth";
+import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
 import mongoose from "mongoose";
 
 export async function POST(req: Request) {
   await dbConnect();
-  const session = await getServerSession(authOptions);
-  const user: User = session?.user;
 
+  // Get session and user
+  const session = await getServerSession(authOptions);
   if (!session || !session.user) {
-    return Response.json(
-      {
-        success: false,
-        message: "Unauthorized",
-      },
-      { status: 401 }
-    );
+    return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
   }
 
-  const userId = new mongoose.Types.ObjectId(user._id);
-
   try {
+    const userId = new mongoose.Types.ObjectId(session.user.id); // Ensure `id` exists in your user session
     const body = await req.json();
     const { title, description, image, startingPrice, startTime, endTime } = body;
 
+    // Validate required fields
     if (!title || !description || !startingPrice || !startTime || !endTime) {
       return NextResponse.json({ message: "All required fields must be provided" }, { status: 400 });
     }
 
+    // Create auction
     const newAuction = await Auction.create({
       title,
       description,
       image: image || "",
       startingPrice,
       currentPrice: startingPrice,
-      startTime,
-      endTime,
+      startTime: new Date(startTime),
+      endTime: new Date(endTime),
       status: "active",
+      createdBy:  session.user.name || session.user.email,
     });
 
     return NextResponse.json({ message: "Auction created successfully", auction: newAuction }, { status: 201 });
