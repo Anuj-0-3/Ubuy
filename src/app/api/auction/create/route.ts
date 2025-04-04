@@ -34,7 +34,8 @@ export async function POST(req: Request) {
       startTime: new Date(startTime),
       endTime: new Date(endTime),
       status: "active",
-      createdBy:  session.user.name || session.user.email,
+      createdBy:  session.user.name ,
+      createdByemail: session.user.email,
     });
 
     return NextResponse.json({ message: "Auction created successfully", auction: newAuction }, { status: 201 });

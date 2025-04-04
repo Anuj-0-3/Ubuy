@@ -11,6 +11,7 @@ export interface IAuction extends Document {
   endTime: Date;
   status: "active" | "closed";
   createdBy: string;
+  createdByemail:string;
 }
 
 const AuctionSchema: Schema = new Schema({
@@ -24,6 +25,7 @@ const AuctionSchema: Schema = new Schema({
   endTime: { type: Date, required: true },
   status: { type: String, enum: ["active", "closed"], default: "active" },
   createdBy: { type: String, required: true },
+  createdByemail:{type :String, required: true},
 });
 
 export default mongoose.model<IAuction>("Auction", AuctionSchema);
