@@ -8,7 +8,7 @@ export async function GET(request: Request) {
          await dbConnect();
         
     
-         const auctions = await Auction.find().select("-createdByemail -_id");
+         const auctions = await Auction.find().select("-createdByemail");
         console.log(auctions);
     
         return NextResponse.json(auctions, { status: 200 });

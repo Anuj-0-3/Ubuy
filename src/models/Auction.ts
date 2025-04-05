@@ -6,7 +6,7 @@ export interface IAuction extends Document {
   image: string;
   startingPrice: number;
   currentPrice: number;
-  highestBidder?: mongoose.Types.ObjectId;
+  highestBidder?: string;
   startTime: Date;
   endTime: Date;
   status: "active" | "closed";
@@ -20,7 +20,7 @@ const AuctionSchema: Schema = new Schema({
   image: { type: String },
   startingPrice: { type: Number, required: true },
   currentPrice: { type: Number, default: 0 },
-  highestBidder: { type: Schema.Types.ObjectId, ref: "User" },
+  highestBidder: { type: String },
   startTime: { type: Date, required: true },
   endTime: { type: Date, required: true },
   status: { type: String, enum: ["active", "closed"], default: "active" },
