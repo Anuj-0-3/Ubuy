@@ -4,8 +4,23 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import Navbar from "@/components/navbar";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 interface Auction {
+  _id: string;
   title: string;
   description: string;
   image: string;
@@ -22,19 +37,37 @@ const MyAuctionsPage = () => {
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchAuctions = async () => {
-      try {
-        const res = await fetch("/api/auction/myauction");
-        const data = await res.json();
-        setAuctions(data);
-      } catch (err) {
-        console.error("Error fetching auctions", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchAuctions = async () => {
+    try {
+      const res = await fetch("/api/auction/myauction");
+      const data = await res.json();
+      setAuctions(data);
+    } catch (err) {
+      console.error("Error fetching auctions", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const handleCloseAuction = async (auctionId: string) => {
+    try {
+      const res = await fetch("/api/auction/close", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ auctionId }),
+      });
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to close auction");
+
+      toast.success("Auction closed successfully!");
+      fetchAuctions(); // Refresh auctions
+    } catch (err: any) {
+      toast.error(err.message || "Something went wrong");
+    }
+  };
+
+  useEffect(() => {
     fetchAuctions();
   }, []);
 
@@ -57,9 +90,8 @@ const MyAuctionsPage = () => {
               auctions.map((auction, index) => (
                 <Card
                   key={index}
-                  className="bg-white/10  border border-emerald-400/40 shadow-lg rounded-2xl transform transition-transform duration-300 hover:scale-105 hover:shadow-xl"
+                  className="bg-white/10 border border-emerald-400/40 shadow-lg rounded-2xl transform transition-transform duration-300 hover:scale-105 hover:shadow-xl"
                 >
-
                   <CardContent className="p-6 space-y-4">
                     <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
                     <p className="text-gray-700">{auction.description}</p>
@@ -74,6 +106,33 @@ const MyAuctionsPage = () => {
                       <p><strong>Status:</strong> {auction.status}</p>
                       <p><strong>Current Price:</strong> ₹{auction.currentPrice}</p>
                     </div>
+
+                    {auction.status === "active" && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button className="w-full mt-4 bg-red-500 text-white hover:bg-red-600">
+                            Close Auction
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Closing this auction will prevent any further bids. This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              className="bg-red-500 hover:bg-red-600 text-white"
+                              onClick={() => handleCloseAuction(auction._id)}
+                            >
+                              Yes, close it
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
                   </CardContent>
                 </Card>
               ))
@@ -86,3 +145,4 @@ const MyAuctionsPage = () => {
 };
 
 export default MyAuctionsPage;
+

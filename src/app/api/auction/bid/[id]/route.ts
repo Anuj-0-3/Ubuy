@@ -33,6 +33,14 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     return NextResponse.json({ error: "Auction not found" }, { status: 404 });
   }
 
+  // ✅ Auto-close auction if expired
+  const currentTime = new Date();
+  if (new Date(auction.endTime) <= currentTime) {
+    auction.status = "closed";
+    await auction.save();
+    return NextResponse.json({ error: "Auction has ended and is now closed" }, { status: 403 });
+  }
+
   if (auction.status === "closed") {
     return NextResponse.json({ error: "Auction is closed" }, { status: 403 });
   }
@@ -46,5 +54,9 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 
   await auction.save();
 
-  return NextResponse.json({ message: "Bid placed successfully", currentPrice: auction.currentPrice });
+  return NextResponse.json({
+    message: "Bid placed successfully",
+    currentPrice: auction.currentPrice,
+  });
 }
+
