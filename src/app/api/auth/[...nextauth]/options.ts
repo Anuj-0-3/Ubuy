@@ -4,6 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
+import AuthUser from '@/models/AuthUser';
 
 
 export const authOptions: NextAuthOptions = {
@@ -47,6 +48,23 @@ export const authOptions: NextAuthOptions = {
       }),
     ],
     callbacks: {
+      async signIn({ user, account }) {
+        await dbConnect();
+  
+        if (account?.provider === 'google') {
+          const existingUser = await AuthUser.findOne({ email: user.email });
+  
+          if (!existingUser) {
+            await AuthUser.create({        
+              email: user.email,              
+              name: user.name,                        
+              provider: 'google', 
+            });
+          }
+        }
+  
+        return true;
+      },
       async jwt({ token, user }) {
         if (user) {
           token._id = user._id?.toString(); 
