@@ -41,8 +41,8 @@ const Page = () => {
         try {
           const response = await axios.get(`/api/check-username-unique?username=${username}`);
           setUsernameMessage(response.data.message);
-        } catch (error) {
-          setUsernameMessage("An error occurred");
+        } catch (error: unknown) {
+          setUsernameMessage(error instanceof Error ? error.message : "An unexpected error occurred");
         } finally {
           setIsCheckingUsername(false);
         }
@@ -63,8 +63,8 @@ const Page = () => {
       await axios.post("/api/sign-up", data);
       toast.success("Account created successfully");
       router.replace("/dashboard");
-    } catch (error) {
-      toast.error("An error occurred");
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }

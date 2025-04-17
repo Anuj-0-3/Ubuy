@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IAuction extends Document {
   title: string;
@@ -6,26 +6,39 @@ export interface IAuction extends Document {
   image: string;
   startingPrice: number;
   currentPrice: number;
-  highestBidder?: string;
+  bidders: {
+    bidder: Types.ObjectId;
+    amount: number;
+    bidTime: Date;
+  }[];
   startTime: Date;
   endTime: Date;
   status: "active" | "closed";
-  createdBy: string;
-  createdByemail:string;
+  createdBy: Types.ObjectId;
 }
 
-const AuctionSchema: Schema = new Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  image: { type: String },
-  startingPrice: { type: Number, required: true },
-  currentPrice: { type: Number, default: 0 },
-  highestBidder: { type: String },
-  startTime: { type: Date, required: true },
-  endTime: { type: Date, required: true },
-  status: { type: String, enum: ["active", "closed"], default: "active" },
-  createdBy: { type: String, required: true },
-  createdByemail:{type :String, required: true},
-});
+const AuctionSchema: Schema = new Schema(
+  {
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    image: { type: String },
+    startingPrice: { type: Number, required: true },
+    currentPrice: { type: Number, default: 0 },
+    bidders: [
+      {
+        bidder: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        amount: { type: Number, required: true },
+        bidTime: { type: Date, default: Date.now },
+      },
+    ],
+    startTime: { type: Date, required: true },
+    endTime: { type: Date, required: true },
+    status: { type: String, enum: ["active", "closed"], default: "active" },
+    createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-export default mongoose.model<IAuction>("Auction", AuctionSchema);
+export default mongoose.models.Auction || mongoose.model<IAuction>("Auction", AuctionSchema);

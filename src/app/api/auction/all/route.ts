@@ -7,19 +7,25 @@ export async function GET(request: Request) {
   try {
     await dbConnect();
 
-    // Automatically close auctions whose endTime has passed
+    // Automatically close expired auctions
     await autoCloseExpiredAuctions();
 
-    // Fetch auctions without revealing user email
-    const auctions = await Auction.find().select("-createdByemail").sort({ endTime: -1 });
+    // Fetch auctions, populate createdBy info, sorted by endTime descending
+    const auctions = await Auction.find()
+      .populate({
+        path: "createdBy",
+        select: "username email", // Include only these fields
+      })
+      .sort({ endTime: -1 });
 
     return NextResponse.json(auctions, { status: 200 });
 
   } catch (error) {
     const errorMessage = (error as Error).message;
     return NextResponse.json(
-      { error: "Failed to fetch data", details: errorMessage },
+      { error: "Failed to fetch auctions", details: errorMessage },
       { status: 500 }
     );
   }
 }
+

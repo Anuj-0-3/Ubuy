@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const userId = new mongoose.Types.ObjectId(session.user.id); // Ensure `id` exists in your user session
+    const userId = new mongoose.Types.ObjectId(session.user._id);  // now using _id populated in JWT callback
     const body = await req.json();
     const { title, description, image, startingPrice, startTime, endTime } = body;
 
@@ -34,11 +34,11 @@ export async function POST(req: Request) {
       startTime: new Date(startTime),
       endTime: new Date(endTime),
       status: "active",
-      createdBy:  session.user.name ,
-      createdByemail: session.user.email,
+      createdBy: userId,   // saving the ObjectId reference here
     });
 
     return NextResponse.json({ message: "Auction created successfully", auction: newAuction }, { status: 201 });
+
   } catch (error) {
     console.error("Error creating auction:", error);
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });

@@ -47,7 +47,7 @@ function Navbar() {
             <>
               <Link href="/auctions" className="hover:text-slate-100" onClick={() => setIsOpen(false)}>Auctions</Link>
               <Link href="/create-auction" className="hover:text-slate-100" onClick={() => setIsOpen(false)}>Create Auction</Link>
-              <Link href="/my-auctions" className="hover:text-slate-100" onClick={() => setIsOpen(false)}>My Auctions</Link>
+              <Link href="/my-auction" className="hover:text-slate-100" onClick={() => setIsOpen(false)}>My Auctions</Link>
               <Link href="/profile" className="hover:text-slate-100" onClick={() => setIsOpen(false)}>Profile</Link>
               <Button onClick={() => { signOut(); setIsOpen(false); }} className="bg-slate-100 text-emerald-600" variant='outline'>Logout</Button>
             </>
