@@ -116,7 +116,7 @@ const MyAuctionsPage = () => {
                     </div>
 
                     {auction.status === "active" && (
-                      <AlertDialog key={`dialog-${auction._id}`}>
+                      <AlertDialog >
                         <AlertDialogTrigger asChild>
                           <Button className="w-full mt-4 bg-red-500 text-white hover:bg-red-600">
                             Close Auction

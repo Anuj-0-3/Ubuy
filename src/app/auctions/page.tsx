@@ -135,7 +135,6 @@ const AllAuctionsPage = () => {
                           </span>
                         </p>
                         <p><strong>Current Price:</strong> ₹{auction.currentPrice}</p>
-                        <p><strong>Created By:</strong> {auction.createdBy}</p>
                       </div>
 
                       {!isClosed && (

@@ -3,26 +3,39 @@ import dbConnect from "@/lib/dbConnect";
 import Auction from "@/models/Auction";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
+import mongoose from "mongoose";
 
 export async function POST(req: Request) {
   await dbConnect();
 
   const session = await getServerSession(authOptions);
-  if (!session || !session.user?.email) {
+
+  if (!session || !session.user?.id) {
     return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    const userEmail = session.user.email;
+    const { auctionId } = await req.json();
 
-    // Find the latest active auction created by this user
+    if (!auctionId || !mongoose.Types.ObjectId.isValid(auctionId)) {
+      return NextResponse.json({ success: false, message: "Invalid auction ID" }, { status: 400 });
+    }
+
+    const userId = new mongoose.Types.ObjectId(session.user.id);
+
+    // Find the specific active auction created by this user
     const auction = await Auction.findOne({
-      createdByemail: userEmail,
+      _id: auctionId,
+      createdBy: userId,
       status: "active",
-    }).sort({ endTime: -1 });
+    });
+    
 
     if (!auction) {
-      return NextResponse.json({ success: false, message: "No active auction found for this user" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, message: "No active auction found for this user" },
+        { status: 404 }
+      );
     }
 
     // Close auction and update endTime to now
@@ -49,3 +62,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }
+

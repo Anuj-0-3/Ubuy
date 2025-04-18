@@ -1,10 +1,58 @@
+"use client";
 import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
+import Auction from "@/models/Auction";
 import { Card, CardContent } from "@/components/ui/card";
-import { TimerIcon, HammerIcon, UserIcon, ShieldCheckIcon } from "lucide-react";
+import { TimerIcon, HammerIcon, UserIcon, ShieldCheckIcon, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getRemainingTime } from "@/utils/time";
+
+interface Auction {
+  _id: string;
+  title: string;
+  description: string;
+  image: string;
+  startingPrice: number;
+  currentPrice: number;
+  highestBidder?: string;
+  startTime: string;
+  endTime: string;
+  status: "active" | "closed";
+  createdBy: string;
+}
 
 
 export default function HomePage() {
+  const [auctions, setAuctions] = useState<Auction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [remainingTimes, setRemainingTimes] = useState<{ [key: string]: string }>({});
+    useEffect(() => {
+      const fetchAuctions = async () => {
+        try {
+          const res = await fetch("/api/auction/all");
+          const data = await res.json();
+          setAuctions(data);
+        } catch (err) {
+          console.error("Error fetching auctions", err);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchAuctions();
+    }, []);
+  
+    useEffect(() => {
+      const interval = setInterval(() => {
+        const updatedTimes: { [key: string]: string } = {};
+        auctions.forEach((auction) => {
+          updatedTimes[auction._id] = getRemainingTime(auction.endTime);
+        });
+        setRemainingTimes(updatedTimes);
+      }, 1000);
+  
+      return () => clearInterval(interval);
+    }, [auctions]);
   return (<>
     <Navbar/>
     
@@ -20,23 +68,65 @@ export default function HomePage() {
       </div>
       
       {/* Live Auctions */}
-      <section className="py-12 px-6">
-        <h2 className="text-2xl font-semibold text-emerald-800 mb-6">Live Auctions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[1, 2, 3].map((auction) => (
-            <Card key={auction} className="p-4 bg-white shadow-md border border-emerald-300">
-              <img src="/sample-auction.jpg" alt="Auction Item" className="rounded-md mb-4" />
-              <h3 className="text-lg font-semibold text-emerald-800">Rare Collectible Watch</h3>
-              <p className="text-gray-600">Current Bid: <span className="font-bold">₹15,000</span></p>
-              <div className="flex items-center gap-2 mt-3">
-                <TimerIcon className="w-4 h-4 text-red-500" />
-                <span className="text-sm text-gray-600">Ends in: 2h 30m</span>
-              </div>
-              <Button className="mt-4 w-full bg-emerald-600 hover:bg-emerald-700">Place Bid</Button>
-            </Card>
-          ))}
-        </div>
-      </section>
+      <div className="flex flex-col  bg-gray-50">
+
+        {loading ? (
+          <Loader2 className="animate-spin text-emerald-500" size={40} />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 w-full max-w-6xl">
+            {auctions.length === 0 ? (
+              <p className="text-gray-500">No auctions found.</p>
+            ) : (
+              auctions.map((auction) => {
+                const timeLeft = remainingTimes[auction._id] || "Calculating...";
+                const isClosed = timeLeft === "Closed" || auction.status === "closed";
+
+                return (
+                  <Card
+                    key={auction._id}
+                    className="relative bg-white/10 backdrop-blur-md border border-emerald-400/40 shadow-lg rounded-2xl transition-transform duration-300 hover:scale-105 hover:shadow-xl"
+                  >
+                    {/* ⏳ Countdown in top right */}
+                    <div className="absolute top-3 right-3 bg-red-500 text-white text-sm font-semibold px-3 py-1 rounded-full z-10 shadow">
+                      {timeLeft}
+                    </div>
+
+                    <CardContent className="p-6 space-y-4">
+                      <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
+                      <p className="text-gray-700">{auction.description}</p>
+                      {auction.image && (
+                        <img
+                          src={auction.image}
+                          alt={auction.title}
+                          className="w-full h-40 object-cover rounded-lg border border-gray-300"
+                        />
+                      )}
+                      <div className="text-sm text-gray-600 space-y-1">
+                        <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleString()}</p>
+                        <p><strong>End:</strong> {new Date(auction.endTime).toLocaleString()}</p>
+                        <p>
+                          <strong>Status:</strong>{" "}
+                          <span className={isClosed ? "text-red-500 font-semibold" : "text-green-600 font-semibold"}>
+                            {isClosed ? "Closed" : "Active"}
+                          </span>
+                        </p>
+                        <p><strong>Current Price:</strong> ₹{auction.currentPrice}</p>
+                      </div>
+
+                      {!isClosed && (
+                        <div className="pt-2 space-y-2">
+                          
+                          
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })
+            )}
+          </div>
+        )}
+      </div>
       
       {/* How It Works */}
       <section className="bg-white py-12 px-6 text-center">
