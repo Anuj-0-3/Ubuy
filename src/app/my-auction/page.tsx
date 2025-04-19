@@ -18,6 +18,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import Image from "next/image";
 
 interface Auction {
   _id: string;
@@ -104,11 +105,15 @@ const MyAuctionsPage = () => {
                   <CardContent className="p-6 space-y-4">
                     <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
                     <p className="text-gray-700">{auction.description}</p>
-                    <img
-                      src={auction.image}
-                      alt={auction.title}
-                      className="w-full h-40 object-cover rounded-lg border border-gray-300"
-                    />
+                    <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
+                      <Image
+                        src={auction.image}
+                        alt={auction.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                      />
+                    </div>
                     <div className="text-sm text-gray-600">
                       <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleString()}</p>
                       <p><strong>End:</strong> {new Date(auction.endTime).toLocaleString()}</p>

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import Auction from "@/models/Auction";
 import { autoCloseExpiredAuctions } from "@/lib/autoCloseExpiredAuctions";
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     await dbConnect();
 

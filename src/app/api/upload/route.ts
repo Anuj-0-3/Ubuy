@@ -35,6 +35,7 @@ export async function POST(req: Request) {
       stream.pipe(uploadStream);
     });
   } catch (error) {
+    console.error("Error uploading file:", error);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }

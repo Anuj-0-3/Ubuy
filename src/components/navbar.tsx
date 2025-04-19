@@ -11,7 +11,6 @@ import { User } from 'next-auth';
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
-  const user : User = session?.user;
 
   return (
     <nav className="p-6 shadow-md bg-emerald-600 text-white">

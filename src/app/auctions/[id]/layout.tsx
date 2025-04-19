@@ -1,7 +1,6 @@
 'use client'
 
 import Navbar from "@/components/navbar";
-import { Toaster } from "@/components/ui/sonner"
 import { SessionProvider } from "next-auth/react";
 
 

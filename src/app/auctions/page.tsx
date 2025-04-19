@@ -9,6 +9,7 @@ import Link from "next/link";
 import Navbar from "@/components/navbar";
 import { toast } from "sonner";
 import { getRemainingTime } from "@/utils/time";
+import Image from "next/image";
 
 interface Auction {
   _id: string;
@@ -122,11 +123,15 @@ const AllAuctionsPage = () => {
                       <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
                       <p className="text-gray-700">{auction.description}</p>
                       {auction.image && (
-                        <img
+                        <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
+                        <Image
                           src={auction.image}
                           alt={auction.title}
-                          className="w-full h-40 object-cover rounded-lg border border-gray-300"
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 33vw"
                         />
+                      </div>
                       )}
                       <div className="text-sm text-gray-600 space-y-1">
                         <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleString()}</p>

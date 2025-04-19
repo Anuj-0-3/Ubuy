@@ -2,10 +2,11 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Loader2, Gavel, IndianRupee, Timer } from "lucide-react";
+import { Loader2, IndianRupee, Timer } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 
 export default function AuctionDetailPage() {
   const params = useParams();
@@ -80,11 +81,15 @@ export default function AuctionDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Side Image */}
         <div className="flex justify-center">
-          <img
-            src={auction.image}
-            alt={auction.title}
-            className="w-full max-w-md rounded-lg shadow-lg"
-          />
+        <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
+        <Image
+          src={auction.image}
+          alt={auction.title}
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, 33vw"
+        />
+      </div>
         </div>
 
         {/* Right Side Content */}

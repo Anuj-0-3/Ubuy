@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { LogOut, LogIn, Mail, User } from "lucide-react";
 import Navbar from "@/components/navbar";
+import Image from "next/image";
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
@@ -22,7 +23,7 @@ export default function ProfilePage() {
         ) : session ? (
           <Card className="w-full max-w-md bg-white/10 backdrop-blur-lg border border-emerald-500/40 shadow-lg rounded-2xl p-6 text-center">
             <CardHeader className="flex flex-col items-center">
-              <img
+              <Image
                 src={session.user?.image || "/default-profile.png"}
                 alt="Profile"
                 className="w-24 h-24 rounded-full border-4 border-emerald-400 shadow-md"
