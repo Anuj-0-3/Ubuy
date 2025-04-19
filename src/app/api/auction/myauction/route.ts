@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     );
 
     // ✅ Fetch user's auctions
-    const auctions = await Auction.find({ createdBy: objectId }).select("-_id");
+    const auctions = await Auction.find({ createdBy: objectId });
 
     return NextResponse.json(auctions, { status: 200 });
 

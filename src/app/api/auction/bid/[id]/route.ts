@@ -14,7 +14,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 
   await dbConnect();
 
-  const auctionId = params.id;
+  const auctionId =await params.id;
 
   if (!mongoose.Types.ObjectId.isValid(auctionId)) {
     return NextResponse.json({ error: "Invalid Auction ID" }, { status: 400 });
@@ -49,8 +49,14 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     return NextResponse.json({ error: "Bid must be higher than the current price" }, { status: 400 });
   }
 
+  auction.bidders.push({
+    bidder: session.user.id, 
+    amount: bidAmount,
+    bidTime: new Date(),
+  });
+
   auction.currentPrice = bidAmount;
-  auction.highestBidder = session.user.email;
+  auction.highestBidder = session.user.username;
 
   await auction.save();
 

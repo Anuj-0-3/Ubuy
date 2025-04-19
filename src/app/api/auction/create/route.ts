@@ -34,7 +34,7 @@ export async function POST(req: Request) {
       startTime: new Date(startTime),
       endTime: new Date(endTime),
       status: "active",
-      createdBy: userId,   // saving the ObjectId reference here
+      createdBy: session.user.id,   // saving the ObjectId reference here
     });
 
     return NextResponse.json({ message: "Auction created successfully", auction: newAuction }, { status: 201 });

@@ -58,6 +58,7 @@ const MyAuctionsPage = () => {
   };
 
   const handleCloseAuction = async (auctionId: string) => {
+    console.log("👉 Closing auction with ID:", auctionId);
     try {
       const res = await fetch("/api/auction/close", {
         method: "POST",

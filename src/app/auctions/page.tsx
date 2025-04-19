@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
 import Navbar from "@/components/navbar";
 import { toast } from "sonner";
 import { getRemainingTime } from "@/utils/time";
@@ -106,10 +107,12 @@ const AllAuctionsPage = () => {
                 const isClosed = timeLeft === "Closed" || auction.status === "closed";
 
                 return (
+                  
                   <Card
                     key={auction._id}
                     className="relative bg-white/10 backdrop-blur-md border border-emerald-400/40 shadow-lg rounded-2xl transition-transform duration-300 hover:scale-105 hover:shadow-xl"
                   >
+                    <Link href={`/auctions/${auction._id}`} passHref>
                     {/* ⏳ Countdown in top right */}
                     <div className="absolute top-3 right-3 bg-red-500 text-white text-sm font-semibold px-3 py-1 rounded-full z-10 shadow">
                       {timeLeft}
@@ -157,6 +160,7 @@ const AllAuctionsPage = () => {
                         </div>
                       )}
                     </CardContent>
+                    </Link>
                   </Card>
                 );
               })

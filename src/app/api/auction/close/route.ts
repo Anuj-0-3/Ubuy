@@ -11,34 +11,66 @@ export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.id) {
-    return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { success: false, message: "Unauthorized" },
+      { status: 401 }
+    );
   }
 
+  const body = await req.json();
+  
+
+  const { auctionId } = body;
+  
+
+  if (!auctionId || !mongoose.Types.ObjectId.isValid(auctionId)) {
+    console.error("❌ Invalid ID received:", auctionId);
+    return NextResponse.json(
+      { success: false, message: "Invalid auction ID" },
+      { status: 400 }
+    );
+  }
+
+
   try {
-    const { auctionId } = await req.json();
 
     if (!auctionId || !mongoose.Types.ObjectId.isValid(auctionId)) {
-      return NextResponse.json({ success: false, message: "Invalid auction ID" }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "Invalid auction ID" },
+        { status: 400 }
+      );
     }
 
     const userId = new mongoose.Types.ObjectId(session.user.id);
 
-    // Find the specific active auction created by this user
     const auction = await Auction.findOne({
       _id: auctionId,
       createdBy: userId,
       status: "active",
     });
-    
 
     if (!auction) {
       return NextResponse.json(
-        { success: false, message: "No active auction found for this user" },
+        {
+          success: false,
+          message: "No active auction found for this user",
+        },
         { status: 404 }
       );
     }
 
-    // Close auction and update endTime to now
+    // Extra safety check (optional)
+    if (auction.createdBy.toString() !== session.user.id) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Forbidden: You are not the owner of this auction",
+        },
+        { status: 403 }
+      );
+    }
+
+    // Close the auction
     auction.status = "closed";
     auction.endTime = new Date();
 
@@ -59,7 +91,10 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     console.error("Error closing auction:", error);
-    return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
