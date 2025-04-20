@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import AuctionImageUploader from "@/components/AuctionImageUploader";
-import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-react";
 import Link from "next/link";
@@ -77,7 +76,6 @@ const CreateAuction = () => {
 
   return (
     <>
-      <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen">
         {session ? (
           <div className="w-full max-w-lg p-6 bg-white shadow-md rounded-lg">

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
-import Navbar from "@/components/navbar";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -83,7 +82,6 @@ const MyAuctionsPage = () => {
 
   return (
     <>
-      <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 py-10">
         <div className="text-center mb-10">
           <h1 className="text-4xl font-extrabold text-gray-900">My Auctions</h1>

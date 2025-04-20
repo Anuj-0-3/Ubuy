@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import Navbar from "@/components/navbar";
 import { toast } from "sonner";
 import { getRemainingTime } from "@/utils/time";
 import Image from "next/image";
@@ -89,8 +88,7 @@ const AllAuctionsPage = () => {
 
   return (
     <>
-      <Navbar />
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 py-10">
+       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 py-10">
         <div className="text-center mb-10">
           <h1 className="text-4xl font-extrabold text-gray-900">All Auctions</h1>
           <p className="text-gray-600 mt-2">Explore live and upcoming auctions</p>
