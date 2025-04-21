@@ -32,10 +32,14 @@ function Navbar() {
               <Link href="/profile" className="hover:text-slate-100">Profile</Link>
               <Button onClick={() => signOut()} className="bg-slate-100 text-emerald-600" variant='outline'>Logout</Button>
             </>
-          ) : (
-            <Link href="/sign-in">
+          ) : (<>
+            <Link href="/sign-in" onClick={() => setIsOpen(false)}>
               <Button className="bg-slate-100 text-emerald-600" variant='outline'>Login</Button>
             </Link>
+            <Link href="/sign-up" onClick={() => setIsOpen(false)}>
+            <Button className="bg-slate-100 text-emerald-600" variant='outline'>Sign-Up</Button>
+          </Link>
+          </>
           )}
         </div>
       </div>
@@ -50,10 +54,14 @@ function Navbar() {
               <Link href="/profile" className="hover:text-slate-100" onClick={() => setIsOpen(false)}>Profile</Link>
               <Button onClick={() => { signOut(); setIsOpen(false); }} className="bg-slate-100 text-emerald-600" variant='outline'>Logout</Button>
             </>
-          ) : (
+          ) : (<>
             <Link href="/sign-in" onClick={() => setIsOpen(false)}>
               <Button className="bg-slate-100 text-emerald-600" variant='outline'>Login</Button>
             </Link>
+             <Link href="/sign-up" onClick={() => setIsOpen(false)}>
+             <Button className="bg-slate-100 text-emerald-600" variant='outline'>Sign-Up</Button>
+           </Link>
+           </>
           )}
         </div>
       )}

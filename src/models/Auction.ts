@@ -8,6 +8,7 @@ export interface IAuction extends Document {
   currentPrice: number;
   bidders: {
     bidder: Types.ObjectId;
+    bidderName?: string;
     amount: number;
     bidTime: Date;
   }[];
@@ -27,6 +28,7 @@ const AuctionSchema: Schema = new Schema(
     bidders: [
       {
         bidder: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        bidderName: { type: String },
         amount: { type: Number, required: true },
         bidTime: { type: Date, default: Date.now },
       },

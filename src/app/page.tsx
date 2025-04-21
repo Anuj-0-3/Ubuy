@@ -18,6 +18,7 @@ import "swiper/css/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 interface Auction {
   _id: string;
@@ -34,6 +35,7 @@ interface Auction {
 }
 
 export default function HomePage() {
+  const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,12 +95,16 @@ export default function HomePage() {
             </>
           ) : (
             <>
-              <Button className="bg-white text-emerald-700 hover:bg-gray-200">
-                Login to Bid
-              </Button>
-              <Button variant="outline" className="border-white text-white hover:bg-emerald-900">
-                Sign Up
-              </Button>
+              <Link href="/sign-in" onClick={() => setIsOpen(false)}>
+                <Button className="bg-white text-emerald-700 hover:bg-gray-200">
+                  Login to Bid
+                </Button>
+              </Link>
+              <Link href="/sign-up" onClick={() => setIsOpen(false)}>
+                <Button variant="outline" className="bg-emerald-700 text-white hover:bg-gray-400">
+                  Sign Up
+                </Button>
+              </Link>
             </>
           )}
         </div>
@@ -166,6 +172,9 @@ export default function HomePage() {
                                 <p><strong>End:</strong> {new Date(auction.endTime).toLocaleString()}</p>
                                 <p><strong>Current Price:</strong> ₹{auction.currentPrice}</p>
                               </div>
+                              <Link href={`/auctions/${auction._id}`} passHref>
+                                <Button className="w-full bg-indigo-500 text-white rounded-full hover:bg-indigo-600 ">Explore More</Button>
+                              </Link>
                             </CardContent>
                           </Card>
                         </motion.div>
@@ -178,42 +187,7 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* How It Works */}
-      <motion.section
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true }}
-        className="bg-white py-12 px-6 text-center"
-      >
-        <h2 className="text-2xl font-semibold text-emerald-800 mb-6">How It Works</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            {
-              icon: <UserIcon className="text-emerald-600" />,
-              title: "Sign Up",
-              desc: "Create your free account to start bidding.",
-            },
-            {
-              icon: <HammerIcon className="text-emerald-600" />,
-              title: "Place Bids",
-              desc: "Join live auctions and place competitive bids.",
-            },
-            {
-              icon: <ShieldCheckIcon className="text-emerald-600" />,
-              title: "Win & Secure",
-              desc: "Secure payments and trusted transactions.",
-            },
-          ].map((step, index) => (
-            <div key={index} className="flex flex-col items-center">
-              <div className="p-4 bg-emerald-200 rounded-full mb-3">{step.icon}</div>
-              <h3 className="text-lg font-semibold text-emerald-800">{step.title}</h3>
-              <p className="text-gray-600">{step.desc}</p>
-            </div>
-          ))}
-        </div>
-      </motion.section>
-  
+
       {/* Mega Auction */}
       <motion.section
         initial={{ opacity: 0 }}
@@ -228,7 +202,7 @@ export default function HomePage() {
       </motion.section>
 
 
-      {/* Feautred Categories */}
+      {/* Featured Categories */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -320,44 +294,6 @@ export default function HomePage() {
             </div>
           ))}
         </div>
-      </motion.section>
-
-
-
-      {/* Newsletter */}
-      <motion.section
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="bg-emerald-600 text-white py-12 px-6 text-center"
-      >
-        <h2 className="text-2xl font-semibold mb-4">Stay Updated!</h2>
-        <p className="mb-6">Subscribe to our newsletter to get the latest auction alerts.</p>
-        <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="px-4 py-2 rounded-md text-emerald-700 w-full sm:w-64"
-          />
-          <Button className="bg-white text-emerald-700 hover:bg-emerald-100">Subscribe</Button>
-        </div>
-      </motion.section>
-
-
-      {/* Call to Action */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true }}
-        className="bg-emerald-700 text-white text-center py-12 px-6"
-      >
-        <h2 className="text-2xl font-semibold mb-4">Want to Sell Your Items?</h2>
-        <p className="mb-6">List your items and start earning today!</p>
-        <Button className="bg-white text-emerald-700 hover:bg-gray-200">
-          {session ? "Start Selling" : "Login to Start Selling"}
-        </Button>
       </motion.section>
     </div>
   );
