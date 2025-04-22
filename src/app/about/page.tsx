@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { BadgePercent, Hammer, HammerIcon, ShieldCheck, ShieldCheckIcon, TrophyIcon, UserRound, UsersIcon } from "lucide-react";
+import { BadgePercent, Hammer, HammerIcon, ShieldCheck, ShieldCheckIcon, TrophyIcon, UsersIcon } from "lucide-react";
 
 const MotionLink = motion(Link);
 
