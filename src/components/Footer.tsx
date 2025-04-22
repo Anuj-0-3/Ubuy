@@ -46,7 +46,7 @@ export default function Footer() {
                     <h3 className="text-lg font-semibold text-white mb-4">Connect with Us</h3>
                     <p className="text-sm flex items-center mb-3">
                         <Mail className="w-4 h-4 mr-2" />
-                        <a href="mailto:support@auctionify.com" className="hover:text-white">support@auctionify.com</a>
+                        <a href="mailto:support@auctionify.com" className="hover:text-white">support@ubuy.com</a>
                     </p>
 
                     <div className="flex space-x-5 mt-4">

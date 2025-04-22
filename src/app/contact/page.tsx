@@ -8,11 +8,11 @@ export default function ContactPage() {
   return (
     <>
       <Head>
-        <title>Contact Us | TechSaviour</title>
-        <meta name="description" content="Get in touch with TechSaviour. Reach out for support, inquiries, or feedback through our contact form or contact details." />
-        <meta property="og:title" content="Contact Us | TechSaviour" />
-        <meta property="og:description" content="Get in touch with TechSaviour. Reach out for support, inquiries, or feedback through our contact form or contact details." />
-        <meta name="keywords" content="Contact, TechSaviour, Support, Feedback, Help, Inquiry" />
+        <title>Contact Us | U-Buy</title>
+        <meta name="description" content="Get in touch with U-Buy. Reach out for support, inquiries, or feedback through our contact form or contact details." />
+        <meta property="og:title" content="Contact Us | U-Buy" />
+        <meta property="og:description" content="Get in touch with U-Buy. Reach out for support, inquiries, or feedback through our contact form or contact details." />
+        <meta name="keywords" content="Contact, U-Buy, Support, Feedback, Help, Inquiry" />
       </Head>
 
       <section className="max-w-5xl mx-auto p-6 sm:p-10 space-y-14">
@@ -41,7 +41,7 @@ export default function ContactPage() {
             {
               icon: <MailIcon className="text-emerald-600" />,
               title: "Email",
-              value: "support@techsaviour.in",
+              value: "support@ubuy.in",
             },
             {
               icon: <PhoneIcon className="text-emerald-600" />,

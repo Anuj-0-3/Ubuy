@@ -1,148 +1,169 @@
 "use client";
 
-import Head from "next/head";
 import { motion } from "framer-motion";
-import { FaPeopleCarry, FaAward, FaRocket, FaHeart, FaLightbulb, FaUsers } from "react-icons/fa";
-import { JSX } from "react";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { BadgePercent, Hammer, HammerIcon, ShieldCheck, ShieldCheckIcon, TrophyIcon, UserRound, UsersIcon } from "lucide-react";
+
+const MotionLink = motion(Link);
 
 export default function AboutPage() {
+  const { data: session } = useSession();
+
+  const features = [
+    {
+      icon: <BadgePercent size={32} className="text-emerald-600" />,
+      title: "Best Deals",
+      desc: "Unlock incredible auction deals on premium products.",
+      color: "bg-emerald-100",
+    },
+    {
+      icon: <Hammer size={32} className="text-rose-600" />,
+      title: "Live Auctions",
+      desc: "Experience real-time bidding with live price updates.",
+      color: "bg-rose-100",
+    },
+    {
+      icon: <ShieldCheck size={32} className="text-indigo-600" />,
+      title: "Trusted & Secure",
+      desc: "Your transactions are protected and fully transparent.",
+      color: "bg-indigo-100",
+    },
+  ];
+
   return (
-    <>
-      <Head>
-        <title>About Us | TechSaviour</title>
-        <meta name="description" content="Discover TechSaviour — our mission, values, inspiring story, and passionate team driving digital innovation forward." />
-        <meta property="og:title" content="About TechSaviour" />
-        <meta property="og:description" content="Discover TechSaviour — our mission, values, inspiring story, and passionate team driving digital innovation forward." />
-        <meta name="keywords" content="TechSaviour, About Us, Company Story, Our Mission, Web Development, Innovation, Team" />
-      </Head>
+    <div className="bg-gray-50 min-h-screen pt-16 ">
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7 }}
+        className="text-center px-6 max-w-4xl mx-auto"
+      >
+        <h1 className="text-4xl font-extrabold text-emerald-800 mb-4">Welcome to Ubuy</h1>
+        <p className="text-gray-600 text-lg mb-10">
+          Your trusted online auction platform for amazing deals, unique products, and secure
+          transactions. Join thousands of happy bidders today!
+        </p>
+      </motion.section>
 
-      <section className="max-w-6xl mx-auto p-6 sm:p-10 space-y-14">
-        {/* Hero Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center"
-        >
-          <h1 className="text-5xl font-extrabold text-gray-800">About Us</h1>
-          <p className="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">
-            We’re a creative tech company focused on delivering innovative solutions that make people’s digital lives easier, better, and more meaningful.
-          </p>
-        </motion.div>
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7 }}
+        viewport={{ once: true }}
+        className="grid grid-cols-1 md:grid-cols-3 gap-6 px-6 max-w-6xl mx-auto"
+      >
+        {features.map((feature, i) => (
+          <motion.div
+            key={i}
+            whileHover={{ scale: 1.05 }}
+            className={`rounded-2xl shadow-lg p-6 ${feature.color} flex flex-col items-center text-center`}
+          >
+            <div className="p-3 rounded-full bg-white mb-4">{feature.icon}</div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">{feature.title}</h3>
+            <p className="text-gray-600">{feature.desc}</p>
+          </motion.div>
+        ))}
+      </motion.section>
 
-        {/* Mission, Values, Vision */}
-        <div className="grid gap-8 md:grid-cols-3">
-          <AboutCard
-            icon={<FaRocket className="text-white text-4xl" />}
-            title="Our Mission"
-            description="To empower individuals and businesses by creating fast, reliable, and user-friendly digital experiences."
-            color="bg-emerald-500"
-          />
-          <AboutCard
-            icon={<FaPeopleCarry className="text-white text-4xl" />}
-            title="Our Values"
-            description="Innovation, honesty, and a relentless commitment to providing value to our community."
-            color="bg-indigo-500"
-          />
-          <AboutCard
-            icon={<FaAward className="text-white text-4xl" />}
-            title="Our Vision"
-            description="To be a globally recognized brand known for setting standards in quality, creativity, and customer satisfaction."
-            color="bg-pink-500"
-          />
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7 }}
+        viewport={{ once: true }}
+        className="bg-white mt-20 py-12 px-6 text-center"
+      >
+        <h2 className="text-2xl font-semibold text-emerald-800 mb-6">How It Works</h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
+          {[
+            {
+              icon: <UsersIcon className="text-emerald-700" size={32} />,
+              title: "Create Account",
+              desc: "Quickly sign up and dive into the action.",
+            },
+            {
+              icon: <HammerIcon className="text-emerald-700" size={32} />,
+              title: "Join Auctions",
+              desc: "Find live auctions and place your bids.",
+            },
+            {
+              icon: <TrophyIcon className="text-emerald-700" size={32} />,
+              title: "Win Big",
+              desc: "Beat the competition and secure your deals.",
+            },
+            {
+              icon: <ShieldCheckIcon className="text-emerald-700" size={32} />,
+              title: "Pay Securely",
+              desc: "Complete transactions through our secure system.",
+            },
+          ].map((step, index) => (
+            <motion.div
+              key={index}
+              whileHover={{ y: -8, scale: 1.03 }}
+              transition={{ type: "spring", stiffness: 120 }}
+              className="p-6 bg-emerald-50 rounded-2xl border border-emerald-100 flex flex-col items-center text-center shadow-md"
+            >
+              <div className="p-3 bg-white rounded-full shadow-sm mb-4">{step.icon}</div>
+              <h3 className="text-xl font-semibold text-emerald-800 mb-2">{step.title}</h3>
+              <p className="text-gray-600">{step.desc}</p>
+            </motion.div>
+          ))}
         </div>
+      </motion.section>
 
-        {/* Who We Are */}
-        <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="text-3xl font-bold mb-4 text-gray-800">Who We Are</h2>
-          <p className="text-lg text-gray-600 leading-relaxed">
-            TechSaviour is a passionate collective of designers, developers, and thinkers united by a common goal — to bring meaningful technology solutions to life. We believe that technology should be beautiful, easy to use, and accessible to everyone.
-          </p>
-        </motion.div>
-
-        {/* Our Story (Timeline) */}
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="text-3xl font-bold mb-6 text-gray-800">Our Story</h2>
-          <div className="space-y-6 border-l-4 border-emerald-500 pl-6">
-            <div>
-              <h3 className="text-xl font-semibold text-emerald-600">2023 — TechSaviour Begins</h3>
-              <p className="text-gray-600 mt-2">A group of passionate tech enthusiasts come together to build impactful, user-first digital products.</p>
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold text-emerald-600">2024 — First Major Projects</h3>
-              <p className="text-gray-600 mt-2">We partnered with clients across industries and launched several successful web platforms and applications.</p>
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold text-emerald-600">2025 — Scaling Up</h3>
-              <p className="text-gray-600 mt-2">Expanding our team, introducing AI-powered solutions, and pushing the boundaries of innovation.</p>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Why Choose Us */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="text-3xl font-bold mb-6 text-gray-800">Why Choose Us</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <FeatureCard icon={<FaHeart className="text-red-500 text-3xl" />} title="Customer Focused" />
-            <FeatureCard icon={<FaLightbulb className="text-yellow-500 text-3xl" />} title="Creative Solutions" />
-            <FeatureCard icon={<FaUsers className="text-purple-500 text-3xl" />} title="Talented Team" />
-          </div>
-        </motion.div>
-      </section>
-    </>
-  );
-}
-
-interface AboutCardProps {
-  icon: JSX.Element;
-  title: string;
-  description: string;
-  color: string;
-}
-
-function AboutCard({ icon, title, description, color }: AboutCardProps) {
-  return (
-    <motion.article
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.98 }}
-      className={`rounded-2xl p-6 text-white shadow-lg ${color} flex flex-col items-center text-center transition-all`}
-    >
-      <div className="mb-4">{icon}</div>
-      <h2 className="text-2xl font-bold mb-2">{title}</h2>
-      <p className="text-base leading-relaxed">{description}</p>
-    </motion.article>
-  );
-}
-
-interface FeatureCardProps {
-  icon: JSX.Element;
-  title: string;
-}
-
-function FeatureCard({ icon, title }: FeatureCardProps) {
-  return (
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      className="flex flex-col items-center bg-white rounded-xl shadow p-6 text-center transition-all"
-    >
-      <div className="mb-3">{icon}</div>
-      <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-    </motion.div>
+      {/* Conditional CTA section */}
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+        className="text-center mt-16"
+      >
+        {session ? (
+          <motion.section
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white py-20 px-6 text-center"
+          >
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Welcome Back to Ubuy, {session.user?.name || "Bidder"}!
+            </h2>
+            <p className="text-lg mb-8 max-w-2xl mx-auto text-gray-200">
+              Ready to win your next great deal? Explore live auctions, outbid your rivals, and claim exclusive offers reserved for our members.
+            </p>
+            <MotionLink
+              href="/auctions"
+              whileHover={{ scale: 1.05 }}
+              className="inline-block px-8 py-4 text-emerald-600 bg-white font-semibold rounded-xl shadow-lg"
+            >
+              Go to Live Auctions<span className="inline-block p-1.5 ml-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            </MotionLink>
+          </motion.section>
+        ) : (
+          <motion.section
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white py-20 px-6 text-center"
+          >
+            <h2 className="text-4xl font-bold mb-4">Start Bidding Today!</h2>
+            <p className="text-lg mb-8 max-w-2xl mx-auto">
+              Join thousands of happy bidders on Ubuy — secure deals, beat competitors, and enjoy a safe auction experience.
+            </p>
+            <MotionLink
+              href="/sign-up"
+              whileHover={{ scale: 1.05 }}
+              className="inline-block px-8 py-4 text-emerald-600 bg-white font-semibold rounded-xl shadow-lg"
+            >
+              Join U-Buy Now
+            </MotionLink>
+          </motion.section>
+        )}
+      </motion.section>
+    </div>
   );
 }
 
