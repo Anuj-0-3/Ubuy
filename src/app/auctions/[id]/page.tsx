@@ -60,8 +60,8 @@ export default function AuctionDetailPage() {
 
       // ✅ Safe live update
       setAuction((prevAuction) => {
-        if (!prevAuction) return prevAuction;
-
+        if (!prevAuction || !result.updatedAuction) return prevAuction;
+  
         return {
           ...prevAuction,
           currentPrice: result.updatedAuction.currentPrice,
@@ -137,7 +137,7 @@ export default function AuctionDetailPage() {
             {auction && (
               <div className="flex items-center gap-2 text-lg font-semibold">
                 <IndianRupee className="text-green-600" />
-                Current Price: ₹{auction.currentPrice}
+                Current Price: ₹{auction?.currentPrice}
               </div>
             )}
 

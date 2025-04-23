@@ -30,6 +30,8 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     return NextResponse.json({ error: "Invalid Auction ID" }, { status: 400 });
   }
 
+  
+
   // Get the request body
   const body = await req.json();
   const { bidAmount } = body;
@@ -43,6 +45,11 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   const auction = await Auction.findById(auctionId);
   if (!auction) {
     return NextResponse.json({ error: "Auction not found" }, { status: 404 });
+  }
+
+   // 🔐 Prevent owner from bidding on own auction
+   if (auction.createdBy.toString() === session.user.id) {
+    return NextResponse.json({ error: "You cannot bid on your own auction" }, { status: 403 });
   }
 
   // ✅ Auto-close auction if expired

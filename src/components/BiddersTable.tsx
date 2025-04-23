@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 
 interface Bidders {
   _id: string;
-  bidder: string;
+  bidder: { name: string };
   amount: number;
   bidTime: string;
   bidderName?: string;

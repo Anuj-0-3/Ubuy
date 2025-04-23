@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -36,6 +36,7 @@ interface Auction {
 const MyAuctionsPage = () => {
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const fetchAuctions = async () => {
     try {
@@ -58,7 +59,6 @@ const MyAuctionsPage = () => {
   };
 
   const handleCloseAuction = async (auctionId: string) => {
-    console.log("👉 Closing auction with ID:", auctionId);
     try {
       const res = await fetch("/api/auction/close", {
         method: "POST",
@@ -70,6 +70,27 @@ const MyAuctionsPage = () => {
       if (!res.ok) throw new Error(result.message || "Failed to close auction");
 
       toast.success("Auction closed successfully!");
+      fetchAuctions();
+    } catch (err: any) {
+      toast.error(err.message || "Something went wrong");
+    }
+  };
+
+  const handleDeleteAuction = async () => {
+    if (!deleteId) return;
+
+    try {
+      const res = await fetch("/api/auction/delete", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ auctionId: deleteId }),
+      });
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to delete auction");
+
+      toast.success("Auction deleted successfully!");
+      setDeleteId(null);
       fetchAuctions();
     } catch (err: any) {
       toast.error(err.message || "Something went wrong");
@@ -98,8 +119,38 @@ const MyAuctionsPage = () => {
               auctions.map((auction) => (
                 <Card
                   key={auction._id}
-                  className="bg-white/10 border border-emerald-400/40 shadow-lg rounded-2xl transform transition-transform duration-300 hover:scale-105 hover:shadow-xl"
+                  className="relative bg-white/10 border border-emerald-400/40 shadow-lg rounded-2xl overflow-hidden"
                 >
+                  {/* 🔴 Top-right Delete Icon */}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="absolute top-2 right-2 p-2 rounded-full text-red-500 hover:bg-red-100"
+                        onClick={() => setDeleteId(auction._id)}
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Auction?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. Are you sure you want to delete this auction?
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-red-600 hover:bg-red-700 text-white"
+                          onClick={handleDeleteAuction}
+                        >
+                          Yes, delete it
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+
                   <CardContent className="p-6 space-y-4">
                     <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
                     <p className="text-gray-700">{auction.description}</p>
@@ -120,7 +171,7 @@ const MyAuctionsPage = () => {
                     </div>
 
                     {auction.status === "active" && (
-                      <AlertDialog >
+                      <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button className="w-full mt-4 bg-red-500 text-white hover:bg-red-600">
                             Close Auction
