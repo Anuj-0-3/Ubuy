@@ -48,6 +48,10 @@ export default function ProfilePage() {
                   <LogOut className="w-5 h-5" />
                   Sign Out
                 </Button>
+                <p className="text-sm text-gray-600 mt-2">
+                  Logged in via: <strong>Google</strong>
+                </p>
+
               </CardContent>
             </Card>
           ) : (

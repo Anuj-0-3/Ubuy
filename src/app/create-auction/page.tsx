@@ -20,6 +20,14 @@ const CreateAuction = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  
+   // Set minimum date to current time
+  const getMinDateTime = () => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); // correct for timezone
+    return now.toISOString().slice(0, 16); // format for datetime-local
+  };
+  
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -128,6 +136,7 @@ const CreateAuction = () => {
                     value={formData.startTime}
                     onChange={handleChange}
                     required
+                    min={getMinDateTime()}
                     className="w-full p-2 border rounded"
                   />
                 </div>
