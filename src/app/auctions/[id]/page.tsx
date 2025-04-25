@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import BiddersTable from "@/components/BiddersTable";
+import BidSocket from "@/components/BidSocket"; // Import the BidSocket component
 
 type Bidder = {
   _id: string;
@@ -61,7 +62,7 @@ export default function AuctionDetailPage() {
       // ✅ Safe live update
       setAuction((prevAuction) => {
         if (!prevAuction || !result.updatedAuction) return prevAuction;
-  
+
         return {
           ...prevAuction,
           currentPrice: result.updatedAuction.currentPrice,
@@ -111,6 +112,32 @@ export default function AuctionDetailPage() {
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+      {/* Integrate the BidSocket component here */}
+      <BidSocket
+  auctionId={auction._id}
+  onBidReceived={(data) => {
+    // Make sure the data structure matches what you expect
+    setAuction((prev) => {
+      if (!prev) return prev;
+      
+      // Create a properly structured bidder object
+      const newBidder = {
+        _id: data._id,
+        bidder: data.bidder,
+        amount: data.amount,
+        bidTime: data.bidTime
+      };
+      
+      // Use a more targeted update
+      return {
+        ...prev,
+        currentPrice: data.amount,
+        bidders: [newBidder, ...prev.bidders].slice(0, 5)
+      };
+    });
+  }}
+/>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Side Image */}
         <div className="flex justify-center">
@@ -137,7 +164,7 @@ export default function AuctionDetailPage() {
             {auction && (
               <div className="flex items-center gap-2 text-lg font-semibold">
                 <IndianRupee className="text-green-600" />
-                Current Price: ₹{auction?.currentPrice}
+                Current Price: ₹{auction.currentPrice}
               </div>
             )}
 
@@ -167,7 +194,6 @@ export default function AuctionDetailPage() {
             </div>
           )}
 
-
           <div className="border rounded-lg overflow-hidden mt-6">
             <h2 className="bg-gray-100 px-4 py-2 font-semibold text-lg">
               Top 5 Bidders
@@ -179,4 +205,5 @@ export default function AuctionDetailPage() {
     </div>
   );
 }
+
 

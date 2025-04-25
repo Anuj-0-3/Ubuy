@@ -148,6 +148,7 @@ const CreateAuction = () => {
                     name="endTime"
                     value={formData.endTime}
                     onChange={handleChange}
+                    min={getMinDateTime()}
                     required
                     className="w-full p-2 border rounded"
                   />
