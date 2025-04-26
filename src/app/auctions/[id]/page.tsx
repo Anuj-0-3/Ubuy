@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import BiddersTable from "@/components/BiddersTable";
-import BidSocket from "@/components/BidSocket"; // Import the BidSocket component
 
 type Bidder = {
   _id: string;
@@ -44,38 +43,34 @@ export default function AuctionDetailPage() {
       toast.error("Please enter a valid bid amount.");
       return;
     }
-
+  
     try {
       const res = await fetch(`/api/auction/bid/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ bidAmount }),
       });
-
+  
       const result = await res.json();
       if (!res.ok) {
         throw new Error(result.error || "Failed to place bid");
       }
-
+  
       toast.success("Bid placed successfully!");
-
-      // ✅ Safe live update
-      setAuction((prevAuction) => {
-        if (!prevAuction || !result.updatedAuction) return prevAuction;
-
-        return {
-          ...prevAuction,
-          currentPrice: result.updatedAuction.currentPrice,
-          bidders: result.updatedAuction.bidders,
-        };
-      });
-
+  
+      // ✅ Instead of local update, fetch updated auction
+      const updatedRes = await fetch(`/api/auction/${id}/details`);
+      const updatedData = await updatedRes.json();
+      if (updatedData.success) {
+        setAuction(updatedData.auction);
+      }
+  
       setBidInputs({ ...bidInputs, [id]: "" });
-    } catch  {
+    } catch {
       toast.error("Something went wrong");
     }
   };
-
+  
   useEffect(() => {
     async function fetchAuction() {
       setLoading(true);
@@ -112,31 +107,6 @@ export default function AuctionDetailPage() {
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-      {/* Integrate the BidSocket component here */}
-      <BidSocket
-  auctionId={auction._id}
-  onBidReceived={(data) => {
-    // Make sure the data structure matches what you expect
-    setAuction((prev) => {
-      if (!prev) return prev;
-      
-      // Create a properly structured bidder object
-      const newBidder = {
-        _id: data._id,
-        bidder: data.bidder,
-        amount: data.amount,
-        bidTime: data.bidTime
-      };
-      
-      // Use a more targeted update
-      return {
-        ...prev,
-        currentPrice: data.amount,
-        bidders: [newBidder, ...prev.bidders].slice(0, 5)
-      };
-    });
-  }}
-/>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Side Image */}
@@ -198,7 +168,7 @@ export default function AuctionDetailPage() {
             <h2 className="bg-gray-100 px-4 py-2 font-semibold text-lg">
               Top 5 Bidders
             </h2>
-            <BiddersTable bidders={auction.bidders.slice(0, 5)} />
+            <BiddersTable bidders={auction.bidders} />
           </div>
         </div>
       </div>
