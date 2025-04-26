@@ -35,7 +35,6 @@ interface Auction {
 }
 
 export default function HomePage() {
-  const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -95,12 +94,12 @@ export default function HomePage() {
             </>
           ) : (
             <>
-              <Link href="/sign-in" onClick={() => setIsOpen(false)}>
+              <Link href="/sign-in">
                 <Button className="bg-white text-emerald-700 hover:bg-gray-200">
                   Login to Bid
                 </Button>
               </Link>
-              <Link href="/sign-up" onClick={() => setIsOpen(false)}>
+              <Link href="/sign-up" >
                 <Button variant="outline" className="bg-emerald-700 text-white hover:bg-gray-400">
                   Sign Up
                 </Button>

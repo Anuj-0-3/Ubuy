@@ -6,7 +6,7 @@ import { isValidObjectId } from "mongoose";
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   await dbConnect();
 
-  const { id } = await params;  // ✅ here we safely extract params.id
+  const { id } = params;  
 
   if (!isValidObjectId(id)) {
     return NextResponse.json(

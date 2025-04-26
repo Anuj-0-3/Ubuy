@@ -3,7 +3,7 @@ import dbConnect from "@/lib/dbConnect";
 import Auction from "@/models/Auction";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
-import mongoose from "mongoose";
+
 
 export async function POST(req: Request) {
   await dbConnect();
@@ -15,7 +15,6 @@ export async function POST(req: Request) {
   }
 
   try {
-    const userId = new mongoose.Types.ObjectId(session.user._id);  // now using _id populated in JWT callback
     const body = await req.json();
     const { title, description, image, startingPrice, startTime, endTime } = body;
 

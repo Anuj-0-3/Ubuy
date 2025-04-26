@@ -71,8 +71,8 @@ const MyAuctionsPage = () => {
 
       toast.success("Auction closed successfully!");
       fetchAuctions();
-    } catch (err: any) {
-      toast.error(err.message || "Something went wrong");
+    } catch  {
+      toast.error( "Something went wrong");
     }
   };
 
@@ -92,8 +92,8 @@ const MyAuctionsPage = () => {
       toast.success("Auction deleted successfully!");
       setDeleteId(null);
       fetchAuctions();
-    } catch (err: any) {
-      toast.error(err.message || "Something went wrong");
+    } catch {
+      toast.error( "Something went wrong");
     }
   };
 

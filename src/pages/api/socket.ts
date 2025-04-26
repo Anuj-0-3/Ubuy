@@ -1,6 +1,5 @@
 // src/pages/api/socket.ts
 import { Server as IOServer } from "socket.io";
-import { Server as HTTPServer } from "http";
 import type { NextApiRequest } from "next";
 import type { NextApiResponseServerIO } from "@/types/next.d.ts";
 
@@ -8,7 +7,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponseServerI
   if (!res.socket.server.io) {
     console.log("🔌 Initializing Socket.io server...");
 
-    const httpServer: HTTPServer = res.socket.server as any;
+    const httpServer = res.socket.server ;
     const io = new IOServer(httpServer, {
       path: "/api/socketio",
     });

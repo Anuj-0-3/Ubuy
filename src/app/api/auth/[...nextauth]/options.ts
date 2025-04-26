@@ -12,11 +12,18 @@ export const authOptions: NextAuthOptions = {
       id: 'credentials',
       name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'text', placeholder: 'user@example.com' },
+        identifier: { label: 'Email or Username', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials: any): Promise<any> {
+      //@ts-expect-error : Ignoring type error here 
+      async authorize(credentials) {
+        // Ensuring dbConnect is called to connect to MongoDB
         await dbConnect();
+
+        if (!credentials || !credentials.identifier || !credentials.password) {
+          throw new Error('Missing credentials');
+        }
+
         try {
           const user = await User.findOne({
             $or: [
@@ -24,24 +31,42 @@ export const authOptions: NextAuthOptions = {
               { username: credentials.identifier },
             ],
           });
+
           if (!user) {
-            throw new Error('No user found with this email');
+            throw new Error('No user found with this email/username');
           }
+
+          // Check if the user is verified
+          if (!user.isVerified) {
+            throw new Error('Please verify your account before logging in');
+          }
+
+          // Compare password
           const isPasswordCorrect = await bcrypt.compare(
             credentials.password,
             user.password
           );
+
           if (isPasswordCorrect) {
+            // If password matches, return user object
             return {
-              email: user.email,
+              _id: user.id.toString(),
               username: user.username,
+              email: user.email,
+              isVerified: user.isVerified,
+              isAcceptingMessages: user.isAcceptingMessages,
             };
           } else {
             throw new Error('Incorrect password');
           }
-        } catch (err: any) {
-          throw new Error(err);
+        } catch (err) {
+          if (err instanceof Error) {
+            throw new Error(err.message || 'An error occurred during authentication');
+          } else {
+            // Fallback in case the error doesn't have the expected shape
+            throw new Error('An unknown error occurred during authentication');
         }
+      }
       },
     }),
     GoogleProvider({

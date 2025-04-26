@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 interface AuctionImageUploaderProps {
   onUpload: (imageUrl: string) => void;
@@ -48,7 +49,17 @@ const AuctionImageUploader: React.FC<AuctionImageUploaderProps> = ({ onUpload })
   return (
     <div className="p-4 border rounded-lg shadow-md w-96">
       <input type="file" onChange={handleFileChange} className="mb-2" />
-      {preview && <img src={preview} alt="Preview" className="w-full mb-2" />}
+      {preview &&
+        <div className="relative w-full h-64 mb-2">
+        <Image
+          src={preview}
+          alt="Preview"
+          layout="fill"
+          objectFit="contain"
+          className="rounded-lg"
+        />
+      </div>
+       }
       <button
         onClick={handleUpload}
         className="bg-blue-500 text-white px-4 py-2 rounded-lg"
