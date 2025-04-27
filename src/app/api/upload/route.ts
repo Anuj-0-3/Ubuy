@@ -9,38 +9,21 @@ cloudinary.config({
 });
 
 export async function POST(req: Request) {
+  console.log("Incoming upload request!");
+  
   try {
     const formData = await req.formData();
-    const file = formData.get("file") as File | null;
+    const file = formData.get("file");
 
     if (!file) {
-      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+      return NextResponse.json({ error: "No file found" }, { status: 400 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const stream = Readable.from(buffer);
+    console.log("File received:", (file as File).name);
 
-    const uploadedUrl = await new Promise<string>((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: "auction_images" },
-        (error, result) => {
-          if (error) {
-            reject(error);  
-          } else if (result?.secure_url) {
-            resolve(result.secure_url);
-          } else {
-            reject(new Error("Upload failed with no URL"));
-          }
-        }
-      );
-
-      stream.pipe(uploadStream);
-    });
-
-    return NextResponse.json({ url: uploadedUrl });
-
+    return NextResponse.json({ message: "File received successfully" });
   } catch (error) {
-    console.error("Error uploading file:",error);
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+    console.error("Error inside POST:", error);
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }
