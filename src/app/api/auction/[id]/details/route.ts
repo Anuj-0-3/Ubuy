@@ -1,12 +1,15 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Auction from "@/models/Auction";
 import { isValidObjectId } from "mongoose";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   await dbConnect();
 
-  const { id } = params;  
+  const { id } = params;
 
   if (!isValidObjectId(id)) {
     return NextResponse.json(

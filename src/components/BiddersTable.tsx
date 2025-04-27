@@ -33,7 +33,7 @@ export default function BiddersTable({ bidders }: { bidders: Bidder[] }) {
               className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
             >
               <td className="p-2 ml-3 flex items-center gap-2">
-                {bid.bidder?.name || "Anonymous"}
+                {bid.bidderName || "Anonymous"}
               </td>
               <td className="p-2">₹{bid.amount}</td>
               <td className="p-2">{new Date(bid.bidTime).toLocaleString()}</td>
