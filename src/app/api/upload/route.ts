@@ -1,6 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import { NextResponse } from "next/server";
-import { Readable } from "stream";
+// import { Readable } from "stream";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME as string,
