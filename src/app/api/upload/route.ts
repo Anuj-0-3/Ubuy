@@ -20,22 +20,27 @@ export async function POST(req: Request) {
     const buffer = Buffer.from(await file.arrayBuffer());
     const stream = Readable.from(buffer);
 
-    return new Promise((resolve, reject) => {
+    const uploadedUrl = await new Promise<string>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         { folder: "auction_images" },
         (error, result) => {
           if (error) {
-            reject(NextResponse.json({ error: error.message }, { status: 500 }));
+            reject(error);  
+          } else if (result?.secure_url) {
+            resolve(result.secure_url);
           } else {
-            resolve(NextResponse.json({ url: result?.secure_url }));
+            reject(new Error("Upload failed with no URL"));
           }
         }
       );
 
       stream.pipe(uploadStream);
     });
+
+    return NextResponse.json({ url: uploadedUrl });
+
   } catch (error) {
     console.error("Error uploading file:", error);
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+    return NextResponse.json({ error: (error as any)?.message || "Upload failed" }, { status: 500 });
   }
 }
