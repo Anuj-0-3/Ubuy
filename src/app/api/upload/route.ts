@@ -1,6 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import { NextResponse } from "next/server";
-// import { Readable } from "stream";
+import { Readable } from "stream";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME as string,
@@ -9,21 +9,45 @@ cloudinary.config({
 });
 
 export async function POST(req: Request) {
-  console.log("Incoming upload request!");
-  
   try {
     const formData = await req.formData();
-    const file = formData.get("file");
+    const file = formData.get("file") as File | null;
 
     if (!file) {
-      return NextResponse.json({ error: "No file found" }, { status: 400 });
+      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
-    console.log("File received:", (file as File).name);
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const stream = Readable.from(buffer);
 
-    return NextResponse.json({ message: "File received successfully" });
+    const uploadedUrl = await new Promise<string>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: "auction_images" },
+        (error, result) => {
+          if (error) {
+            reject(error);  
+          } else if (result?.secure_url) {
+            resolve(result.secure_url);
+          } else {
+            reject(new Error("Upload failed with no URL"));
+          }
+        }
+      );
+
+      stream.pipe(uploadStream);
+    });
+
+    
+    const response = NextResponse.json({ url: uploadedUrl });
+
+    response.headers.set('Access-Control-Allow-Origin', '*'); 
+    response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS'); 
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization'); 
+
+    return response;
+
   } catch (error) {
-    console.error("Error inside POST:", error);
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    console.error("Error uploading file:",error);
+    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }
