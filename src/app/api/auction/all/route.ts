@@ -2,6 +2,8 @@ import dbConnect from "@/lib/dbConnect";
 import { NextResponse } from "next/server";
 import Auction from "@/models/Auction";
 import { autoCloseExpiredAuctions } from "@/lib/autoCloseExpiredAuctions";
+import "@/models/User";
+import "@/models/AuthUser";
 
 export async function GET() {
   try {
@@ -10,13 +12,20 @@ export async function GET() {
     // Automatically close expired auctions
     await autoCloseExpiredAuctions();
 
-    // Fetch auctions, populate createdBy info, sorted by endTime descending
-    const auctions = await Auction.find()
-      .populate({
+    // Fetch auctions sorted by endTime descending
+    const auctions = await Auction.find().sort({ endTime: -1 });
+
+    // Manually populate both createdBy and bidders.bidder (polymorphic)
+    await Auction.populate(auctions, [
+      {
         path: "createdBy",
-        select: "username email", // Include only these fields
-      })
-      .sort({ endTime: -1 });
+        select: "username email provider",
+      },
+      {
+        path: "bidders.bidder",
+        select: "username email provider",
+      },
+    ]);
 
     return NextResponse.json(auctions, { status: 200 });
 
@@ -28,4 +37,3 @@ export async function GET() {
     );
   }
 }
-

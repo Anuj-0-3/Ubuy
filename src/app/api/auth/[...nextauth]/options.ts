@@ -5,6 +5,20 @@ import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
 import AuthUser from '@/models/AuthUser';
+import { User as NextAuthUser } from "next-auth";
+import { DefaultSession } from "next-auth";
+
+declare module "next-auth" {
+  interface User {
+    authProvider?: string; 
+  }
+
+  interface Session {
+    user: User & { 
+      authProvider?: string;
+    };
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -17,7 +31,6 @@ export const authOptions: NextAuthOptions = {
       },
       //@ts-expect-error : Ignoring type error here 
       async authorize(credentials) {
-        // Ensuring dbConnect is called to connect to MongoDB
         await dbConnect();
 
         if (!credentials || !credentials.identifier || !credentials.password) {
@@ -54,7 +67,7 @@ export const authOptions: NextAuthOptions = {
               username: user.username,
               email: user.email,
               isVerified: user.isVerified,
-              isAcceptingMessages: user.isAcceptingMessages,
+              authProvider: 'local', 
             };
           } else {
             throw new Error('Incorrect password');
@@ -65,8 +78,8 @@ export const authOptions: NextAuthOptions = {
           } else {
             // Fallback in case the error doesn't have the expected shape
             throw new Error('An unknown error occurred during authentication');
+          }
         }
-      }
       },
     }),
     GoogleProvider({
@@ -78,55 +91,59 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
       await dbConnect();
-  
+
       if (account?.provider === 'google') {
         let existingUser = await AuthUser.findOne({ email: user.email });
-  
+
         if (!existingUser) {
           existingUser = await AuthUser.create({
             email: user.email,
             name: user.name,
             provider: 'google',
+            authProvider: 'google',
           });
         }
-  
-        // Attach id to user object for jwt callback
+
+        // Attach id and mark as AuthUser in the session
         user.id = existingUser._id.toString();
         user.username = existingUser.name;
+        user.authProvider = 'google';
       }
-  
+
       return true;
-      
     },
-  
+
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.username = user.username;
+        token.authProvider = user.authProvider; 
       }
       return token;
     },
-  
+
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id;
+        session.user.id = token.id as string;
         session.user.username = token.username;
+        session.user.authProvider = token.authProvider as string; 
       }
       return session;
     },
-  
+
     async redirect({ baseUrl }) {
       return baseUrl;
     },
   },
-  
+
   session: {
     strategy: 'jwt',
   },
-  
+
   secret: process.env.NEXTAUTH_SECRET,
 
   pages: {
     signIn: '/sign-in',
   },
 };
+

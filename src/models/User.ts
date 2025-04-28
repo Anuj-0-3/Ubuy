@@ -5,13 +5,25 @@ export interface IUser extends Document {
   email: string;
   password: string;
   createdAt: Date;
+  isVerified: boolean;
+  authProvider: string; 
 }
 
-const UserSchema: Schema = new Schema({
-  username: { type: String, required: true,unique: true },
-  email: { type: String, required: true, unique: true,match: [/.+\@.+\..+/, 'Please use a valid email address'] },
-  password: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
-});
+const UserSchema: Schema = new Schema(
+  {
+    username: { type: String, required: true, unique: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      match: [/.+\@.+\..+/, 'Please use a valid email address'],
+    },
+    password: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now },
+    isVerified: { type: Boolean, default: false },
+    authProvider: { type: String, default: "local" }
+  },
+  { timestamps: true } 
+);
 
 export default mongoose.models.User || mongoose.model<IUser>("User", UserSchema);

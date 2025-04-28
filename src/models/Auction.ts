@@ -8,6 +8,7 @@ export interface IAuction extends Document {
   currentPrice: number;
   bidders: {
     bidder: Types.ObjectId;
+    bidderModel: "User" | "AuthUser";
     bidderName?: string;
     amount: number;
     bidTime: Date;
@@ -16,6 +17,7 @@ export interface IAuction extends Document {
   endTime: Date;
   status: "active" | "closed";
   createdBy: Types.ObjectId;
+  createdByModel: "User" | "AuthUser";
 }
 
 const AuctionSchema: Schema = new Schema(
@@ -27,7 +29,16 @@ const AuctionSchema: Schema = new Schema(
     currentPrice: { type: Number, default: 0 },
     bidders: [
       {
-        bidder: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        bidder: {
+          type: Schema.Types.ObjectId,
+          required: true,
+          refPath: "bidders.bidderModel", // Dynamic reference
+        },
+        bidderModel: {
+          type: String,
+          required: true,
+          enum: ["User", "AuthUser"], // Only these models allowed
+        },
         bidderName: { type: String },
         amount: { type: Number, required: true },
         bidTime: { type: Date, default: Date.now },
@@ -36,7 +47,16 @@ const AuctionSchema: Schema = new Schema(
     startTime: { type: Date, required: true },
     endTime: { type: Date, required: true },
     status: { type: String, enum: ["active", "closed"], default: "active" },
-    createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      refPath: "createdByModel",
+    },
+    createdByModel: {
+      type: String,
+      required: true,
+      enum: ["User", "AuthUser"],
+    },
   },
   {
     timestamps: true,
