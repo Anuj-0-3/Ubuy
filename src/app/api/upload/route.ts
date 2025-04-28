@@ -9,6 +9,12 @@ cloudinary.config({
 });
 
 export async function POST(req: Request) {
+  if (req.method === "OPTIONS") {
+    const response = new NextResponse(null, { status: 204 });
+    setCorsHeaders(response);
+    return response;
+  }
+
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
@@ -25,7 +31,7 @@ export async function POST(req: Request) {
         { folder: "auction_images" },
         (error, result) => {
           if (error) {
-            reject(error);  
+            reject(error);
           } else if (result?.secure_url) {
             resolve(result.secure_url);
           } else {
@@ -37,17 +43,18 @@ export async function POST(req: Request) {
       stream.pipe(uploadStream);
     });
 
-    
     const response = NextResponse.json({ url: uploadedUrl });
-
-    response.headers.set('Access-Control-Allow-Origin', '*'); 
-    response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS'); 
-    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization'); 
-
+    setCorsHeaders(response);
     return response;
 
   } catch (error) {
-    console.error("Error uploading file:",error);
+    console.error("Error uploading file:", error instanceof Error ? error.message : error);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
+}
+
+function setCorsHeaders(response: NextResponse) {
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 }
