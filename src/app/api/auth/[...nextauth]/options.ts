@@ -5,8 +5,7 @@ import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
 import AuthUser from '@/models/AuthUser';
-import { User as NextAuthUser } from "next-auth";
-import { DefaultSession } from "next-auth";
+
 
 declare module "next-auth" {
   interface User {
