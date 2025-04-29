@@ -66,8 +66,8 @@ export default function AuctionDetailPage() {
       }
   
       setBidInputs({ ...bidInputs, [id]: "" });
-    } catch {
-      toast.error("Something went wrong");
+    } catch(error) {
+      toast.error(error instanceof Error ? error.message :"Something went wrong");
     }
   };
   

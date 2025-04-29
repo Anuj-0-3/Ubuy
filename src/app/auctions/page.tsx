@@ -81,8 +81,8 @@ const AllAuctionsPage = () => {
       const updated = await fetch("/api/auction/all");
       setAuctions(await updated.json());
       setBidInputs({ ...bidInputs, [id]: "" });
-    } catch  {
-      toast.error( "Something went wrong");
+    } catch(error)  {
+      toast.error(error instanceof Error ? error.message : "Something went wrong");
     }
   };
 
