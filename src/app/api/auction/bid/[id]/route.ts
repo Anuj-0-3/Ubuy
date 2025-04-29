@@ -75,7 +75,8 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     bidder: session.user.id,  // Assuming session.user.id is available
     amount: bidAmount,
     bidTime: new Date(),
-    bidderName: session.user.username, // Assuming session.user.username is available
+    bidderName: session.user.username,
+    bidderModel: session.user.authProvider,
   });
 
   // Update the auction's current price and highest bidder

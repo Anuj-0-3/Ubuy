@@ -66,7 +66,7 @@ export const authOptions: NextAuthOptions = {
               username: user.username,
               email: user.email,
               isVerified: user.isVerified,
-              authProvider: 'local', 
+              authProvider: 'User', 
             };
           } else {
             throw new Error('Incorrect password');
@@ -99,14 +99,14 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             name: user.name,
             provider: 'google',
-            authProvider: 'google',
+            authProvider: 'AuthUser',
           });
         }
 
         // Attach id and mark as AuthUser in the session
         user.id = existingUser._id.toString();
         user.username = existingUser.name;
-        user.authProvider = 'google';
+        user.authProvider = 'AuthUser';
       }
 
       return true;

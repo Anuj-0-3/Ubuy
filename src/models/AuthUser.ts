@@ -28,8 +28,8 @@ const AuthUserSchema: Schema = new Schema(
     },
     authProvider: {
       type: String,
-      default: 'google',  // Field for authentication provider (can be 'google' or another provider)
-      enum: ['google', 'facebook', 'github'],  // You can add more providers here
+      default: 'AuthUser',  
+      enum: ["AuthUser"],  
     },
   },
   {
