@@ -62,13 +62,14 @@ const Page = () => {
     try {
       await axios.post("/api/sign-up", data);
       toast.success("Account created successfully");
-      router.replace("/dashboard");
+      router.replace(`/verify/${data.username}`);
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : "An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
   };
+  
 
   return (
     <div className="flex justify-center  items-center min-h-screen bg-gray-50">

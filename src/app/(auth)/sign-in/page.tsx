@@ -36,7 +36,7 @@ const Page = () => {
       toast.error("Invalid credentials");
     }
     if (result?.url) {
-      router.replace("/dashboard");
+      router.replace("/");
     }
   };
 
@@ -80,9 +80,19 @@ const Page = () => {
                   <FormControl>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3 text-gray-400" size={20} />
-                      <Input type="password" placeholder="Enter your password" className="pl-10 border border-gray-300 focus:border-emerald-500 focus:ring-emerald-500" {...field} />
+                      <Input
+                        type="password"
+                        placeholder="Enter your password"
+                        className="pl-10 border border-gray-300 focus:border-emerald-500 focus:ring-emerald-500"
+                        {...field}
+                      />
                     </div>
                   </FormControl>
+                  <div className="text-right mt-1">
+                    <Link href="/forgot-password" className="text-sm text-emerald-500 hover:underline">
+                      Forgot Password?
+                    </Link>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}

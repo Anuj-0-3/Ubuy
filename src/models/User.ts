@@ -6,7 +6,9 @@ export interface IUser extends Document {
   password: string;
   createdAt: Date;
   isVerified: boolean;
-  authProvider: string; 
+  verificationcode: string;
+  authProvider: string;
+  verificationCodeExpiry: Date; 
 }
 
 const UserSchema: Schema = new Schema(
@@ -21,6 +23,8 @@ const UserSchema: Schema = new Schema(
     password: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
     isVerified: { type: Boolean, default: false },
+    verificationcode: { type: String, default: "" },
+    verificationCodeExpiry: { type: Date, default: Date.now },
     authProvider: { type: String, default: "local" }
   },
   { timestamps: true } 
