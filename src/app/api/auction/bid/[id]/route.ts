@@ -1,15 +1,23 @@
+// app/api/auction/bid/route.ts
 import dbConnect from "@/lib/dbConnect";
 import Auction from "@/models/Auction";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../auth/[...nextauth]/options";
 import mongoose from "mongoose";
+import Pusher from "pusher";
+
+// Initialize Pusher
+const pusher = new Pusher({
+  appId: process.env.PUSHER_APP_ID!,
+  key: process.env.PUSHER_KEY!,
+  secret: process.env.PUSHER_SECRET!,
+  cluster: process.env.PUSHER_CLUSTER!,
+  useTLS: true,
+});
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
-  // Await params to ensure you have access to its properties
-  const { id: auctionId } = await params; // Awaiting params before using auctionId
-
-  // Get the current session
+  const { id: auctionId } = params; // Get auction ID from params
   const session = await getServerSession(authOptions);
 
   // Unauthorized if no session or user email
@@ -25,12 +33,10 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   // Connect to the database
   await dbConnect();
 
-  // Validate auctionId (ensure it's a valid MongoDB ObjectId)
+  // Validate auctionId
   if (!mongoose.Types.ObjectId.isValid(auctionId)) {
     return NextResponse.json({ error: "Invalid Auction ID" }, { status: 400 });
   }
-
-  
 
   // Get the request body
   const body = await req.json();
@@ -47,12 +53,12 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     return NextResponse.json({ error: "Auction not found" }, { status: 404 });
   }
 
-   // 🔐 Prevent owner from bidding on own auction
-   if (auction.createdBy.toString() === session.user.id) {
+  // Prevent owner from bidding on own auction
+  if (auction.createdBy.toString() === session.user.id) {
     return NextResponse.json({ error: "You cannot bid on your own auction" }, { status: 403 });
   }
 
-  // ✅ Auto-close auction if expired
+  // Auto-close auction if expired
   const currentTime = new Date();
   if (new Date(auction.endTime) <= currentTime) {
     auction.status = "closed";
@@ -72,7 +78,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 
   // Add the bidder to the auction
   auction.bidders.push({
-    bidder: session.user.id,  // Assuming session.user.id is available
+    bidder: session.user.id,
     amount: bidAmount,
     bidTime: new Date(),
     bidderName: session.user.username,
@@ -85,6 +91,18 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 
   // Save the updated auction
   await auction.save();
+
+  // Find the latest bid (the one we just added)
+const latestBid = auction.bidders[auction.bidders.length - 1];
+
+// Send complete bid info to frontend
+await pusher.trigger(`auction-${auctionId}`, "new-bid", {
+  _id: latestBid._id,
+  amount: latestBid.amount,
+  bidTime: latestBid.bidTime,
+  bidder: latestBid.bidderName ,
+});
+
 
   // Return success response
   return NextResponse.json({

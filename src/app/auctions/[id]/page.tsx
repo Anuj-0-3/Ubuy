@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import BiddersTable from "@/components/BiddersTable";
+import Pusher from 'pusher-js';
 
 type Bidder = {
   _id: string;
@@ -43,34 +44,34 @@ export default function AuctionDetailPage() {
       toast.error("Please enter a valid bid amount.");
       return;
     }
-  
+
     try {
       const res = await fetch(`/api/auction/bid/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ bidAmount }),
       });
-  
+
       const result = await res.json();
       if (!res.ok) {
         throw new Error(result.error || "Failed to place bid");
       }
-  
+
       toast.success("Bid placed successfully!");
-  
-      // ✅ Instead of local update, fetch updated auction
+
+      // Fetch updated auction data
       const updatedRes = await fetch(`/api/auction/${id}/details`);
       const updatedData = await updatedRes.json();
       if (updatedData.success) {
         setAuction(updatedData.auction);
       }
-  
+
       setBidInputs({ ...bidInputs, [id]: "" });
-    } catch(error) {
-      toast.error(error instanceof Error ? error.message :"Something went wrong");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Something went wrong");
     }
   };
-  
+
   useEffect(() => {
     async function fetchAuction() {
       setLoading(true);
@@ -87,6 +88,36 @@ export default function AuctionDetailPage() {
     }
 
     if (id) fetchAuction();
+  }, [id]);
+
+  useEffect(() => {
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
+      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || "default-cluster",
+    });
+
+    const channel = pusher.subscribe(`auction-${id}`);
+
+    // Listen for new bids and update the auction data
+    channel.bind('new-bid', (data: Bidder) => {
+      setAuction((prevAuction) => {
+        if (prevAuction) {
+          const updatedBidders = [...prevAuction.bidders, data];
+          return {
+            ...prevAuction,
+            currentPrice: data.amount,
+            bidders: updatedBidders,
+          };
+        }
+        return prevAuction;
+      });
+    });
+    
+
+    return () => {
+      channel.unbind_all();
+      channel.unsubscribe();
+      pusher.disconnect();
+    };
   }, [id]);
 
   if (loading) {
@@ -107,7 +138,6 @@ export default function AuctionDetailPage() {
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Side Image */}
         <div className="flex justify-center">
