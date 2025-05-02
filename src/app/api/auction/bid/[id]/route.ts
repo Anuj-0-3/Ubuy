@@ -1,4 +1,3 @@
-// app/api/auction/bid/route.ts
 import dbConnect from "@/lib/dbConnect";
 import Auction from "@/models/Auction";
 import { NextResponse } from "next/server";
@@ -17,7 +16,7 @@ const pusher = new Pusher({
 });
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
-  const { id: auctionId } = params; // Get auction ID from params
+  const { id: auctionId } = params; 
   const session = await getServerSession(authOptions);
 
   // Unauthorized if no session or user email
@@ -30,7 +29,6 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     return NextResponse.json({ error: "User data incomplete" }, { status: 400 });
   }
 
-  // Connect to the database
   await dbConnect();
 
   // Validate auctionId
@@ -100,7 +98,7 @@ await pusher.trigger(`auction-${auctionId}`, "new-bid", {
   _id: latestBid._id,
   amount: latestBid.amount,
   bidTime: latestBid.bidTime,
-  bidder: latestBid.bidderName ,
+  bidderName: latestBid.bidderName ,
 });
 
 

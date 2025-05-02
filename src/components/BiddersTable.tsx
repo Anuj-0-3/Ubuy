@@ -4,10 +4,9 @@ import React, { useEffect, useState } from "react";
 
 interface Bidder {
   _id: string;
-  bidder: { name: string };
   amount: number;
   bidTime: string;
-  bidderName?: string;
+  bidderName: string;
 }
 
 export default function BiddersTable({ bidders }: { bidders: Bidder[] }) {

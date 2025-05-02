@@ -12,9 +12,7 @@ import Pusher from 'pusher-js';
 
 type Bidder = {
   _id: string;
-  bidder: {
-    name: string;
-  };
+  bidderName: string;
   amount: number;
   bidTime: string;
 };
