@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { SessionProvider } from "next-auth/react";
 import Footer from "@/components/Footer";
 import { usePathname } from "next/navigation";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 
 export default function RootLayout({
@@ -19,6 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
       <SessionProvider>
+        <SpeedInsights/>
       {!isAuthPage && <Navbar/>}
       {children}
       <Toaster />
