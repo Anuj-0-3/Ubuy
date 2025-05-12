@@ -212,17 +212,17 @@ export default function HomePage() {
         <h2 className="text-2xl font-semibold text-emerald-800 mb-6 text-center">Explore Categories</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           {[
-            { title: "Electronics", icon: "/icons/electronics.png" },
-            { title: "Collectibles", icon: "/icons/collectibles.png" },
-            { title: "Furniture", icon: "/icons/furniture.png" },
-            { title: "Fashion", icon: "/icons/fashion.png" },
+            { title: "Electronics", icon: "/electronics.png" },
+            { title: "Collectibles", icon: "/Collectibles.png" },
+            { title: "Art", icon: "/Art.png" },
+            { title: "Fashion", icon: "/fashion.png" },
           ].map((category, i) => (
             <motion.div
               key={i}
               whileHover={{ scale: 1.1 }}
               className="p-4 rounded-lg bg-gray-100 shadow-md cursor-pointer"
             >
-              <Image src={category.icon} alt={category.title} width={50} height={50} className="mx-auto mb-2" />
+              <Image src={category.icon} alt={category.title} width={150} height={50} className="mx-auto mb-2" />
               <p className="text-gray-800 font-semibold">{category.title}</p>
             </motion.div>
           ))}
