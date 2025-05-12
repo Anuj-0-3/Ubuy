@@ -4,6 +4,8 @@ import Auction from "@/models/Auction";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
 
+const validCategories = ["Collectibles", "Art", "Electronics", "Fashion", "Other"];
+
 export async function POST(req: Request) {
   await dbConnect();
 
@@ -15,15 +17,20 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { title, description, image, startingPrice, startTime, endTime } = body;
+    const { title, description, image, startingPrice, startTime, endTime,category, } = body;
 
     // Validate required fields
-    if (!title || !description || !startingPrice || !startTime || !endTime) {
+    if (!title || !description || !startingPrice || !startTime || !endTime|| !category) {
       return NextResponse.json({ message: "All required fields must be provided" }, { status: 400 });
     }
 
+    // Validate category
+    if (!validCategories.includes(category)) {
+      return NextResponse.json({ message: "Invalid category provided" }, { status: 400 });
+    }
+
     // Determine the correct model for createdBy
-    const createdByModel = session.user.authProvider ? "AuthUser" : "User"; // Assuming `authProvider` can be used to distinguish AuthUser vs User
+    const createdByModel = session.user.authProvider ? "AuthUser" : "User"; 
 
     // Create auction
     const newAuction = await Auction.create({
@@ -35,8 +42,9 @@ export async function POST(req: Request) {
       startTime: new Date(startTime),
       endTime: new Date(endTime),
       status: "active",
-      createdBy: session.user.id,   // saving the ObjectId reference here
-      createdByModel: createdByModel, // Dynamically set model type
+      category, 
+      createdBy: session.user.id,   
+      createdByModel: createdByModel, 
     });
 
     return NextResponse.json({ message: "Auction created successfully", auction: newAuction }, { status: 201 });

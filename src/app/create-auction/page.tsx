@@ -14,32 +14,28 @@ const CreateAuction = () => {
     startingPrice: "",
     startTime: "",
     endTime: "",
-    image: "", // ✅ Store image URL here
+    image: "",
+    category: "Other",
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  
-   // Set minimum date to current time
+
   const getMinDateTime = () => {
     const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); // correct for timezone
-    return now.toISOString().slice(0, 16); // format for datetime-local
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    return now.toISOString().slice(0, 16);
   };
-  
 
-  // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ✅ Handle Image Upload Callback
   const handleImageUpload = (imageUrl: string) => {
     setFormData({ ...formData, image: imageUrl });
   };
 
-  // Submit form to API
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -74,7 +70,15 @@ const CreateAuction = () => {
       if (!res.ok) throw new Error(data.message || "Something went wrong");
 
       setSuccess("Auction created successfully!");
-      setFormData({ title: "", description: "", startingPrice: "", startTime: "", endTime: "", image: "" });
+      setFormData({
+        title: "",
+        description: "",
+        startingPrice: "",
+        startTime: "",
+        endTime: "",
+        image: "",
+        category: "Other",
+      });
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -83,101 +87,114 @@ const CreateAuction = () => {
   };
 
   return (
-    <>
-      <div className="flex py-10 flex-col items-center justify-center min-h-screen">
-        {session ? (
-          <div className="w-full max-w-lg p-6 bg-white shadow-md rounded-lg">
-            <h2 className="text-2xl font-semibold text-center mb-4">Create Auction</h2>
-            {error && <p className="text-red-500">{error}</p>}
-            {success && <p className="text-green-500">{success}</p>}
+    <div className="flex py-10 flex-col items-center justify-center min-h-screen">
+      {session ? (
+        <div className="w-full max-w-lg p-6 bg-white shadow-md rounded-lg">
+          <h2 className="text-2xl font-semibold text-center mb-4">Create Auction</h2>
+          {error && <p className="text-red-500">{error}</p>}
+          {success && <p className="text-green-500">{success}</p>}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block font-medium">Title</label>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block font-medium">Title</label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border rounded"
+              />
+            </div>
+
+            <div>
+              <label className="block font-medium">Description</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border rounded"
+              />
+            </div>
+
+            <div>
+              <label className="block font-medium">Starting Price (₹)</label>
+              <input
+                type="number"
+                name="startingPrice"
+                value={formData.startingPrice}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border rounded"
+              />
+            </div>
+
+            <div className="flex gap-4">
+              <div className="w-1/2">
+                <label className="block font-medium">Start Time</label>
                 <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
+                  type="datetime-local"
+                  name="startTime"
+                  value={formData.startTime}
                   onChange={handleChange}
                   required
+                  min={getMinDateTime()}
                   className="w-full p-2 border rounded"
                 />
               </div>
 
-              <div>
-                <label className="block font-medium">Description</label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  required
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-
-              <div>
-                <label className="block font-medium">Starting Price (₹)</label>
+              <div className="w-1/2">
+                <label className="block font-medium">End Time</label>
                 <input
-                  type="number"
-                  name="startingPrice"
-                  value={formData.startingPrice}
+                  type="datetime-local"
+                  name="endTime"
+                  value={formData.endTime}
                   onChange={handleChange}
+                  min={getMinDateTime()}
                   required
                   className="w-full p-2 border rounded"
                 />
               </div>
+            </div>
 
-              <div className="flex gap-4">
-                <div className="w-1/2">
-                  <label className="block font-medium">Start Time</label>
-                  <input
-                    type="datetime-local"
-                    name="startTime"
-                    value={formData.startTime}
-                    onChange={handleChange}
-                    required
-                    min={getMinDateTime()}
-                    className="w-full p-2 border rounded"
-                  />
-                </div>
+            <div>
+              <label className="block font-medium">Category</label>
+              <select
+                name="category"
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                required
+                className="w-full p-2 border rounded"
+              >
+                <option value="Collectibles">Collectibles</option>
+                <option value="Art">Art</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Fashion">Fashion</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
 
-                <div className="w-1/2">
-                  <label className="block font-medium">End Time</label>
-                  <input
-                    type="datetime-local"
-                    name="endTime"
-                    value={formData.endTime}
-                    onChange={handleChange}
-                    min={getMinDateTime()}
-                    required
-                    className="w-full p-2 border rounded"
-                  />
-                </div>
-              </div>
+            <AuctionImageUploader onUpload={handleImageUpload} />
+            {formData.image && <p className="text-green-600">Image uploaded successfully!</p>}
 
-              {/* ✅ Image Upload */}
-              <AuctionImageUploader onUpload={handleImageUpload} />
-              {formData.image && <p className="text-green-600">Image uploaded successfully!</p>}
-
-              {/* Submit Button */}
-              <Button type="submit" className="w-full bg-emerald-600 text-white" disabled={loading}>
-                {loading ? "Creating Auction..." : "Create Auction"}
-              </Button>
-            </form>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-4 border border-gray-300 p-6 rounded-lg shadow-lg">
-            <Lock size={48} className="text-gray-500" />
-            <p className="text-lg text-gray-700">You must log in to create an auction.</p>
-            <Link href="/sign-in">
-              <Button className="bg-emerald-600 text-gray-50" variant="outline">
-                Login
-              </Button>
-            </Link>
-          </div>
-        )}
-      </div>
-    </>
+            <Button type="submit" className="w-full bg-emerald-600 text-white" disabled={loading}>
+              {loading ? "Creating Auction..." : "Create Auction"}
+            </Button>
+          </form>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center gap-4 border border-gray-300 p-6 rounded-lg shadow-lg">
+          <Lock size={48} className="text-gray-500" />
+          <p className="text-lg text-gray-700">You must log in to create an auction.</p>
+          <Link href="/sign-in">
+            <Button className="bg-emerald-600 text-gray-50" variant="outline">
+              Login
+            </Button>
+          </Link>
+        </div>
+      )}
+    </div>
   );
 };
 

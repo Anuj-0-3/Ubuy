@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Loader2, IndianRupee, Timer } from "lucide-react";
+import { Loader2, IndianRupee, Timer, Tag } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,8 @@ type Auction = {
   description: string;
   image: string;
   currentPrice: number;
+  startingPrice: number;
+  category: string;
   endTime: string;
   status: string;
   bidders: Bidder[];
@@ -109,7 +111,7 @@ export default function AuctionDetailPage() {
         return prevAuction;
       });
     });
-    
+
 
     return () => {
       channel.unbind_all();
@@ -157,8 +159,17 @@ export default function AuctionDetailPage() {
           </h1>
 
           <p className="text-gray-600">{auction.description}</p>
+          <div className="space-y-2" >
+            <div className="flex items-center gap-2  text-lg font-semibold text-gray-800">
+              <Tag className="text-purple-500" />
+              Category: <span className="font-medium text-gray-600">{auction.category}</span>
+            </div>
 
-          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-lg font-semibold text-gray-800 ">
+              <IndianRupee className="text-blue-500" />
+              Starting Price: ₹{auction.startingPrice}
+            </div>
+
             {auction && (
               <div className="flex items-center gap-2 text-lg font-semibold">
                 <IndianRupee className="text-green-600" />

@@ -13,6 +13,7 @@ export interface IAuction extends Document {
     amount: number;
     bidTime: Date;
   }[];
+  category: "Collectibles" | "Art" | "Electronics" | "Fashion" | "Other";
   startTime: Date;
   endTime: Date;
   status: "active" | "closed";
@@ -32,18 +33,23 @@ const AuctionSchema: Schema = new Schema(
         bidder: {
           type: Schema.Types.ObjectId,
           required: true,
-          refPath: "bidders.bidderModel", // Dynamic reference
+          refPath: "bidders.bidderModel",
         },
         bidderModel: {
           type: String,
           required: true,
-          enum: ["User", "AuthUser"], // Only these models allowed
+          enum: ["User", "AuthUser"], 
         },
         bidderName: { type: String },
         amount: { type: Number, required: true },
         bidTime: { type: Date, default: Date.now },
       },
     ],
+    category: {
+      type: String,
+      enum: ["Collectibles", "Art", "Electronics", "Fashion", "Other"],
+      required: true,
+    },
     startTime: { type: Date, required: true },
     endTime: { type: Date, required: true },
     status: { type: String, enum: ["active", "closed"], default: "active" },
