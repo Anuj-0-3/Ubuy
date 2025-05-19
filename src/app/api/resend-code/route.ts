@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import User from "@/models/User";
 
-// Optional: Use IP-based rate limiting (simple in-memory)
 const rateLimitMap = new Map<string, number>();
 const RATE_LIMIT_INTERVAL_MS = 60 * 1000; // 1 minute
 

@@ -11,6 +11,7 @@ const AuctionImageUploader: React.FC<AuctionImageUploaderProps> = ({ onUpload })
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.currentTarget.files?.[0];
@@ -29,23 +30,36 @@ const AuctionImageUploader: React.FC<AuctionImageUploaderProps> = ({ onUpload })
     const formData = new FormData();
     formData.append("file", image);
 
-    try {
-      const res = await fetch(UPLOADIMG, {
-        method: "POST",
-        body: formData,
-      });
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", UPLOADIMG, true);
 
-      const data = await res.json();
-      if (res.ok) {
-        onUpload(data.url);
-      } else {
-        alert("Upload failed: " + data.error);
+    // Track progress of the upload
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percent = Math.round((event.loaded / event.total) * 100);
+        setProgress(percent);
       }
-    } catch (error) {
-      console.error("Upload error:", error);
-    } finally {
+    };
+
+    // On successful upload
+    xhr.onload = () => {
       setUploading(false);
-    }
+      if (xhr.status === 200) {
+        const response = JSON.parse(xhr.responseText);
+        onUpload(response.url);
+      } else {
+        alert("Upload failed: " + xhr.responseText);
+      }
+    };
+
+    // On error
+    xhr.onerror = () => {
+      setUploading(false);
+      alert("An error occurred during the upload.");
+    };
+
+    // Send the FormData
+    xhr.send(formData);
   };
 
   return (
@@ -69,9 +83,13 @@ const AuctionImageUploader: React.FC<AuctionImageUploaderProps> = ({ onUpload })
       >
         {uploading ? "Uploading..." : "Upload"}
       </button>
+      {uploading && (
+        <div className="mt-2">
+          <progress value={progress} max={100} className="w-full" />
+        </div>
+      )}
     </div>
   );
 };
 
 export default AuctionImageUploader;
-
