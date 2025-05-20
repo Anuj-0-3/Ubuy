@@ -146,7 +146,7 @@ export default function AuctionDetailPage() {
               src={auction.image}
               alt={auction.title}
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="(max-width: 768px) 100vw, 33vw"
             />
           </div>
