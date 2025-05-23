@@ -174,9 +174,11 @@ const CreateAuction = () => {
                 <option value="Other">Other</option>
               </select>
             </div>
+             <div className="flex justify-center">
 
             <AuctionImageUploader onUpload={handleImageUpload} />
             {formData.image && <p className="text-green-600">Image uploaded successfully!</p>}
+             </div>
 
             <Button type="submit" className="w-full bg-emerald-600 text-white" disabled={loading}>
               {loading ? "Creating Auction..." : "Create Auction"}
