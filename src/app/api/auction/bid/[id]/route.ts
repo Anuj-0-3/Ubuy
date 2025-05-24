@@ -5,6 +5,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../../auth/[...nextauth]/options";
 import mongoose from "mongoose";
 import Pusher from "pusher";
+import User from "@/models/User";
+import AuthUser from "@/models/AuthUser";
+
 
 // Initialize Pusher
 const pusher = new Pusher({
@@ -16,7 +19,7 @@ const pusher = new Pusher({
 });
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
-  const { id: auctionId } = params; 
+  const { id: auctionId } = params;
   const session = await getServerSession(authOptions);
 
   // Unauthorized if no session or user email
@@ -90,16 +93,29 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   // Save the updated auction
   await auction.save();
 
-  // Find the latest bid (the one we just added)
-const latestBid = auction.bidders[auction.bidders.length - 1];
+  // Update User and AuthUser documents if auctionId not present in biddedauction
+  const updateQuery = { $addToSet: { biddedauction: auctionId } };
 
-// Send complete bid info to frontend
-await pusher.trigger(`auction-${auctionId}`, "new-bid", {
-  _id: latestBid._id,
-  amount: latestBid.amount,
-  bidTime: latestBid.bidTime,
-  bidderName: latestBid.bidderName ,
-});
+let updateResult;
+if (session.user.authProvider === "AuthUser") {
+  updateResult = await AuthUser.updateOne({ _id: session.user.id }, updateQuery);
+} else {
+  updateResult = await User.updateOne({ _id: session.user.id }, updateQuery);
+}
+
+console.log("Update result:", updateResult);
+
+
+  // Find the latest bid (the one we just added)
+  const latestBid = auction.bidders[auction.bidders.length - 1];
+
+  // Send complete bid info to frontend
+  await pusher.trigger(`auction-${auctionId}`, "new-bid", {
+    _id: latestBid._id,
+    amount: latestBid.amount,
+    bidTime: latestBid.bidTime,
+    bidderName: latestBid.bidderName,
+  });
 
 
   // Return success response

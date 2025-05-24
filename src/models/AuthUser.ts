@@ -6,6 +6,7 @@ export interface IAuthUser extends Document {
   provider: string;  
   authProvider: string;  
   createdAt: Date;
+  biddedauction:String[];
   updatedAt: Date;
 }
 
@@ -30,6 +31,10 @@ const AuthUserSchema: Schema = new Schema(
       type: String,
       default: 'AuthUser',  
       enum: ["AuthUser"],  
+    },
+    biddedauction: {
+      type: [String], 
+      default: [], 
     },
   },
   {

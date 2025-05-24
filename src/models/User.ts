@@ -8,7 +8,8 @@ export interface IUser extends Document {
   isVerified: boolean;
   verificationcode: string;
   authProvider: string;
-  verificationCodeExpiry: Date; 
+  verificationCodeExpiry: Date;
+  biddedauction:String[]; 
 }
 
 const UserSchema: Schema = new Schema(
@@ -25,7 +26,11 @@ const UserSchema: Schema = new Schema(
     isVerified: { type: Boolean, default: false },
     verificationcode: { type: String, default: "" },
     verificationCodeExpiry: { type: Date, default: Date.now },
-    authProvider: { type: String, default: "local" }
+    authProvider: { type: String, default: "local" },
+    biddedauction: {
+      type: [String], 
+      default: [], 
+    },
   },
   { timestamps: true } 
 );
