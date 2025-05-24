@@ -9,7 +9,7 @@ export interface IUser extends Document {
   verificationcode: string;
   authProvider: string;
   verificationCodeExpiry: Date;
-  biddedauction:String[]; 
+  biddedauction:string[]; 
 }
 
 const UserSchema: Schema = new Schema(

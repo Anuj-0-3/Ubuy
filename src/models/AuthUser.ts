@@ -6,7 +6,7 @@ export interface IAuthUser extends Document {
   provider: string;  
   authProvider: string;  
   createdAt: Date;
-  biddedauction:String[];
+  biddedauction:string[];
   updatedAt: Date;
 }
 
