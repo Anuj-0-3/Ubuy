@@ -77,6 +77,16 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     return NextResponse.json({ error: "Bid must be higher than the current price" }, { status: 400 });
   }
 
+  // Before adding the new bid, check if the latest bid is from the same user
+  const lastBidder = auction.bidders[auction.bidders.length - 1];
+  if (lastBidder && lastBidder.bidder.toString() === session.user.id) {
+    return NextResponse.json(
+      { error: "You cannot place consecutive bids ." },
+      { status: 400 }
+    );
+  }
+
+
   // Add the bidder to the auction
   auction.bidders.push({
     bidder: session.user.id,
@@ -96,14 +106,14 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   // Update User and AuthUser documents if auctionId not present in biddedauction
   const updateQuery = { $addToSet: { biddedauction: auctionId } };
 
-let updateResult;
-if (session.user.authProvider === "AuthUser") {
-  updateResult = await AuthUser.updateOne({ _id: session.user.id }, updateQuery);
-} else {
-  updateResult = await User.updateOne({ _id: session.user.id }, updateQuery);
-}
+  let updateResult;
+  if (session.user.authProvider === "AuthUser") {
+    updateResult = await AuthUser.updateOne({ _id: session.user.id }, updateQuery);
+  } else {
+    updateResult = await User.updateOne({ _id: session.user.id }, updateQuery);
+  }
 
-console.log("Update result:", updateResult);
+  console.log("Update result:", updateResult);
 
 
   // Find the latest bid (the one we just added)
