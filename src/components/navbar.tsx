@@ -29,7 +29,7 @@ function Navbar() {
             <>
               <Link href="/auctions" className="hover:text-slate-100">Auctions</Link>
               <Link href="/create-auction" className="hover:text-slate-100">Create Auction</Link>
-              <Link href="/my-auction" className="hover:text-slate-100">My Auctions</Link>
+              <Link href="/bidded-auctions" className="hover:text-slate-100">Bidded Auctions</Link>
               <Link href="/profile" className="hover:text-slate-100">Profile</Link>
               <Button onClick={() => signOut()} className="bg-slate-100 text-emerald-600" variant='outline'>Logout</Button>
             </>
