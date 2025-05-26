@@ -31,15 +31,15 @@ function Navbar() {
               <Link href="/create-auction" className="hover:text-slate-100">Create Auction</Link>
               <Link href="/bidded-auctions" className="hover:text-slate-100">Bidded Auctions</Link>
               <Link href="/profile" className="hover:text-slate-100">Profile</Link>
-              <Button onClick={() => signOut()} className="bg-slate-100 text-emerald-600" variant='outline'>Logout</Button>
+              <Button onClick={() => signOut()} className="bg-slate-100 hover:cursor-pointer text-emerald-600" variant='outline'>Logout</Button>
             </>
           ) : (
             <>
               <Link href="/sign-in" onClick={() => setIsOpen(false)}>
-                <Button className="bg-slate-100 text-emerald-600" variant='outline'>Login</Button>
+                <Button className="bg-slate-100 hover:cursor-pointer text-emerald-600" variant='outline'>Login</Button>
               </Link>
               <Link href="/sign-up" onClick={() => setIsOpen(false)}>
-                <Button className="bg-slate-100 text-emerald-600" variant='outline'>Sign-Up</Button>
+                <Button className="bg-slate-100 hover:cursor-pointer text-emerald-600" variant='outline'>Sign-Up</Button>
               </Link>
             </>
           )}
@@ -60,15 +60,15 @@ function Navbar() {
               <Link href="/create-auction" className="hover:text-slate-100" onClick={() => setIsOpen(false)}>Create Auction</Link>
               <Link href="/my-auction" className="hover:text-slate-100" onClick={() => setIsOpen(false)}>My Auctions</Link>
               <Link href="/profile" className="hover:text-slate-100" onClick={() => setIsOpen(false)}>Profile</Link>
-              <Button onClick={() => { signOut(); setIsOpen(false); }} className="bg-slate-100 text-emerald-600" variant='outline'>Logout</Button>
+              <Button onClick={() => { signOut(); setIsOpen(false); }} className="bg-slate-100 hover:cursor-pointer text-emerald-600" variant='outline'>Logout</Button>
             </>
           ) : (
             <>
               <Link href="/sign-in" onClick={() => setIsOpen(false)}>
-                <Button className="bg-slate-100 text-emerald-600" variant='outline'>Login</Button>
+                <Button className="bg-slate-100 hover:cursor-pointer text-emerald-600" variant='outline'>Login</Button>
               </Link>
               <Link href="/sign-up" onClick={() => setIsOpen(false)}>
-                <Button className="bg-slate-100 text-emerald-600" variant='outline'>Sign-Up</Button>
+                <Button className="bg-slate-100 hover:cursor-pointer text-emerald-600" variant='outline'>Sign-Up</Button>
               </Link>
             </>
           )}

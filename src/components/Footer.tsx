@@ -15,7 +15,7 @@ export default function Footer() {
 
                 {/* Logo & Intro */}
                 <div>
-                    <h2 className="text-3xl font-bold text-white mb-4">U-Buy</h2>
+                    <h2 className="text-3xl hover:cursor-pointer font-bold text-white mb-4">U-Buy</h2>
                     <p className="text-sm leading-relaxed">
                         Bid, win, and own unique collectibles and rare finds at unbeatable prices. Experience seamless, real-time auctions.
                     </p>

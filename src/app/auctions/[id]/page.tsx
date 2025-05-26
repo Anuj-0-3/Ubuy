@@ -196,7 +196,7 @@ export default function AuctionDetailPage() {
               />
               <Button
                 onClick={() => handleBid(auction._id)}
-                className="w-full bg-emerald-500 text-white rounded-full hover:bg-emerald-600"
+                className="w-full hover:cursor-pointer bg-emerald-500 text-white rounded-full hover:bg-emerald-600"
               >
                 Place Bid
               </Button>

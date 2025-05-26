@@ -82,25 +82,25 @@ export default function HomePage() {
         <div className="flex gap-4">
           {session ? (
             <>
-              <Button className="bg-emerald-800 hover:bg-emerald-900">
+              <Button className="bg-emerald-800 hover:cursor-pointer hover:bg-emerald-900">
                 Start Bidding
               </Button>
               <Button
                 variant="outline"
-                className="text-emerald-600 border-white hover:bg-gray-300 hover:text-emerald-800"
+                className="text-emerald-600 hover:cursor-pointer border-white hover:bg-gray-300 hover:text-emerald-800"
               >
                 Sell an Item
               </Button>
             </>
           ) : (
             <>
-              <Link href="/sign-in">
-                <Button className="bg-white text-emerald-700 hover:bg-gray-200">
+              <Link href="/sign-in"> 
+                <Button className="bg-white hover:cursor-pointer text-emerald-700 hover:bg-gray-200">
                   Login to Bid
                 </Button>
               </Link>
               <Link href="/sign-up" >
-                <Button variant="outline" className="bg-emerald-700 text-white hover:bg-gray-400">
+                <Button variant="outline" className="bg-emerald-700 hover:cursor-pointer text-white hover:bg-gray-400">
                   Sign Up
                 </Button>
               </Link>
@@ -147,7 +147,7 @@ export default function HomePage() {
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.5 }}
                         >
-                          <Card className="p-4 transition-transform duration-300 hover:scale-105 hover:shadow-xl bg-white shadow-md border-emerald-300">
+                          <Card className="p-4 transition-transform duration-300 hover:shadow-xl bg-white shadow-md border-emerald-300">
                             <div className="top-3 right-3 text-red-500 text-sm font-semibold px-3 py-1">
                               {timeLeft}
                             </div>
@@ -172,7 +172,7 @@ export default function HomePage() {
                                 <p><strong>Current Price:</strong> ₹{auction.currentPrice}</p>
                               </div>
                               <Link href={`/auctions/${auction._id}`} passHref>
-                                <Button className="w-full bg-indigo-500 text-white rounded-full hover:bg-indigo-600 ">Explore More</Button>
+                                <Button className="w-full hover:cursor-pointer bg-indigo-500 text-white rounded-full hover:bg-indigo-600 ">Explore More</Button>
                               </Link>
                             </CardContent>
                           </Card>

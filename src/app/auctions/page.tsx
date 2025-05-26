@@ -160,7 +160,7 @@ const AllAuctionsPage = () => {
                           Place Bid
                         </Button>
                         <Link href={`/auctions/${auction._id}`} passHref>
-                          <Button className="w-full bg-indigo-500 text-white rounded-full hover:bg-indigo-600">Explore More</Button>
+                          <Button className="w-full hover:cursor-pointer bg-indigo-500 text-white rounded-full hover:bg-indigo-600">Explore More</Button>
                         </Link>
                       </div>
                     )}

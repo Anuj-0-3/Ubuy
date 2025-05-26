@@ -180,7 +180,7 @@ const CreateAuction = () => {
             {formData.image && <p className="text-green-600">Image uploaded successfully!</p>}
              </div>
 
-            <Button type="submit" className="w-full bg-emerald-600 text-white" disabled={loading}>
+            <Button type="submit" className="w-full bg-emerald-600 hover:cursor-pointer text-white" disabled={loading}>
               {loading ? "Creating Auction..." : "Create Auction"}
             </Button>
           </form>
