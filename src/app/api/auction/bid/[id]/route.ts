@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import Pusher from "pusher";
 import User from "@/models/User";
 import AuthUser from "@/models/AuthUser";
+import Notification from "@/models/Notification";
 
 
 // Initialize Pusher
@@ -85,6 +86,42 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
       { status: 400 }
     );
   }
+
+  //sending notification to the previous highest bidder
+  const previousBidderId = lastBidder?.bidder;
+  const previousBidderModel = lastBidder?.bidderModel;
+
+  if (
+    previousBidderId &&
+    previousBidderId.toString() !== session.user.id // avoid notifying self
+  ) {
+    await Notification.create({
+      recipient: previousBidderId,
+      recipientModel: previousBidderModel,
+      type: "bid",
+      message: `You've been outbid on an auction. New highest bid: ₹${bidAmount}`,
+      relatedAuction: auction._id,
+    });
+
+    await pusher.trigger(`user-${previousBidderId}`, "outbid", {
+      message: `You've been outbid. New highest bid: ₹${bidAmount}`,
+      auctionId: auction._id,
+    });
+  }
+
+
+  //sending notification to the current highest bidder
+  await Notification.create({
+    recipient: session.user.id,
+    recipientModel: session.user.authProvider,
+    type: "bid",
+    message: `Your bid of ₹${bidAmount} was placed successfully.`,
+    relatedAuction: auction._id,
+  });
+
+  console.log("Notification sent to current bidder:", session.user.id);
+
+
 
 
   // Add the bidder to the auction

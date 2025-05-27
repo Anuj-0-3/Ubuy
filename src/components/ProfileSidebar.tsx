@@ -19,7 +19,7 @@ export default function ProfileSidebar() {
         <div className="flex flex-col items-center md:items-start px-2">
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="mb-4 flex items-center justify-center md:justify-center w-full p-2 hover:bg-emerald-200 rounded-full transition"
+            className="mb-4 flex items-center justify-start w-full p-2 hover:bg-emerald-200 rounded-full transition"
             aria-label="Toggle Panel"
           >
             {isCollapsed ? (
@@ -28,14 +28,14 @@ export default function ProfileSidebar() {
               <ChevronLeft className="w-5 h-5 text-emerald-700" />
             )}
           </button>
-          <button className="flex items-center gap-2 text-gray-700 hover:text-emerald-700 w-full py-2 px-2 transition-colors rounded-md hover:bg-emerald-200">
-            <Settings className="w-5 h-5" />
-            {!isCollapsed && <span>Account Settings</span>}
+          <button className="flex  items-center gap-2 text-gray-700 hover:text-emerald-700 w-full py-2 px-2 transition-colors rounded-md hover:bg-emerald-200">
+            <Settings className="w-5  h-5" />
+            {!isCollapsed && <span >Account Settings</span>}
           </button>
-          <button className="flex items-center gap-2 text-gray-700 hover:text-emerald-700 w-full py-2 px-2 transition-colors rounded-md hover:bg-emerald-200">
+          <Link href="/profile/notifications" className="flex items-center gap-2 text-gray-700 hover:text-emerald-700 w-full py-2 px-2 transition-colors rounded-md hover:bg-emerald-200">
             <Bell className="w-5 h-5" />
             {!isCollapsed && <span>Notifications</span>}
-          </button>
+          </Link>
           <button className="flex items-center gap-2 text-gray-700 hover:text-emerald-700 w-full py-2 px-2 transition-colors rounded-md hover:bg-emerald-200">
             <Shield className="w-5 h-5" />
             {!isCollapsed && <span>Privacy</span>}
