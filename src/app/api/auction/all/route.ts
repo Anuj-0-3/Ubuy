@@ -4,6 +4,7 @@ import Auction from "@/models/Auction";
 import { autoCloseExpiredAuctions } from "@/lib/autoCloseExpiredAuctions";
 import "@/models/User";
 import "@/models/AuthUser";
+import Notification from "@/models/Notification";
 
 export async function GET() {
   try {
@@ -26,6 +27,33 @@ export async function GET() {
         select: "username email provider",
       },
     ]);
+
+    //// Filter for closed auctions that haven’t been notified
+    const closedAuctions = auctions.filter((auction: any) =>
+      auction.status === "closed" && !auction._doc.notified
+    );
+
+    for (const auction of closedAuctions) {
+      if (!auction.bidders || auction.bidders.length === 0) continue;
+
+      // Sort bidders by amount descending
+      const sortedBidders = auction.bidders.sort((a: any, b: any) => b.amount - a.amount);
+      const winner = sortedBidders[0];
+
+      if (winner?.bidder?._id && winner?.bidderModel) {
+        await Notification.create({
+          recipient: winner.bidder._id,
+          recipientModel: winner.bidderModel,
+          type: "win",
+          message: `🎉 Congratulations! You have won the auction for "${auction.title}".`,
+          relatedAuction: auction._id,
+        });
+      }
+
+      // Add a 'notified' flag dynamically
+      auction._doc.notified = true;
+      await Auction.updateOne({ _id: auction._id }, { $set: { 'notified': true } });
+    }
 
     return NextResponse.json(auctions, { status: 200 });
 

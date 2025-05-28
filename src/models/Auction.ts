@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
-
 export interface IAuction extends Document {
   title: string;
   description: string;
