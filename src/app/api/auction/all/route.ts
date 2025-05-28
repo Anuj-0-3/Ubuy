@@ -29,7 +29,7 @@ export async function GET() {
     ]);
 
     //// Filter for closed auctions that haven’t been notified
-    const closedAuctions = auctions.filter((auction: any) =>
+    const closedAuctions = auctions.filter((auction) =>
       auction.status === "closed" && !auction._doc.notified
     );
 
@@ -37,7 +37,19 @@ export async function GET() {
       if (!auction.bidders || auction.bidders.length === 0) continue;
 
       // Sort bidders by amount descending
-      const sortedBidders = auction.bidders.sort((a: any, b: any) => b.amount - a.amount);
+      interface Bidder {
+        bidder: {
+          _id: string;
+          username?: string;
+          email?: string;
+          provider?: string;
+        };
+        bidderModel?: string;
+        amount: number;
+      }
+
+
+      const sortedBidders = (auction.bidders as Bidder[]).sort((a, b) => b.amount - a.amount);
       const winner = sortedBidders[0];
 
       if (winner?.bidder?._id && winner?.bidderModel) {
