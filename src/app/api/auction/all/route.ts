@@ -29,9 +29,10 @@ export async function GET() {
     ]);
 
     //// Filter for closed auctions that haven’t been notified
-    const closedAuctions = auctions.filter((auction) =>
-      auction.status === "closed" && !auction._doc.notified
+    const closedAuctions = auctions.filter(
+      (auction) => auction.status === "closed" && !auction.notified
     );
+
 
     for (const auction of closedAuctions) {
       if (!auction.bidders || auction.bidders.length === 0) continue;
@@ -47,7 +48,6 @@ export async function GET() {
         bidderModel?: string;
         amount: number;
       }
-
 
       const sortedBidders = (auction.bidders as Bidder[]).sort((a, b) => b.amount - a.amount);
       const winner = sortedBidders[0];

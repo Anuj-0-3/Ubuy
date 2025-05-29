@@ -44,7 +44,8 @@ export async function POST(req: Request) {
       status: "active",
       category, 
       createdBy: session.user.id,   
-      createdByModel: createdByModel, 
+      createdByModel: createdByModel,
+      notified: false, 
     });
 
     return NextResponse.json({ message: "Auction created successfully", auction: newAuction }, { status: 201 });

@@ -97,7 +97,7 @@ export default function ForgotPasswordPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">Send Reset Code</Button>
+              <Button type="submit" className="w-full hover:cursor-pointer">Send Reset Code</Button>
             </form>
           </FormProvider>
         ) : (

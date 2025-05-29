@@ -99,7 +99,7 @@ const Page = () => {
             />
 
             {/* Sign-In Button */}
-            <Button type="submit" className="w-full py-2 px-4 bg-emerald-500 text-white rounded-full shadow-md hover:bg-emerald-600 transition-transform transform hover:scale-105">
+            <Button type="submit" className="w-full hover:cursor-pointer py-2 px-4 bg-emerald-500 text-white rounded-full shadow-md hover:bg-emerald-600 transition-transform transform hover:scale-105">
               Sign In
             </Button>
 
@@ -107,7 +107,7 @@ const Page = () => {
             <Button
               type="button"
               onClick={() => signIn("google")}
-              className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-white text-gray-900 border border-gray-300 rounded-full shadow-md hover:bg-gray-100 transition-transform transform hover:scale-105"
+              className="w-full flex items-center hover:cursor-pointer justify-center gap-2 py-2 px-4 bg-white text-gray-900 border border-gray-300 rounded-full shadow-md hover:bg-gray-100 transition-transform transform hover:scale-105"
             >
               <FcGoogle size={24} /> Sign in with Google
             </Button>
@@ -118,7 +118,7 @@ const Page = () => {
         <div className="text-center mt-6">
           <p className="text-gray-600">
             New user?{" "}
-            <Link href="/sign-up" className="text-emerald-500 hover:underline">
+            <Link href="/sign-up" className="text-emerald-500 hover:cursor-pointer hover:underline">
               Sign Up
             </Link>
           </p>

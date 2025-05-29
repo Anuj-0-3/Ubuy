@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { BellIcon, CheckCircleIcon, XCircleIcon, GavelIcon, InfoIcon } from "lucide-react";
+import { BellIcon, CheckCircleIcon, XCircleIcon, GavelIcon, InfoIcon, Trash2Icon } from "lucide-react";
 import axios from "axios";
 
 interface Notification {
@@ -15,6 +15,16 @@ interface Notification {
 
 export default function NotificationPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  //function for deleting a notification
+  const handleDelete = async (id: string) => {
+    try {
+      await axios.delete(`/api/notification/${id}`);
+      setNotifications((prev) => prev.filter((note) => note._id !== id));
+    } catch (error) {
+      console.error("Failed to delete notification", error);
+    }
+  };
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -75,10 +85,19 @@ export default function NotificationPage() {
                 }`}
             >
               <div className="p-3 bg-emerald-100 rounded-full">{getIcon(note.type)}</div>
-              <div>
+              <div className="flex-1">
                 <p className="text-gray-800 font-medium">{note.message}</p>
-                <p className="text-sm text-gray-500 mt-1">{new Date(note.createdAt).toLocaleString()}</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  {new Date(note.createdAt).toLocaleString()}
+                </p>
               </div>
+              <button
+                onClick={() => handleDelete(note._id)}
+                className="ml-auto hover:cursor-pointer p-2 text-red-500 hover:text-red-700"
+                title="Delete notification"
+              >
+                <Trash2Icon className="w-5 h-5" />
+              </button>
             </motion.div>
           ))
         )}

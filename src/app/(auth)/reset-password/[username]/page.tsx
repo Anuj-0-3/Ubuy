@@ -96,7 +96,7 @@ export default function ResetPasswordPage() {
               )}
             />
 
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full hover:cursor-pointer">
               Reset Password
             </Button>
           </form>

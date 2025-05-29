@@ -133,7 +133,7 @@ const Page = () => {
               )}
             />
 
-            <Button type="submit" disabled={isSubmitting} className="w-full py-2 px-4 bg-emerald-500 text-white rounded-full shadow-md hover:bg-emerald-600 transition-transform transform hover:scale-105">
+            <Button type="submit" disabled={isSubmitting} className="w-full py-2 px-4 hover:cursor-pointer bg-emerald-500 text-white rounded-full shadow-md hover:bg-emerald-600 transition-transform transform hover:scale-105">
               {isSubmitting ? "Creating account..." : "Sign Up"}
             </Button>
           </form>
@@ -146,7 +146,7 @@ const Page = () => {
         <Button
           type="button"
           onClick={() => signIn("google")}
-          className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-white text-gray-900 border border-gray-300 rounded-full shadow-md hover:bg-gray-100 transition-transform transform hover:scale-105"
+          className="w-full flex items-center hover:cursor-pointer justify-center gap-2 py-2 px-4 bg-white text-gray-900 border border-gray-300 rounded-full shadow-md hover:bg-gray-100 transition-transform transform hover:scale-105"
         >
           <FcGoogle size={24} /> Sign up with Google
         </Button>
@@ -154,7 +154,7 @@ const Page = () => {
 
         <div className="text-center mt-6">
           <p className="text-gray-600">
-            Already have an account? <Link href="/sign-in" className="text-emerald-500 hover:underline">Sign In</Link>
+            Already have an account? <Link href="/sign-in" className="text-emerald-500 hover:cursor-pointer hover:underline">Sign In</Link>
           </p>
         </div>
       </div>

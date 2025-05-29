@@ -18,6 +18,7 @@ export interface IAuction extends Document {
   status: "active" | "closed";
   createdBy: Types.ObjectId;
   createdByModel: "User" | "AuthUser";
+  notified?: boolean; 
 }
 
 const AuctionSchema: Schema = new Schema(
@@ -62,6 +63,7 @@ const AuctionSchema: Schema = new Schema(
       required: true,
       enum: ["User", "AuthUser"],
     },
+     notified: { type: Boolean, default: false },
   },
   {
     timestamps: true,
