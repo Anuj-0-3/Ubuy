@@ -4,7 +4,7 @@ import mongoose, { Schema, Document, Types } from "mongoose";
 export interface INotification extends Document {
   recipient: Types.ObjectId;
   recipientModel: "User" | "AuthUser";
-  type: "bid" | "win" | "close" | "admin" | "general";
+  type: "bid" | "win" | "close" | "admin" | "general"| "payment";
   message: string;
   isRead: boolean;
   relatedAuction?: Types.ObjectId;
@@ -25,7 +25,7 @@ const NotificationSchema: Schema = new Schema(
     },
     type: {
       type: String,
-      enum: ["bid", "win", "close", "admin", "general"],
+      enum: ["bid", "win", "close", "admin", "general", "payment"],
       default: "general",
     },
     message: { type: String, required: true },
