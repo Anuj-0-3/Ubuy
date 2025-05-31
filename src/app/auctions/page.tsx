@@ -25,11 +25,14 @@ interface Auction {
   createdBy: string;
 }
 
+const ITEMS_PER_PAGE = 9;
+
 const AllAuctionsPage = () => {
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [loading, setLoading] = useState(true);
   const [bidInputs, setBidInputs] = useState<{ [key: string]: string }>({});
   const [remainingTimes, setRemainingTimes] = useState<{ [key: string]: string }>({});
+  const [currentPage, setCurrentPage] = useState(1); // ✅ Pagination state
 
   useEffect(() => {
     const fetchAuctions = async () => {
@@ -87,6 +90,21 @@ const AllAuctionsPage = () => {
     }
   };
 
+  // Pagination logic
+  const indexOfLastAuction = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirstAuction = indexOfLastAuction - ITEMS_PER_PAGE;
+  const currentAuctions = auctions.slice(indexOfFirstAuction, indexOfLastAuction);
+
+  const totalPages = Math.ceil(auctions.length / ITEMS_PER_PAGE);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 py-10">
       <div className="text-center mb-10">
@@ -97,85 +115,95 @@ const AllAuctionsPage = () => {
       {loading ? (
         <Loader2 className="animate-spin text-emerald-500" size={40} />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 w-full max-w-6xl">
-          {auctions.length === 0 ? (
-            <p className="text-gray-500">No auctions found.</p>
-          ) : (
-            auctions.map((auction) => {
-              const timeLeft = remainingTimes[auction._id] || "Calculating...";
-              const isClosed = timeLeft === "Closed" || auction.status === "closed";
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 w-full max-w-6xl">
+            {currentAuctions.length === 0 ? (
+              <p className="text-gray-500">No auctions found.</p>
+            ) : (
+              currentAuctions.map((auction) => {
+                const timeLeft = remainingTimes[auction._id] || "Calculating...";
+                const isClosed = timeLeft === "Closed" || auction.status === "closed";
 
-              return (
-                <Card
-                  key={auction._id}
-                  className="relative bg-white/10 backdrop-blur-md border border-emerald-400/40 shadow-lg rounded-2xl transition-transform duration-300 hover:scale-105 hover:shadow-xl"
-                >
-                  <div className="absolute top-3 right-3 bg-red-500 text-white text-sm font-semibold px-3 py-1 rounded-full z-10 shadow">
-                    {timeLeft}
-                  </div>
-
-                  <CardContent className="p-6 space-y-4">
-                    <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
-                    <p className="text-gray-700">{auction.description}</p>
-                    {auction.image && (
-                      <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
-                        <Image
-                          src={auction.image}
-                          alt={auction.title}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                        />
-                      </div>
-                    )}
-                    <div className="text-sm text-gray-600 space-y-1">
-                      <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleString()}</p>
-                      <p><strong>End:</strong> {new Date(auction.endTime).toLocaleString()}</p>
-                      <p>
-                        <strong>Status:</strong>{" "}
-                        <span className={isClosed ? "text-red-500 font-semibold" : "text-green-600 font-semibold"}>
-                          {isClosed ? "Closed" : "Active"}
-                        </span>
-                      </p>
-                      <p><strong>Starting Price:</strong> ₹{auction.startingPrice}</p>
-                      <p><strong>Current Price:</strong> ₹{auction.currentPrice}</p>
-                      <p><strong>Category:</strong> {auction.category}</p>
+                return (
+                  <Card
+                    key={auction._id}
+                    className="relative bg-white/10 backdrop-blur-md border border-emerald-400/40 shadow-lg rounded-2xl transition-transform duration-300 hover:scale-105 hover:shadow-xl"
+                  >
+                    <div className="absolute top-3 right-3 bg-red-500 text-white text-sm font-semibold px-3 py-1 rounded-full z-10 shadow">
+                      {timeLeft}
                     </div>
 
-                    {!isClosed && (
-                      <div className="pt-2 space-y-2">
-                        <Input
-                          type="number"
-                          placeholder="Your Bid (₹)"
-                          className="border border-gray-300 focus:border-emerald-500"
-                          value={bidInputs[auction._id] || ""}
-                          onChange={(e) =>
-                            setBidInputs({ ...bidInputs, [auction._id]: e.target.value })
-                          }
-                        />
-                        <Button
-                          onClick={() => handleBid(auction._id)}
-                          className="w-full bg-emerald-500 text-white rounded-full hover:bg-emerald-600"
-                        >
-                          Place Bid
-                        </Button>
-                        <Link href={`/auctions/${auction._id}`} passHref>
-                          <Button className="w-full hover:cursor-pointer bg-indigo-500 text-white rounded-full hover:bg-indigo-600">Explore More</Button>
-                        </Link>
+                    <CardContent className="p-6 space-y-4">
+                      <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
+                      <p className="text-gray-700">{auction.description}</p>
+                      {auction.image && (
+                        <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
+                          <Image
+                            src={auction.image}
+                            alt={auction.title}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                          />
+                        </div>
+                      )}
+                      <div className="text-sm text-gray-600 space-y-1">
+                        <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleString()}</p>
+                        <p><strong>End:</strong> {new Date(auction.endTime).toLocaleString()}</p>
+                        <p>
+                          <strong>Status:</strong>{" "}
+                          <span className={isClosed ? "text-red-500 font-semibold" : "text-green-600 font-semibold"}>
+                            {isClosed ? "Closed" : "Active"}
+                          </span>
+                        </p>
+                        <p><strong>Starting Price:</strong> ₹{auction.startingPrice}</p>
+                        <p><strong>Current Price:</strong> ₹{auction.currentPrice}</p>
+                        <p><strong>Category:</strong> {auction.category}</p>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })
-          )}
-        </div>
+
+                      {!isClosed && (
+                        <div className="pt-2 space-y-2">
+                          <Input
+                            type="number"
+                            placeholder="Your Bid (₹)"
+                            className="border border-gray-300 focus:border-emerald-500"
+                            value={bidInputs[auction._id] || ""}
+                            onChange={(e) =>
+                              setBidInputs({ ...bidInputs, [auction._id]: e.target.value })
+                            }
+                          />
+                          <Button
+                            onClick={() => handleBid(auction._id)}
+                            className="w-full bg-emerald-500 text-white rounded-full hover:bg-emerald-600"
+                          >
+                            Place Bid
+                          </Button>
+                          <Link href={`/auctions/${auction._id}`} passHref>
+                            <Button className="w-full hover:cursor-pointer bg-indigo-500 text-white rounded-full hover:bg-indigo-600">Explore More</Button>
+                          </Link>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })
+            )}
+          </div>
+
+          {/* ✅ Pagination controls */}
+          <div className="flex justify-center mt-8 space-x-4">
+            <Button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</Button>
+            <span className="text-gray-700 font-medium">{`Page ${currentPage} of ${totalPages}`}</span>
+            <Button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</Button>
+          </div>
+        </>
       )}
     </div>
   );
 };
 
 export default AllAuctionsPage;
+
 
 
 
