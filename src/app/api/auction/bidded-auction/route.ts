@@ -19,7 +19,6 @@ interface Bidder {
 
       interface AuctionWithBidders extends mongoose.Document {
         bidders: Bidder[];
-        [key: string]: any;
       }
 
 export async function GET() {
