@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 interface Auction {
   _id: string;
@@ -19,6 +20,9 @@ interface Auction {
   endTime: string;
   status: "active" | "closed";
   createdBy: string;
+  winnerId?: string;
+  myUserId?: string;
+
 }
 
 interface PaymentLinkResponse {
@@ -30,7 +34,9 @@ const BiddedAuctionsPage = () => {
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<string | null>(null);
-  
+  const { data: session } = useSession();
+  const myUserId = session?.user?.id;
+
   // Function to fetch bidded auctions
   const fetchBiddedAuctions = async () => {
     try {
@@ -62,35 +68,35 @@ const BiddedAuctionsPage = () => {
 
   // Function to handle payment link generation
   const handlePayHere = async (auctionId: string) => {
-  try {
-    setProcessing(auctionId);
-    toast.loading("Generating payment link...", { id: "payment" });
+    try {
+      setProcessing(auctionId);
+      toast.loading("Generating payment link...", { id: "payment" });
 
-    const res = await fetch("/api/auction/notify-payment", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ auctionId }),
-    });
+      const res = await fetch("/api/auction/notify-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ auctionId }),
+      });
 
-    const data: PaymentLinkResponse = await res.json();
-    console.log("Payment link response:", data);
+      const data: PaymentLinkResponse = await res.json();
+      console.log("Payment link response:", data);
 
-    toast.dismiss("payment");
+      toast.dismiss("payment");
 
-    if (res.ok && data.payment_link) {
-      toast.success("Redirecting to payment page...");
-      window.location.href = data.payment_link;
-    } else {
-      toast.error(data.error || "Failed to generate payment link.");
+      if (res.ok && data.payment_link) {
+        toast.success("Redirecting to payment page...");
+        window.location.href = data.payment_link;
+      } else {
+        toast.error(data.error || "Failed to generate payment link.");
+      }
+    } catch (err) {
+      console.error("Error generating payment link:", err);
+      toast.dismiss("payment");
+      toast.error("Something went wrong while creating payment link.");
+    } finally {
+      setProcessing(null);
     }
-  } catch (err) {
-    console.error("Error generating payment link:", err);
-    toast.dismiss("payment");
-    toast.error("Something went wrong while creating payment link.");
-  } finally {
-    setProcessing(null);
-  }
-};
+  };
 
 
   return (
@@ -139,7 +145,7 @@ const BiddedAuctionsPage = () => {
                   </Button>
 
                   {/* Show Pay Here button only if auction is closed */}
-                  {auction.status === "closed" && (
+                  {auction.status === "closed" && auction.winnerId === myUserId && (
                     <Button
                       className="w-full mt-2 bg-purple-600 text-white hover:bg-purple-700"
                       disabled={processing === auction._id}
@@ -151,7 +157,7 @@ const BiddedAuctionsPage = () => {
                           Redirecting...
                         </>
                       ) : (
-                        "Pay Here"
+                        "Pay "
                       )}
                     </Button>
                   )}
