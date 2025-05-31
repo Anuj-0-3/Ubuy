@@ -86,7 +86,11 @@ export default function NotificationPage() {
             >
               <div className="p-3 bg-emerald-100 rounded-full">{getIcon(note.type)}</div>
               <div className="flex-1">
-                <p className="text-gray-800 font-medium">{note.message}</p>
+                <p
+                  className="text-gray-800 font-medium"
+                  dangerouslySetInnerHTML={{ __html: note.message }}
+                />
+
                 <p className="text-sm text-gray-500 mt-1">
                   {new Date(note.createdAt).toLocaleString()}
                 </p>
