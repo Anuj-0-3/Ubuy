@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -33,10 +32,13 @@ interface Auction {
   createdBy: string;
 }
 
+const ITEMS_PER_PAGE = 6;
+
 const MyAuctionsPage = () => {
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1); 
 
   const fetchAuctions = async () => {
     try {
@@ -71,8 +73,8 @@ const MyAuctionsPage = () => {
 
       toast.success("Auction closed successfully!");
       fetchAuctions();
-    } catch  {
-      toast.error( "Something went wrong");
+    } catch {
+      toast.error("Something went wrong");
     }
   };
 
@@ -93,7 +95,7 @@ const MyAuctionsPage = () => {
       setDeleteId(null);
       fetchAuctions();
     } catch {
-      toast.error( "Something went wrong");
+      toast.error("Something went wrong");
     }
   };
 
@@ -101,22 +103,36 @@ const MyAuctionsPage = () => {
     fetchAuctions();
   }, []);
 
-  return (
-    <>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 py-10">
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-extrabold text-gray-900">My Auctions</h1>
-          <p className="text-gray-600 mt-2">Here are all the auctions you’ve created</p>
-        </div>
+  // Pagination logic
+  const indexOfLastAuction = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirstAuction = indexOfLastAuction - ITEMS_PER_PAGE;
+  const currentAuctions = auctions.slice(indexOfFirstAuction, indexOfLastAuction);
+  const totalPages = Math.ceil(auctions.length / ITEMS_PER_PAGE);
 
-        {loading ? (
-          <Loader2 className="animate-spin text-emerald-500" size={40} />
-        ) : (
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 py-10">
+      <div className="text-center mb-10">
+        <h1 className="text-4xl font-extrabold text-gray-900">My Auctions</h1>
+        <p className="text-gray-600 mt-2">Here are all the auctions you’ve created</p>
+      </div>
+
+      {loading ? (
+        <Loader2 className="animate-spin text-emerald-500" size={40} />
+      ) : (
+        <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 w-full max-w-6xl">
-            {auctions.length === 0 ? (
+            {currentAuctions.length === 0 ? (
               <p className="text-gray-500">No auctions found.</p>
             ) : (
-              auctions.map((auction) => (
+              currentAuctions.map((auction) => (
                 <Card
                   key={auction._id}
                   className="relative bg-white/10 border border-emerald-400/40 shadow-lg rounded-2xl overflow-hidden"
@@ -201,9 +217,18 @@ const MyAuctionsPage = () => {
               ))
             )}
           </div>
-        )}
-      </div>
-    </>
+
+          {/* Pagination controls */}
+          {auctions.length > ITEMS_PER_PAGE && (
+            <div className="flex justify-center mt-8 space-x-4">
+              <Button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</Button>
+              <span className="text-gray-700 font-medium">{`Page ${currentPage} of ${totalPages}`}</span>
+              <Button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</Button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
   );
 };
 

@@ -116,7 +116,7 @@ const BiddedAuctionsPage = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 py-10">
       <div className="text-center mb-10">
         <h1 className="text-4xl font-extrabold text-gray-900">Bidded Auctions</h1>
-        <p className="text-gray-600 mt-2">Here are the auctions you've placed bids on</p>
+        <p className="text-gray-600 mt-2">Here are the auctions you&apos;ve placed bids on</p>
       </div>
 
       {loading ? (
@@ -125,7 +125,7 @@ const BiddedAuctionsPage = () => {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 w-full max-w-6xl">
             {currentAuctions.length === 0 ? (
-              <p className="text-gray-500">You haven't placed any bids yet.</p>
+              <p className="text-gray-500">You haven&apos;t placed any bids yet.</p>
             ) : (
               currentAuctions.map((auction) => (
                 <Card
