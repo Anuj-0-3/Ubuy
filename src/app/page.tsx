@@ -94,7 +94,7 @@ export default function HomePage() {
             </>
           ) : (
             <>
-              <Link href="/sign-in"> 
+              <Link href="/sign-in">
                 <Button className="bg-white hover:cursor-pointer text-emerald-700 hover:bg-gray-200">
                   Login to Bid
                 </Button>
@@ -217,14 +217,21 @@ export default function HomePage() {
             { title: "Art", icon: "/Art.png" },
             { title: "Fashion", icon: "/fashion.png" },
           ].map((category, i) => (
-            <motion.div
-              key={i}
-              whileHover={{ scale: 1.1 }}
-              className="p-4 rounded-lg bg-gray-100 shadow-md cursor-pointer"
-            >
-              <Image src={category.icon} alt={category.title} width={150} height={50} className="mx-auto mb-2" />
-              <p className="text-gray-800 font-semibold">{category.title}</p>
-            </motion.div>
+            <Link key={i} href={`/auctions/by-category/${encodeURIComponent(category.title)}`}>
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                className="p-4 rounded-lg bg-gray-100 shadow-md cursor-pointer"
+              >
+                <Image
+                  src={category.icon}
+                  alt={category.title}
+                  width={150}
+                  height={50}
+                  className="mx-auto mb-2"
+                />
+                <p className="text-gray-800 font-semibold">{category.title}</p>
+              </motion.div>
+            </Link>
           ))}
         </div>
       </motion.section>

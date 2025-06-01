@@ -1,0 +1,214 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import Link from "next/link";
+import { toast } from "sonner";
+import { getRemainingTime } from "@/utils/time";
+import Image from "next/image";
+
+interface Auction {
+  _id: string;
+  title: string;
+  description: string;
+  image: string;
+  startingPrice: number;
+  currentPrice: number;
+  category: string;
+  highestBidder?: string;
+  startTime: string;
+  endTime: string;
+  status: "active" | "closed";
+  createdBy: string;
+}
+
+const ITEMS_PER_PAGE = 9;
+
+interface CategoryAuctionsProps {
+  category: string;
+}
+
+const CategoryAuctionsPage: React.FC<CategoryAuctionsProps> = ({ category }) => {
+  const [auctions, setAuctions] = useState<Auction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [bidInputs, setBidInputs] = useState<{ [key: string]: string }>({});
+  const [remainingTimes, setRemainingTimes] = useState<{ [key: string]: string }>({});
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    const fetchCategoryAuctions = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/auction/bycategory?category=${encodeURIComponent(category)}`);
+        const data = await res.json();
+        setAuctions(data);
+      } catch (err) {
+        console.error("Error fetching auctions by category", err);
+        toast.error("Failed to load auctions for this category.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategoryAuctions();
+  }, [category]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const updatedTimes: { [key: string]: string } = {};
+      auctions.forEach((auction) => {
+        updatedTimes[auction._id] = getRemainingTime(auction.endTime);
+      });
+      setRemainingTimes(updatedTimes);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [auctions]);
+
+  const handleBid = async (id: string) => {
+    const bidAmount = parseFloat(bidInputs[id]);
+    if (isNaN(bidAmount) || bidAmount <= 0) {
+      toast.error("Please enter a valid bid amount.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/auction/bid/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bidAmount }),
+      });
+
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.error || "Failed to place bid");
+      }
+
+      toast.success("Bid placed successfully!");
+      // Refresh auctions list
+      const updated = await fetch(`/api/auction/bycategory?category=${encodeURIComponent(category)}`);
+      setAuctions(await updated.json());
+      setBidInputs({ ...bidInputs, [id]: "" });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Something went wrong");
+    }
+  };
+
+  const indexOfLastAuction = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirstAuction = indexOfLastAuction - ITEMS_PER_PAGE;
+  const currentAuctions = auctions.slice(indexOfFirstAuction, indexOfLastAuction);
+
+  const totalPages = Math.ceil(auctions.length / ITEMS_PER_PAGE);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 py-10">
+      <div className="text-center mb-10">
+        <h1 className="text-4xl font-extrabold text-gray-900">
+          {category} Auctions
+        </h1>
+        <p className="text-gray-600 mt-2">
+          Explore live and upcoming auctions in the &quot;{category}&quot;  category.
+        </p>
+      </div>
+
+      {loading ? (
+        <Loader2 className="animate-spin text-emerald-500" size={40} />
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 w-full max-w-6xl">
+            {currentAuctions.length === 0 ? (
+              <p className="text-gray-500">No auctions found in this category.</p>
+            ) : (
+              currentAuctions.map((auction) => {
+                const timeLeft = remainingTimes[auction._id] || "Calculating...";
+                const isClosed = timeLeft === "Closed" || auction.status === "closed";
+
+                return (
+                  <Card
+                    key={auction._id}
+                    className="relative bg-white/10 backdrop-blur-md border border-emerald-400/40 shadow-lg rounded-2xl transition-transform duration-300 hover:scale-105 hover:shadow-xl"
+                  >
+                    <div className="absolute top-3 right-3 bg-red-500 text-white text-sm font-semibold px-3 py-1 rounded-full z-10 shadow">
+                      {timeLeft}
+                    </div>
+
+                    <CardContent className="p-6 space-y-4">
+                      <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
+                      <p className="text-gray-700">{auction.description}</p>
+                      {auction.image && (
+                        <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
+                          <Image
+                            src={auction.image}
+                            alt={auction.title}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                          />
+                        </div>
+                      )}
+                      <div className="text-sm text-gray-600 space-y-1">
+                        <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleString()}</p>
+                        <p><strong>End:</strong> {new Date(auction.endTime).toLocaleString()}</p>
+                        <p>
+                          <strong>Status:</strong>{" "}
+                          <span className={isClosed ? "text-red-500 font-semibold" : "text-green-600 font-semibold"}>
+                            {isClosed ? "Closed" : "Active"}
+                          </span>
+                        </p>
+                        <p><strong>Starting Price:</strong> ₹{auction.startingPrice}</p>
+                        <p><strong>Current Price:</strong> ₹{auction.currentPrice}</p>
+                        <p><strong>Category:</strong> {auction.category}</p>
+                      </div>
+
+                      {!isClosed && (
+                        <div className="pt-2 space-y-2">
+                          <Input
+                            type="number"
+                            placeholder="Your Bid (₹)"
+                            className="border border-gray-300 focus:border-emerald-500"
+                            value={bidInputs[auction._id] || ""}
+                            onChange={(e) =>
+                              setBidInputs({ ...bidInputs, [auction._id]: e.target.value })
+                            }
+                          />
+                          <Button
+                            onClick={() => handleBid(auction._id)}
+                            className="w-full bg-emerald-500 text-white rounded-full hover:bg-emerald-600"
+                          >
+                            Place Bid
+                          </Button>
+                          <Link href={`/auctions/${auction._id}`} passHref>
+                            <Button className="w-full hover:cursor-pointer bg-indigo-500 text-white rounded-full hover:bg-indigo-600">Explore More</Button>
+                          </Link>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })
+            )}
+          </div>
+
+          <div className="flex justify-center mt-8 space-x-4">
+            <Button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</Button>
+            <span className="text-gray-700 font-medium">{`Page ${currentPage} of ${totalPages}`}</span>
+            <Button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</Button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default CategoryAuctionsPage;

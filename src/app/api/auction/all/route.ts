@@ -6,6 +6,16 @@ import "@/models/User";
 import "@/models/AuthUser";
 import Notification from "@/models/Notification";
 
+interface Bidder {
+  bidder: {
+    _id: string;
+    username?: string;
+    email?: string;
+    provider?: string;
+  };
+  bidderModel?: string;
+  amount: number;
+}
 export async function GET() {
   try {
     await dbConnect();
@@ -36,19 +46,6 @@ export async function GET() {
 
     for (const auction of closedAuctions) {
       if (!auction.bidders || auction.bidders.length === 0) continue;
-
-      // Sort bidders by amount descending
-      interface Bidder {
-        bidder: {
-          _id: string;
-          username?: string;
-          email?: string;
-          provider?: string;
-        };
-        bidderModel?: string;
-        amount: number;
-      }
-
       const sortedBidders = (auction.bidders as Bidder[]).sort((a, b) => b.amount - a.amount);
       const winner = sortedBidders[0];
 
