@@ -8,6 +8,7 @@ export interface IAuthUser extends Document {
   createdAt: Date;
   biddedauction:string[];
   updatedAt: Date;
+  image?: string;
 }
 
 const AuthUserSchema: Schema = new Schema(
@@ -25,7 +26,7 @@ const AuthUserSchema: Schema = new Schema(
     provider: {
       type: String,
       default: 'google',  // Default to Google for external users
-      enum: ['google', 'facebook', 'github'], // Add other providers if needed
+      enum: ['google', 'facebook', 'github'], 
     },
     authProvider: {
       type: String,
@@ -36,6 +37,10 @@ const AuthUserSchema: Schema = new Schema(
       type: [String], 
       default: [], 
     },
+    image:{
+      type: String,
+      default: '', 
+    }
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt
