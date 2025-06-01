@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Notification from "@/models/Notification";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/options";
+import { authOptions } from "../../(user-auth)/auth/[...nextauth]/options";
 
 export async function DELETE(
   req: Request,

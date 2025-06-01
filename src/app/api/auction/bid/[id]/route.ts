@@ -2,7 +2,7 @@ import dbConnect from "@/lib/dbConnect";
 import Auction from "@/models/Auction";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../../auth/[...nextauth]/options";
+import { authOptions } from "../../../(user-auth)/auth/[...nextauth]/options";
 import mongoose from "mongoose";
 import Pusher from "pusher";
 import User from "@/models/User";
