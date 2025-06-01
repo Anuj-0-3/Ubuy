@@ -8,9 +8,16 @@ import { LogOut, LogIn, Mail, User, Upload } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
 
+type Profile = {
+    image?: string;
+    username?: string;
+    name?: string;
+  };
+
+
 const ProfilePage = () => {
   const { data: session, status, update } = useSession();
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [username, setUsername] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
