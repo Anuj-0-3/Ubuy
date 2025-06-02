@@ -14,7 +14,7 @@ const CreateAuction = () => {
     startingPrice: "",
     startTime: "",
     endTime: "",
-    image: "",
+    images: [] as string[],
     category: "Other",
   });
 
@@ -32,9 +32,10 @@ const CreateAuction = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleImageUpload = (imageUrl: string) => {
-    setFormData({ ...formData, image: imageUrl });
+  const handleImageUpload = (imageUrls: string[]) => {
+    setFormData({ ...formData, images: imageUrls });
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,11 +49,13 @@ const CreateAuction = () => {
       return;
     }
 
-    if (!formData.image) {
-      setError("Please upload an image before submitting.");
+    if (!formData.images || formData.images.length === 0) {
+      setError("Please upload at least one image before submitting.");
       setLoading(false);
       return;
     }
+
+
 
     try {
       const res = await fetch("/api/auction/create", {
@@ -76,7 +79,7 @@ const CreateAuction = () => {
         startingPrice: "",
         startTime: "",
         endTime: "",
-        image: "",
+        images: [],
         category: "Other",
       });
     } catch (err) {
@@ -174,11 +177,12 @@ const CreateAuction = () => {
                 <option value="Other">Other</option>
               </select>
             </div>
-             <div className="flex justify-center">
+            <div className="flex justify-center">
 
-            <AuctionImageUploader onUpload={handleImageUpload} />
-            {formData.image && <p className="text-green-600">Image uploaded successfully!</p>}
-             </div>
+              <AuctionImageUploader onUpload={handleImageUpload} />
+              {formData.images.length > 0 && <p className="text-green-600">Images uploaded successfully!</p>}
+
+            </div>
 
             <Button type="submit" className="w-full bg-emerald-600 hover:cursor-pointer text-white" disabled={loading}>
               {loading ? "Creating Auction..." : "Create Auction"}

@@ -22,7 +22,7 @@ interface Auction {
   _id: string;
   title: string;
   description: string;
-  image: string;
+  images: string[];
   startingPrice: number;
   currentPrice: number;
   highestBidder?: string;
@@ -38,7 +38,7 @@ const MyAuctionsPage = () => {
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1); 
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchAuctions = async () => {
     try {
@@ -170,15 +170,20 @@ const MyAuctionsPage = () => {
                   <CardContent className="p-6 space-y-4">
                     <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
                     <p className="text-gray-700">{auction.description}</p>
-                    <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
-                      <Image
-                        src={auction.image}
-                        alt={auction.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                      />
+                    <div className="flex gap-2 overflow-x-auto">
+                      {auction.images && auction.images.length > 0 && (
+                        <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
+                          <Image
+                            src={auction.images[0]} 
+                            alt={auction.title}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                          />
+                        </div>
+                      )}
                     </div>
+
                     <div className="text-sm text-gray-600">
                       <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleString()}</p>
                       <p><strong>End:</strong> {new Date(auction.endTime).toLocaleString()}</p>

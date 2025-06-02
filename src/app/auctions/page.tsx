@@ -14,7 +14,7 @@ interface Auction {
   _id: string;
   title: string;
   description: string;
-  image: string;
+  images: string[];
   startingPrice: number;
   currentPrice: number;
   category: string;
@@ -136,10 +136,10 @@ const AllAuctionsPage = () => {
                     <CardContent className="p-6 space-y-4">
                       <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
                       <p className="text-gray-700">{auction.description}</p>
-                      {auction.image && (
+                      {auction.images && auction.images.length > 0 && (
                         <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
                           <Image
-                            src={auction.image}
+                            src={auction.images[0]} // show the first image
                             alt={auction.title}
                             fill
                             className="object-cover"
@@ -147,6 +147,7 @@ const AllAuctionsPage = () => {
                           />
                         </div>
                       )}
+
                       <div className="text-sm text-gray-600 space-y-1">
                         <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleString()}</p>
                         <p><strong>End:</strong> {new Date(auction.endTime).toLocaleString()}</p>

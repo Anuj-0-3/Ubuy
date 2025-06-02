@@ -9,10 +9,10 @@ import Image from "next/image";
 import { toast } from "sonner";
 
 type Profile = {
-    image?: string;
-    username?: string;
-    name?: string;
-  };
+  image?: string;
+  username?: string;
+  name?: string;
+};
 
 
 const ProfilePage = () => {
@@ -118,13 +118,21 @@ const ProfilePage = () => {
           <Card className="w-full max-w-md bg-white/10 backdrop-blur-lg border border-emerald-500/40 shadow-lg rounded-2xl p-6 text-center">
             <CardHeader className="flex flex-col items-center">
               <div className="relative w-24 h-24">
-                <Image
-                  src={profile?.image || "/default-profile.png"}
-                  alt="Profile"
-                  width={96}
-                  height={96}
-                  className="object-cover rounded-full border-4 border-emerald-400 shadow-md"
-                />
+                {profile?.image ? (
+                  <Image
+                    src={profile.image}
+                    alt="Profile"
+                    width={96}
+                    height={96}
+                    className="object-cover rounded-full border-4 border-emerald-400 shadow-md"
+                  />
+                ) : (
+                  <div
+                    className="flex items-center justify-center w-24 h-24 rounded-full bg-emerald-400 text-white font-bold text-l border-4 border-emerald-400 shadow-md"
+                  >
+                    {profile?.username ? profile.username.charAt(0).toUpperCase() : "Upload profile picture"}
+                  </div>
+                )}
                 <input
                   type="file"
                   ref={fileInputRef}

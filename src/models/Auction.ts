@@ -1,8 +1,9 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
+
 export interface IAuction extends Document {
   title: string;
   description: string;
-  image: string;
+  images: string[]; 
   startingPrice: number;
   currentPrice: number;
   bidders: {
@@ -18,14 +19,14 @@ export interface IAuction extends Document {
   status: "active" | "closed";
   createdBy: Types.ObjectId;
   createdByModel: "User" | "AuthUser";
-  notified?: boolean; 
+  notified?: boolean;
 }
 
 const AuctionSchema: Schema = new Schema(
   {
     title: { type: String, required: true },
     description: { type: String, required: true },
-    image: { type: String },
+    images: [{ type: String }], 
     startingPrice: { type: Number, required: true },
     currentPrice: { type: Number, default: 0 },
     bidders: [
@@ -38,7 +39,7 @@ const AuctionSchema: Schema = new Schema(
         bidderModel: {
           type: String,
           required: true,
-          enum: ["User", "AuthUser"], 
+          enum: ["User", "AuthUser"],
         },
         bidderName: { type: String },
         amount: { type: Number, required: true },
@@ -63,7 +64,7 @@ const AuctionSchema: Schema = new Schema(
       required: true,
       enum: ["User", "AuthUser"],
     },
-     notified: { type: Boolean, default: false },
+    notified: { type: Boolean, default: false },
   },
   {
     timestamps: true,

@@ -14,7 +14,7 @@ interface Auction {
   _id: string;
   title: string;
   description: string;
-  image: string;
+  images: string[];
   startingPrice: number;
   currentPrice: number;
   category: string;
@@ -146,10 +146,10 @@ const CategoryAuctionsPage: React.FC<CategoryAuctionsProps> = ({ category }) => 
                     <CardContent className="p-6 space-y-4">
                       <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
                       <p className="text-gray-700">{auction.description}</p>
-                      {auction.image && (
+                      {auction.images && auction.images.length > 0 && (
                         <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
                           <Image
-                            src={auction.image}
+                            src={auction.images[0]} 
                             alt={auction.title}
                             fill
                             className="object-cover"

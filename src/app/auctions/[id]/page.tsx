@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import BiddersTable from "@/components/BiddersTable";
-import Pusher from 'pusher-js';
+import Pusher from "pusher-js";
 
 type Bidder = {
   _id: string;
@@ -21,7 +21,7 @@ type Auction = {
   _id: string;
   title: string;
   description: string;
-  image: string;
+  images: string[]; // Updated to images array
   currentPrice: number;
   startingPrice: number;
   category: string;
@@ -37,6 +37,7 @@ export default function AuctionDetailPage() {
   const [auction, setAuction] = useState<Auction | null>(null);
   const [loading, setLoading] = useState(true);
   const [bidInputs, setBidInputs] = useState<{ [key: string]: string }>({});
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const handleBid = async (id: string) => {
     const bidAmount = parseFloat(bidInputs[id]);
@@ -59,7 +60,6 @@ export default function AuctionDetailPage() {
 
       toast.success("Bid placed successfully!");
 
-      // Fetch updated auction data
       const updatedRes = await fetch(`/api/auction/${id}/details`);
       const updatedData = await updatedRes.json();
       if (updatedData.success) {
@@ -96,9 +96,7 @@ export default function AuctionDetailPage() {
     });
 
     const channel = pusher.subscribe(`auction-${id}`);
-
-    // Listen for new bids and update the auction data
-    channel.bind('new-bid', (data: Bidder) => {
+    channel.bind("new-bid", (data: Bidder) => {
       setAuction((prevAuction) => {
         if (prevAuction) {
           const updatedBidders = [...prevAuction.bidders, data];
@@ -112,13 +110,19 @@ export default function AuctionDetailPage() {
       });
     });
 
-
     return () => {
       channel.unbind_all();
       channel.unsubscribe();
       pusher.disconnect();
     };
   }, [id]);
+
+  // Set default selected image when auction data loads
+  useEffect(() => {
+    if (auction?.images && auction.images.length > 0) {
+      setSelectedImage(auction.images[0]);
+    }
+  }, [auction]);
 
   if (loading) {
     return (
@@ -139,16 +143,39 @@ export default function AuctionDetailPage() {
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Left Side Image */}
-        <div className="flex justify-center">
-          <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
-            <Image
-              src={auction.image}
-              alt={auction.title}
-              fill
-              className="object-contain"
-              sizes="(max-width: 768px) 100vw, 33vw"
-            />
+        {/* Left Side Image with Mini Photo Viewer */}
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* Thumbnails */}
+          <div className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-y-auto">
+            {auction.images.map((imgUrl, idx) => (
+              <div
+                key={idx}
+                className={`relative flex-shrink-0 w-20 h-20 border rounded cursor-pointer overflow-hidden ${
+                  selectedImage === imgUrl ? "ring-2 ring-emerald-500" : "border-gray-300"
+                }`}
+                onClick={() => setSelectedImage(imgUrl)}
+              >
+                <Image
+                  src={imgUrl}
+                  alt={`Thumbnail ${idx + 1}`}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Main Image */}
+          <div className="flex-1 relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
+            {selectedImage && (
+              <Image
+                src={selectedImage}
+                alt={auction.title}
+                fill
+                className="object-contain"
+                sizes="(max-width: 768px) 100vw, 33vw"
+              />
+            )}
           </div>
         </div>
 
@@ -159,23 +186,25 @@ export default function AuctionDetailPage() {
           </h1>
 
           <p className="text-gray-600">{auction.description}</p>
-          <div className="space-y-2" >
-            <div className="flex items-center gap-2  text-lg font-semibold text-gray-800">
+
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-lg font-semibold text-gray-800">
               <Tag className="text-purple-500" />
-              Category: <span className="font-medium text-gray-600">{auction.category}</span>
+              Category:{" "}
+              <span className="font-medium text-gray-600">
+                {auction.category}
+              </span>
             </div>
 
-            <div className="flex items-center gap-2 text-lg font-semibold text-gray-800 ">
+            <div className="flex items-center gap-2 text-lg font-semibold text-gray-800">
               <IndianRupee className="text-blue-500" />
               Starting Price: ₹{auction.startingPrice}
             </div>
 
-            {auction && (
-              <div className="flex items-center gap-2 text-lg font-semibold">
-                <IndianRupee className="text-green-600" />
-                Current Price: ₹{auction.currentPrice}
-              </div>
-            )}
+            <div className="flex items-center gap-2 text-lg font-semibold">
+              <IndianRupee className="text-green-600" />
+              Current Price: ₹{auction.currentPrice}
+            </div>
 
             <div className="flex items-center gap-2 text-gray-500">
               <Timer className="text-orange-500" />
@@ -183,7 +212,7 @@ export default function AuctionDetailPage() {
             </div>
           </div>
 
-          {!isClosed && auction && (
+          {!isClosed && (
             <div className="pt-2 space-y-2">
               <Input
                 type="number"
@@ -214,5 +243,6 @@ export default function AuctionDetailPage() {
     </div>
   );
 }
+
 
 

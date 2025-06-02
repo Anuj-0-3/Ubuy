@@ -12,7 +12,7 @@ interface Auction {
   _id: string;
   title: string;
   description: string;
-  image: string;
+  images: string[];
   startingPrice: number;
   currentPrice: number;
   highestBidder?: string;
@@ -136,13 +136,17 @@ const BiddedAuctionsPage = () => {
                     <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
                     <p className="text-gray-700">{auction.description}</p>
                     <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
-                      <Image
-                        src={auction.image}
-                        alt={auction.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                      />
+                      {auction.images && auction.images.length > 0 && (
+                        <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
+                          <Image
+                            src={auction.images[0]}
+                            alt={auction.title}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                          />
+                        </div>
+                      )}
                     </div>
                     <div className="text-sm text-gray-600">
                       <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleString()}</p>
