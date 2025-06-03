@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, Settings, Bell, Shield, ChevronLeft, BadgeIndianRupee } from "lucide-react";
+import { Menu, Bell, ChevronLeft, BadgeIndianRupee, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Link from "next/link";
@@ -28,18 +28,14 @@ export default function ProfileSidebar() {
               <ChevronLeft className="w-5 h-5 text-emerald-700" />
             )}
           </button>
-          <button className="flex  items-center gap-2 text-gray-700 hover:text-emerald-700 w-full py-2 px-2 transition-colors rounded-md hover:bg-emerald-200">
-            <Settings className="w-5  h-5" />
-            {!isCollapsed && <span >Account Settings</span>}
-          </button>
+           <Link href="/profile" className="flex items-center gap-2 text-gray-700 hover:text-emerald-700 w-full py-2 px-2 transition-colors rounded-md hover:bg-emerald-200">
+            <User className="w-5 h-5" />
+            {!isCollapsed && <span>Profile</span>}
+          </Link>
           <Link href="/profile/notifications" className="flex items-center gap-2 text-gray-700 hover:text-emerald-700 w-full py-2 px-2 transition-colors rounded-md hover:bg-emerald-200">
             <Bell className="w-5 h-5" />
             {!isCollapsed && <span>Notifications</span>}
           </Link>
-          <button className="flex items-center gap-2 text-gray-700 hover:text-emerald-700 w-full py-2 px-2 transition-colors rounded-md hover:bg-emerald-200">
-            <Shield className="w-5 h-5" />
-            {!isCollapsed && <span>Privacy</span>}
-          </button>
           <Link href="/profile/my-auction" className="flex items-center gap-2 text-gray-700 hover:text-emerald-700 w-full py-2 px-2 transition-colors rounded-md hover:bg-emerald-200">
           <BadgeIndianRupee className="w-5 h-5" />
           {!isCollapsed && <span>Created Auction</span>}

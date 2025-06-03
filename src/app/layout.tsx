@@ -22,6 +22,7 @@ export default function RootLayout({
       <SessionProvider>
         <SpeedInsights/>
       {!isAuthPage && <Navbar/>}
+      <div className="h-20"></div> 
       {children}
       <Toaster />
       {!isAuthPage && <Footer />}

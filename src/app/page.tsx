@@ -225,8 +225,8 @@ export default function HomePage() {
                 <Image
                   src={category.icon}
                   alt={category.title}
-                  width={150}
-                  height={50}
+                  width={250}
+                  height={150}
                   className="mx-auto mb-2"
                 />
                 <p className="text-gray-800 font-semibold">{category.title}</p>

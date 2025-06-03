@@ -10,9 +10,28 @@ import { Input } from "./ui/input";
 
 export default function Footer() {
     return (
-        <footer className="bg-emerald-600 text-gray-300 pt-10 pb-6 ">
-            <div className=" mx-auto  px-10 grid grid-cols-1 md:grid-cols-4 gap-10">
-
+        <footer className="bg-emerald-600 text-gray-300 pb-6 ">
+            
+            {/* Newsletter Subscription */}
+            <motion.section
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+                className="bg-emerald-500 text-white py-12 px-6 text-center"
+            >
+                <h2 className="text-2xl font-semibold mb-4">Stay Updated!</h2>
+                <p className="mb-6">Subscribe to our newsletter to get the latest auction alerts.</p>
+                <div className="flex flex-col sm:flex-row justify-center gap-4">
+                    <Input
+                        type="email"
+                        placeholder="Enter your email"
+                        className="px-4 py-2 bg-white rounded-md text-emerald-700 w-full sm:w-64 placeholder:text-gray-400"
+                    />
+                    <Button className="bg-white hover:cursor-pointer text-emerald-700 hover:bg-emerald-100">Subscribe</Button>
+                </div>
+            </motion.section>
+            <div className=" mx-auto pt-10  px-10 grid grid-cols-1 md:grid-cols-4 gap-10">
                 {/* Logo & Intro */}
                 <div>
                     <h2 className="text-3xl hover:cursor-pointer font-bold text-white mb-4">U-Buy</h2>
@@ -64,25 +83,6 @@ export default function Footer() {
                 </div>
 
             </div>
-
-            <motion.section
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ duration: 0.8 }}
-                viewport={{ once: true }}
-                className="bg-emerald-600 text-white py-12 px-6 text-center"
-            >
-                <h2 className="text-2xl font-semibold mb-4">Stay Updated!</h2>
-                <p className="mb-6">Subscribe to our newsletter to get the latest auction alerts.</p>
-                <div className="flex flex-col sm:flex-row justify-center gap-4">
-                    <Input
-                        type="email"
-                        placeholder="Enter your email"
-                        className="px-4 py-2 bg-white rounded-md text-emerald-700 w-full sm:w-64 placeholder:text-gray-400"
-                    />
-                    <Button className="bg-white text-emerald-700 hover:bg-emerald-100">Subscribe</Button>
-                </div>
-            </motion.section>
 
             {/* Bottom Line */}
             <div className="border-t border-gray-300 mt-10 pt-5 text-center text-sm text-gray-300">
