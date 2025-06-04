@@ -55,7 +55,7 @@ const UserSchema: Schema = new Schema(
 
     authProvider: {
       type: String,
-      default: "local",
+      default: "User",
     },
 
     biddedauction: {

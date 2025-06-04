@@ -29,6 +29,7 @@ export async function POST(req: Request) {
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+    console.log("Looking in model:", userModel, "for userId:", userId);
 
     return NextResponse.json(user, { status: 200 });
   } catch (error) {
