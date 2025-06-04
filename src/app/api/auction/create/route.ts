@@ -4,6 +4,18 @@ import Auction from "@/models/Auction";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../(user-auth)/auth/[...nextauth]/options";
 
+const verifyCaptcha = async (token: string): Promise<boolean> => {
+  const secret = process.env.TURNSTILE_SECRET_KEY!;
+  const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `secret=${secret}&response=${token}`,
+  });
+
+  const data = await res.json();
+  return data.success;
+};
+
 const validCategories = ["Collectibles", "Art", "Electronics", "Fashion", "Other"];
 
 export async function POST(req: Request) {
@@ -24,7 +36,14 @@ export async function POST(req: Request) {
       startTime,
       endTime,
       category,
+      token, 
     } = body;
+
+    // Validate CAPTCHA token
+     const isValidCaptcha = await verifyCaptcha(token);
+    if (!isValidCaptcha) {
+      return NextResponse.json({ message: "CAPTCHA verification failed" }, { status: 400 });
+    }
 
     // Validate required fields
     if (!title || !description || !startingPrice || !startTime || !endTime || !category) {

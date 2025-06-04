@@ -5,6 +5,7 @@ import AuctionImageUploader from "@/components/AuctionImageUploader";
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-react";
 import Link from "next/link";
+import Turnstile from "react-turnstile";
 
 const CreateAuction = () => {
   const { data: session } = useSession();
@@ -21,6 +22,7 @@ const CreateAuction = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [token, setToken] = useState("");
 
   const getMinDateTime = () => {
     const now = new Date();
@@ -54,6 +56,11 @@ const CreateAuction = () => {
       setLoading(false);
       return;
     }
+    if (!token) {
+      setError("CAPTCHA validation failed. Please try again.");
+      setLoading(false);
+      return;
+    }
 
 
 
@@ -66,6 +73,7 @@ const CreateAuction = () => {
           startingPrice: Number(formData.startingPrice),
           startTime: new Date(formData.startTime),
           endTime: new Date(formData.endTime),
+          token,
         }),
       });
 
@@ -183,6 +191,11 @@ const CreateAuction = () => {
               {formData.images.length > 0 && <p className="text-green-600">Images uploaded successfully!</p>}
 
             </div>
+
+            <Turnstile
+              sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""}
+              onSuccess={(token) => setToken(token)}
+            />
 
             <Button type="submit" className="w-full bg-emerald-600 hover:cursor-pointer text-white" disabled={loading}>
               {loading ? "Creating Auction..." : "Create Auction"}
