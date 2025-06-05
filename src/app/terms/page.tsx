@@ -29,41 +29,6 @@ export default function TermsPage() {
           </p>
         </motion.div>
 
-        {/* How It Works (reuse your section) */}
-        <motion.section
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="bg-white py-12 px-6 text-center"
-        >
-          <h2 className="text-2xl font-semibold text-emerald-800 mb-6">How It Works</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                icon: <UserIcon className="text-emerald-600" />,
-                title: "Sign Up",
-                desc: "Create your free account to start bidding securely.",
-              },
-              {
-                icon: <HammerIcon className="text-emerald-600" />,
-                title: "Place Bids",
-                desc: "Participate in live auctions and place competitive bids.",
-              },
-              {
-                icon: <ShieldCheckIcon className="text-emerald-600" />,
-                title: "Win & Secure",
-                desc: "Enjoy trusted, transparent transactions and secure payments.",
-              },
-            ].map((step, index) => (
-              <div key={index} className="flex flex-col items-center">
-                <div className="p-4 bg-emerald-200 rounded-full mb-3">{step.icon}</div>
-                <h3 className="text-lg font-semibold text-emerald-800">{step.title}</h3>
-                <p className="text-gray-600">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </motion.section>
 
         {/* Key Policies */}
         <motion.section
