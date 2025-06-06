@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const isAuthPage = pathname?.startsWith("/sign-in") || pathname?.startsWith("/sign-up") || false;
+  const isAuthPage = pathname?.startsWith("/sign-in") || pathname?.startsWith("/sign-up") || pathname?.startsWith("/forgot-password") ||  pathname?.startsWith("/verify") || pathname?.startsWith("/reset-password") || false;
   
   return (
     <html lang="en">
@@ -22,7 +22,7 @@ export default function RootLayout({
       <SessionProvider>
         <SpeedInsights/>
       {!isAuthPage && <Navbar/>}
-      <div className="h-20"></div> 
+       {!isAuthPage && <div className="h-20"></div>}
       {children}
       <Toaster />
       {!isAuthPage && <Footer />}

@@ -38,7 +38,7 @@ const VerifyCodePage = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50">
-      <div className="w-full max-w-md p-8 bg-white/10 backdrop-blur-xl border-2 border-emerald-500/40 shadow-lg rounded-2xl">
+      <div className="p-4 sm:w-full max-w-md sm:p-8 bg-white/10 backdrop-blur-xl border-2 border-emerald-500/40 shadow-lg rounded-2xl">
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Verify Your Account</h1>
           <p className="text-gray-600">Enter the code sent to your email</p>

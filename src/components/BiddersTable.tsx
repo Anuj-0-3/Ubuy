@@ -24,7 +24,7 @@ export default function BiddersTable({ bidders }: { bidders: Bidder[] }) {
   }, [bidders]);
 
   return (
-    <table className="w-full">
+    <table className="w-full text-sm sm:text-base">
       <tbody>
         {sortedBidders.length > 0 ? (
           sortedBidders.map((bid, index) => (
@@ -33,9 +33,9 @@ export default function BiddersTable({ bidders }: { bidders: Bidder[] }) {
               className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }} // Delay for a staggered effect
+              transition={{ duration: 0.5, delay: index * 0.1 }} 
             >
-              <td className="p-2 ml-3 flex items-center gap-2">
+              <td className="p-1 sm:p-2 ml-3 flex items-center gap-2">
                 {bid.bidderName || "Anonymous"}
               </td>
               <td className="p-2">₹{bid.amount}</td>

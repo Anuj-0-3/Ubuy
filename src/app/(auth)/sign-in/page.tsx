@@ -43,7 +43,7 @@ const Page = () => {
   return (
     <div className="flex justify-center  items-center min-h-screen bg-gray-50">
       {/* Glassmorphism Container */}
-      <div className="w-full max-w-md p-8 bg-white/10 backdrop-blur-3xl border-2 border-emerald-500/40 shadow-lg rounded-2xl">
+      <div className=" p-12 sm:w-full max-w-md sm:p-8 bg-white/10 backdrop-blur-3xl border-2 border-emerald-500/40 shadow-lg rounded-2xl">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">Welcome Back</h1>
           <p className="text-gray-600 mt-2">Sign in to access your account</p>
@@ -60,8 +60,8 @@ const Page = () => {
                 <FormItem>
                   <FormLabel className="text-gray-700">Email/Username</FormLabel>
                   <FormControl>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 text-gray-400" size={20} />
+                    <div className="flex items-center relative">
+                      <Mail className="absolute left-3 text-gray-400" size={20} />
                       <Input placeholder="Enter your email/username" className="pl-10 border border-gray-300 focus:border-emerald-500 focus:ring-emerald-500" {...field} />
                     </div>
                   </FormControl>
@@ -78,8 +78,8 @@ const Page = () => {
                 <FormItem>
                   <FormLabel className="text-gray-700">Password</FormLabel>
                   <FormControl>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 text-gray-400" size={20} />
+                    <div className="flex items-center relative">
+                      <Lock className="absolute left-3  text-gray-400" size={20} />
                       <Input
                         type="password"
                         placeholder="Enter your password"

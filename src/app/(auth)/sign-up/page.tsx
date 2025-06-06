@@ -73,13 +73,13 @@ const Page = () => {
 
   return (
     <div className="flex justify-center  items-center min-h-screen bg-gray-50">
-      <div className="w-full max-w-md p-8 bg-white/10 backdrop-blur-xl border-2 border-emerald-500/40 shadow-lg rounded-2xl">
+      <div className="p-12 sm:w-full max-w-md sm:p-8 bg-white/10 backdrop-blur-xl border-2 border-emerald-500/40 shadow-lg rounded-2xl">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">Join U-Buy</h1>
-          <p className="text-gray-600 mt-2 mb-4">Create an account to start your auction adventure</p>
+          <p className="text-gray-600 mt-2 mb-4">Create an account to start bidding</p>
         </div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 ">
+          <form onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
               name="username"
               control={form.control}
@@ -87,8 +87,8 @@ const Page = () => {
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 text-gray-400" size={20} />
+                    <div className="flex my-1 items-center relative">
+                      <User className="absolute left-3 text-gray-400" size={20} />
                       <Input placeholder="Username" className="pl-10" {...field} onChange={(e) => { field.onChange(e); debounced(e.target.value); }} />
                     </div>
                   </FormControl>
@@ -106,8 +106,8 @@ const Page = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 text-gray-400" size={20} />
+                    <div className="flex my-1 items-center relative">
+                      <Mail className="absolute left-3 text-gray-400" size={20} />
                       <Input placeholder="Email" className="pl-10" {...field} />
                     </div>
                   </FormControl>
@@ -123,8 +123,8 @@ const Page = () => {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 text-gray-400" size={20} />
+                    <div className="flex my-1 items-center relative">
+                      <Lock className="absolute left-3 text-gray-400" size={20} />
                       <Input type="password" placeholder="Password" className="pl-10" {...field} />
                     </div>
                   </FormControl>
