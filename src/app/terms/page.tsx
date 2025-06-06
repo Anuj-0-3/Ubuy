@@ -2,7 +2,7 @@
 
 import Head from "next/head";
 import { motion } from "framer-motion";
-import { ShieldCheckIcon, UserIcon, HammerIcon, FileTextIcon, LockIcon, AlertTriangleIcon } from "lucide-react";
+import {  FileTextIcon, LockIcon, AlertTriangleIcon } from "lucide-react";
 
 export default function TermsPage() {
   return (
