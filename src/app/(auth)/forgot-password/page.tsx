@@ -88,8 +88,8 @@ export default function ForgotPasswordPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-3 text-gray-400" size={20} />
+                      <div className="relative flex items-center">
+                        <Mail className="absolute left-3  text-gray-400" size={20} />
                         <Input {...field} placeholder="Enter your email" className="pl-10" />
                       </div>
                     </FormControl>

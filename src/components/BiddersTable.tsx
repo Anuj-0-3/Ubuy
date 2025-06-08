@@ -24,32 +24,49 @@ export default function BiddersTable({ bidders }: { bidders: Bidder[] }) {
   }, [bidders]);
 
   return (
-    <table className="w-full text-sm sm:text-base">
-      <tbody>
-        {sortedBidders.length > 0 ? (
-          sortedBidders.map((bid, index) => (
-            <motion.tr
-              key={bid._id}
-              className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }} 
-            >
-              <td className="p-1 sm:p-2 ml-3 flex items-center gap-2">
-                {bid.bidderName || "Anonymous"}
-              </td>
-              <td className="p-2">₹{bid.amount}</td>
-              <td className="p-2">{new Date(bid.bidTime).toLocaleString()}</td>
-            </motion.tr>
-          ))
-        ) : (
+    <div className="w-full overflow-x-auto rounded-lg shadow-md border border-gray-200 bg-white">
+      <table className="min-w-full text-sm sm:text-base">
+        <thead className="bg-gray-100 text-gray-700 font-semibold">
           <tr>
-            <td colSpan={3} className="p-2 text-center text-gray-500">
-              No bids yet
-            </td>
+            <th className="p-2 text-left">Bidder</th>
+            <th className="p-2 text-right">Amount</th>
+            <th className="p-2 text-right">Time</th>
           </tr>
-        )}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {sortedBidders.length > 0 ? (
+            sortedBidders.map((bid, index) => (
+              <motion.tr
+                key={bid._id}
+                className="hover:bg-gray-100 transition-colors border-b"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+              >
+                <td className="p-2 font-medium text-gray-800 flex items-center ">
+                  {index === 0 && <span title="Top Bid"></span>}
+                  {bid.bidderName || "Anonymous"}
+                </td>
+                <td className="p-2 text-green-600 font-semibold text-right">
+                  ₹{bid.amount}
+                </td>
+                <td className="p-2 text-gray-500 text-right">
+                  {new Date(bid.bidTime).toLocaleString("en-IN", {
+                    dateStyle: "short",
+                    timeStyle: "short",
+                  })}
+                </td>
+              </motion.tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={3} className="p-4 text-center text-gray-500">
+                No bids yet
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
   );
 }

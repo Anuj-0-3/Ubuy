@@ -233,7 +233,7 @@ export default function AuctionDetailPage() {
           )}
 
           <div className="border rounded-lg overflow-hidden mt-6">
-            <h2 className="bg-gray-100 px-4 py-2 font-semibold text-lg">
+            <h2 className="bg-purple-300 flex justify-center px-4 py-2 font-semibold tracking-wide text-xl md:text-2xl">
               Top 5 Bidders
             </h2>
             <BiddersTable bidders={auction.bidders} />
