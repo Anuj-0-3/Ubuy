@@ -100,7 +100,7 @@ export async function POST(req: Request) {
         category: auction.category,
       },
       link_meta: {
-        return_url: "https://localhost:3000/payment-success",
+        return_url: "https://localhost:3000/auctions",
       },
     };
 

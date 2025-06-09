@@ -209,7 +209,7 @@ export default function HomePage() {
         viewport={{ once: true }}
         className="bg-white py-12 px-6"
       >
-        <h2 className="text-2xl font-semibold text-emerald-800 mb-6 text-center">Explore Categories</h2>
+        <h2 className="text-4xl font-semibold text-emerald-800 mb-6 text-center">Explore Categories</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           {[
             { title: "Electronics", icon: "/electronics.png" },
@@ -220,6 +220,7 @@ export default function HomePage() {
             <Link key={i} href={`/auctions/by-category/${encodeURIComponent(category.title)}`}>
               <motion.div
                 whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
                 className="p-4 rounded-lg bg-gray-100 shadow-md cursor-pointer"
               >
                 <Image
