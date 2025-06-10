@@ -31,7 +31,7 @@ export default function Footer() {
                     <Button className="bg-white hover:cursor-pointer text-emerald-700 hover:bg-emerald-100">Subscribe</Button>
                 </div>
             </motion.section>
-            <div className=" mx-auto pt-10  px-10 grid grid-cols-1 md:grid-cols-4 gap-10">
+            <div className=" mx-auto pt-10  px-8 sm:px-16 grid grid-cols-1 md:grid-cols-4 gap-10">
                 {/* Logo & Intro */}
                 <div>
                     <h2 className="text-3xl hover:cursor-pointer font-bold text-white mb-4">U-Buy</h2>

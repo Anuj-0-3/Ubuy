@@ -6,6 +6,7 @@ import { SessionProvider } from "next-auth/react";
 import Footer from "@/components/Footer";
 import { usePathname } from "next/navigation";
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import HelpPopup from "@/components/HelpPopup";
 
 
 export default function RootLayout({
@@ -26,6 +27,7 @@ export default function RootLayout({
       {children}
       <Toaster />
       {!isAuthPage && <Footer />}
+      <HelpPopup />
       </SessionProvider>
       </body>
     </html>

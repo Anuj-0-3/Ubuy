@@ -75,39 +75,57 @@ export default function HomePage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
-        className="relative bg-cover bg-center h-[60vh] flex flex-col justify-center items-center text-white text-center px-4 bg-gradient-to-b from-emerald-700 to-emerald-500 shadow-lg"
+        className="relative bg-gradient-to-b from-emerald-700 to-emerald-500 shadow-lg h-[80vh] flex items-center px-4"
       >
-        <h1 className="text-4xl font-bold mb-4">Bid, Win & Own Unique Items</h1>
-        <p className="text-lg mb-6">Join live auctions and get the best deals.</p>
-        <div className="flex gap-4">
-          {session ? (
-            <>
-              <Button className="bg-emerald-800 hover:cursor-pointer hover:bg-emerald-900">
-                Start Bidding
-              </Button>
-              <Button
-                variant="outline"
-                className="text-emerald-600 hover:cursor-pointer border-white hover:bg-gray-300 hover:text-emerald-800"
-              >
-                Sell an Item
-              </Button>
-            </>
-          ) : (
-            <>
-              <Link href="/sign-in">
-                <Button className="bg-white hover:cursor-pointer text-emerald-700 hover:bg-gray-200">
-                  Login to Bid
-                </Button>
-              </Link>
-              <Link href="/sign-up" >
-                <Button variant="outline" className="bg-emerald-700 hover:cursor-pointer text-white hover:bg-gray-400">
-                  Sign Up
-                </Button>
-              </Link>
-            </>
-          )}
+        <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-6xl mx-auto">
+
+          {/* Left Side: Image */}
+          <div className="w-full md:w-1/2 flex justify-center mb-8 md:mb-0">
+            <Image
+              src="/hero.png"
+              alt="Hero Image"
+              width={350}
+              height={300}
+              className="w-full max-w-[500px] h-auto object-cover"
+            />
+          </div>
+
+          {/* Right Side: Text & Buttons */}
+          <div className="w-full md:w-1/2 text-white text-center md:text-left">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">Bid, Win & Own Unique Items</h1>
+            <p className="text-lg mb-6">Join live auctions and get the best deals.</p>
+            <div className="flex flex-wrap justify-center md:justify-start gap-4">
+              {session ? (
+                <>
+                  <Button className="bg-emerald-800 hover:cursor-pointer hover:bg-emerald-900">
+                    Start Bidding
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="text-emerald-600 hover:cursor-pointer border-white hover:bg-gray-300 hover:text-emerald-800"
+                  >
+                    Sell an Item
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link href="/sign-in">
+                    <Button className="bg-white hover:cursor-pointer text-emerald-700 hover:bg-gray-200">
+                      Login to Bid
+                    </Button>
+                  </Link>
+                  <Link href="/sign-up">
+                    <Button variant="outline" className="bg-emerald-700 hover:cursor-pointer text-white hover:bg-gray-400">
+                      Sign Up
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </motion.div>
+
 
       {/* Live Auctions */}
       <div className="flex py-12 px-6 flex-col bg-gray-50">

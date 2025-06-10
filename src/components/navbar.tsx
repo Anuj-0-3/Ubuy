@@ -12,7 +12,7 @@ function Navbar() {
   const { data: session } = useSession();
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 p-6 shadow-md bg-emerald-600 text-white">
+    <nav className="fixed top-0 left-0 w-full px-8 sm:px-16  z-50 p-6 shadow-md bg-emerald-600 text-white">
       <div className="container mx-auto flex justify-between items-center">
         <Link href="/" className="text-xl font-bold">
           <h1 className='text-3xl font-bold text-slate-100 font-sans'>U-Buy</h1>
