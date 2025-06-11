@@ -1,11 +1,29 @@
 "use client";
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import AuctionImageUploader from "@/components/AuctionImageUploader";
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-react";
 import Link from "next/link";
 import Turnstile from "react-turnstile";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import {
+  Alert,
+  AlertTitle,
+  AlertDescription,
+} from "@/components/ui/alert";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { format, setHours, setMinutes } from "date-fns";
+
+
 
 const CreateAuction = () => {
   const { data: session } = useSession();
@@ -24,20 +42,42 @@ const CreateAuction = () => {
   const [success, setSuccess] = useState("");
   const [token, setToken] = useState("");
 
-  const getMinDateTime = () => {
+  const now = new Date();
+
+  const [startDate, setStartDate] = useState<Date | null>(now);
+
+  const getLocalTimeString = () => {
     const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    return now.toISOString().slice(0, 16);
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
+  const [startTime, setStartTime] = useState(getLocalTimeString());
+
+  const [endDate, setEndDate] = useState<Date | null>(now);
+  const [endTime, setEndTime] = useState(getLocalTimeString());
+
+  useEffect(() => {
+    const [hours, minutes] = getLocalTimeString().split(":").map(Number);
+    const start = setMinutes(setHours(new Date(), hours), minutes);
+    setFormData(prev => ({ ...prev, startTime: start.toISOString(), endTime: start.toISOString() }));
+  }, []);
+
+  const getCurrentTimeString = () => {
+    const now = new Date();
+    return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleImageUpload = (imageUrls: string[]) => {
     setFormData({ ...formData, images: imageUrls });
   };
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,13 +96,12 @@ const CreateAuction = () => {
       setLoading(false);
       return;
     }
+
     if (!token) {
       setError("CAPTCHA validation failed. Please try again.");
       setLoading(false);
       return;
     }
-
-
 
     try {
       const res = await fetch("/api/auction/create", {
@@ -98,118 +137,251 @@ const CreateAuction = () => {
   };
 
   return (
-    <div className="flex py-10 flex-col items-center justify-center min-h-screen">
+    <div className="flex py-10 flex-col items-center justify-center min-h-screen bg-gray-50">
       {session ? (
-        <div className="w-full max-w-lg p-6 bg-white shadow-md rounded-lg">
-          <h2 className="text-2xl font-semibold text-center mb-4">Create Auction</h2>
-          {error && <p className="text-red-500">{error}</p>}
-          {success && <p className="text-green-500">{success}</p>}
+        <div className="w-full max-w-lg p-6 bg-white border border-gray-200 shadow-lg rounded-2xl">
+          <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
+            Create Auction
+          </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {success && (
+            <Alert variant="default" className="mb-4 bg-emerald-100 border-emerald-400 text-emerald-800">
+              <AlertTitle>Success</AlertTitle>
+              <AlertDescription>{success}</AlertDescription>
+            </Alert>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Title */}
             <div>
-              <label className="block font-medium">Title</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Title
+              </label>
               <input
                 type="text"
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
                 required
-                className="w-full p-2 border rounded"
+                placeholder="Enter auction title"
+                className="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               />
             </div>
 
+            {/* Description */}
             <div>
-              <label className="block font-medium">Description</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
                 required
-                className="w-full p-2 border rounded"
+                rows={3}
+                placeholder="Describe your item in detail"
+                className="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               />
             </div>
 
+            {/* Starting Price */}
             <div>
-              <label className="block font-medium">Starting Price (₹)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Starting Price (₹)
+              </label>
               <input
                 type="number"
                 name="startingPrice"
                 value={formData.startingPrice}
                 onChange={handleChange}
                 required
-                className="w-full p-2 border rounded"
+                placeholder="e.g. 1000"
+                className="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               />
             </div>
 
+            {/* Start & End Time */}
             <div className="flex gap-4">
-              <div className="w-1/2">
-                <label className="block font-medium">Start Time</label>
+              {/* Start Time */}
+              <div className="w-1/2 space-y-2">
+                <label className="block text-sm font-medium text-gray-700">Start Date & Time</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className={`w-full p-3 border border-gray-300 rounded-xl shadow-sm text-left ${!startDate ? "text-gray-400" : "text-gray-800"
+                        }`}
+                    >
+                      {startDate ? format(startDate, "PPP") : "Pick a start date"}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={startDate || undefined}
+                      onSelect={(date) => {
+                        if (!date) return;
+                        const [hours, minutes] = startTime.split(":").map(Number);
+                        const fullDate = setMinutes(setHours(date, hours), minutes);
+                        setStartDate(fullDate);
+                        setFormData({ ...formData, startTime: fullDate.toISOString() });
+                      }}
+                      disabled={(date) => {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        return date < today;
+                      }}
+                      className="bg-white text-gray-900 border rounded-xl shadow"
+                    />
+                  </PopoverContent>
+                </Popover>
                 <input
-                  type="datetime-local"
-                  name="startTime"
-                  value={formData.startTime}
-                  onChange={handleChange}
-                  required
-                  min={getMinDateTime()}
-                  className="w-full p-2 border rounded"
+                  type="time"
+                  value={startTime}
+                  min={
+                    startDate && new Date().toDateString() === startDate.toDateString()
+                      ? getCurrentTimeString()
+                      : undefined
+                  }
+                  onChange={(e) => {
+                    setStartTime(e.target.value);
+                    if (startDate) {
+                      const [hours, minutes] = e.target.value.split(":").map(Number);
+                      const updated = setMinutes(setHours(startDate, hours), minutes);
+                      setStartDate(updated);
+                      setFormData({ ...formData, startTime: updated.toISOString() });
+                    }
+                  }}
+                  className="w-full p-2 border border-gray-300 rounded-xl text-gray-800 focus:ring-2 focus:ring-emerald-500"
                 />
+
+
               </div>
 
-              <div className="w-1/2">
-                <label className="block font-medium">End Time</label>
+              {/* End Time */}
+              <div className="w-1/2 space-y-2">
+                <label className="block text-sm font-medium text-gray-700">End Date & Time</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className={`w-full p-3 border border-gray-300 rounded-xl shadow-sm text-left ${!endDate ? "text-gray-400" : "text-gray-800"
+                        }`}
+                    >
+                      {endDate ? format(endDate, "PPP") : "Pick an end date"}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={endDate || undefined}
+                      onSelect={(date) => {
+                        if (!date) return;
+                        const [hours, minutes] = endTime.split(":").map(Number);
+                        const fullDate = setMinutes(setHours(date, hours), minutes);
+                        setEndDate(fullDate);
+                        setFormData({ ...formData, endTime: fullDate.toISOString() });
+                      }}
+                      disabled={(date) => {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        return date < today;
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
                 <input
-                  type="datetime-local"
-                  name="endTime"
-                  value={formData.endTime}
-                  onChange={handleChange}
-                  min={getMinDateTime()}
-                  required
-                  className="w-full p-2 border rounded"
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => {
+                    setEndTime(e.target.value);
+                    if (endDate) {
+                      const [hours, minutes] = e.target.value.split(":").map(Number);
+                      const updated = setMinutes(setHours(endDate, hours), minutes);
+                      setEndDate(updated);
+                      setFormData({ ...formData, endTime: updated.toISOString() });
+                    }
+                  }}
+                  className="w-full p-2 text-sm bg-white text-gray-800 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                 />
               </div>
             </div>
 
+
+            {/* Category with shadcn Select */}
             <div>
-              <label className="block font-medium">Category</label>
-              <select
-                name="category"
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Category
+              </label>
+              <Select
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                required
-                className="w-full p-2 border rounded"
+                onValueChange={(val) =>
+                  setFormData({ ...formData, category: val })
+                }
               >
-                <option value="Collectibles">Collectibles</option>
-                <option value="Art">Art</option>
-                <option value="Electronics">Electronics</option>
-                <option value="Fashion">Fashion</option>
-                <option value="Other">Other</option>
-              </select>
+                <SelectTrigger className="w-full rounded-xl border border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                  <SelectValue placeholder="Select Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {["Collectibles", "Art", "Electronics", "Fashion", "Other"].map(
+                    (cat) => (
+                      <SelectItem
+                        key={cat}
+                        value={cat}
+                        className="cursor-pointer px-4 py-2 text-sm hover:bg-emerald-100 aria-selected:bg-emerald-200"
+                      >
+                        {cat}
+                      </SelectItem>
+                    )
+                  )}
+                </SelectContent>
+              </Select>
             </div>
-            <div className="flex justify-center">
 
+            {/* Image Upload */}
+            <div className="flex flex-col items-center">
               <AuctionImageUploader onUpload={handleImageUpload} />
-              {formData.images.length > 0 && <p className="text-green-600">Images uploaded successfully!</p>}
+              {formData.images.length > 0 && (
+                <p className="text-sm text-emerald-600 font-medium mt-2">
+                  ✅ {formData.images.length} image(s) uploaded successfully!
+                </p>
+              )}
+            </div>
+            <div className="flex justify-center mt-4">
 
+              {/* Turnstile CAPTCHA */}
+              <Turnstile
+                sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""}
+                onSuccess={(token) => setToken(token)}
+              />
             </div>
 
-            <Turnstile
-              sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""}
-              onSuccess={(token) => setToken(token)}
-            />
-
-            <Button type="submit" className="w-full bg-emerald-600 hover:cursor-pointer text-white" disabled={loading}>
-              {loading ? "Creating Auction..." : "Create Auction"}
+            {/* Submit */}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full hover:cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-full py-3 transition-all"
+            >
+              {loading ? "Creating Auction..." : " Create Auction"}
             </Button>
           </form>
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-4 border border-gray-300 p-6 rounded-lg shadow-lg">
+        <div className="flex flex-col items-center gap-4 border border-gray-300 p-6 rounded-lg shadow-lg bg-white">
           <Lock size={48} className="text-gray-500" />
-          <p className="text-lg text-gray-700">You must log in to create an auction.</p>
+          <p className="text-lg text-gray-700">
+            You must log in to create an auction.
+          </p>
           <Link href="/sign-in">
-            <Button className="bg-emerald-600 text-gray-50" variant="outline">
-              Login
-            </Button>
+            <Button className="bg-emerald-600 text-white">Login</Button>
           </Link>
         </div>
       )}
