@@ -124,7 +124,7 @@ const AllAuctionsPage = () => {
   const currentAuctions = filteredAuctions.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 py-10">
+    <div className="flex flex-col items-center justify-start min-h-screen bg-gray-50 py-10">
       <div className="text-center mb-6">
         <h1 className="text-4xl font-extrabold text-gray-900">All Auctions</h1>
         <p className="text-gray-600 mt-2">Explore live and upcoming auctions</p>
@@ -137,7 +137,7 @@ const AllAuctionsPage = () => {
       >
         <div className="flex flex-wrap sm:flex-nowrap gap-4 sm:gap-6 items-center bg-white/80 backdrop-blur border border-gray-200 rounded-2xl p-4 shadow-sm transition-all duration-300 ease-in-out">
 
-          {/* 🔍 Search Input */}
+          {/* Search Input */}
           <div className="relative flex-1 min-w-[200px]">
             <span className="absolute left-3 top-2.5 text-gray-400"><Search className="w-4 h-4" /></span>
             <Input

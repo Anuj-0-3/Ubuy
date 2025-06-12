@@ -137,7 +137,7 @@ const CreateAuction = () => {
   };
 
   return (
-    <div className="flex py-10 flex-col items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex py-10 px-4 sm:px-0 flex-col items-center justify-center min-h-screen bg-gray-50">
       {session ? (
         <div className="w-full max-w-lg p-6 bg-white border border-gray-200 shadow-lg rounded-2xl">
           <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">

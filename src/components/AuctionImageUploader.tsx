@@ -92,8 +92,8 @@ const AuctionImageUploader: React.FC<AuctionImageUploaderProps> = ({ onUpload })
   };
 
   return (
-    <div className="p-6 border hover:cursor-pointer rounded-lg shadow-lg w-96">
-      <h2 className="text-xl font-semibold mb-4">Upload up to 5 Images</h2>
+    <div className="p-6 border hover:cursor-pointer rounded-lg shadow-lg w-full">
+      <h2 className="text-xl text-center font-semibold mb-4">Upload up to 5 Images</h2>
 
       <div
         className="border-2 border-dashed p-4 rounded-lg bg-gray-50 mb-4"
@@ -108,7 +108,7 @@ const AuctionImageUploader: React.FC<AuctionImageUploaderProps> = ({ onUpload })
           id="file-upload"
           multiple
         />
-        <label htmlFor="file-upload" className="w-full text-center text-gray-600 font-medium cursor-pointer">
+        <label htmlFor="file-upload" className="w-full text-sm sm:text-base text-center text-gray-600 font-medium cursor-pointer">
           Drag & Drop or Click to Upload (max 5)
         </label>
       </div>
