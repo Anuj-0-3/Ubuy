@@ -11,6 +11,7 @@ import { Lock } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 const schema = z
   .object({
@@ -53,25 +54,44 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50">
-      <div className="p-4 sm:w-full max-w-md sm:p-8 bg-white/10 backdrop-blur-3xl border-2 border-emerald-500/40 shadow-lg rounded-2xl">
-        <div className="text-center mb-6">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-100">
+      {/* Blurred Background */}
+      <Image
+        src="/authbg.png"
+        alt="Reset background"
+        fill
+        className="object-cover blur-xl brightness-75 z-0"
+      />
+
+      {/* Glassmorphic Card */}
+      <div className="relative z-10 w-full max-w-md bg-gray-100 backdrop-blur-md shadow-2xl rounded-2xl px-8 py-10 sm:px-10 sm:py-12 mx-4">
+
+        {/* Heading */}
+        <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Reset Your Password</h1>
-          <p className="text-gray-600 mt-1">Enter your new password</p>
+          <p className="mt-2 text-gray-600 text-base">Enter your new password below</p>
         </div>
 
+        {/* Form */}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+
+            {/* New Password */}
             <FormField
               name="password"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>New Password</FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-800">New Password</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-3 text-gray-400" size={20} />
-                      <Input type="password" {...field} placeholder="New password" className="pl-10" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                      <Input
+                        type="password"
+                        placeholder="New password"
+                        className="pl-10 border border-gray-300 placeholder:text-gray-400 px-4 py-2 text-sm"
+                        {...field}
+                      />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -79,16 +99,22 @@ export default function ResetPasswordPage() {
               )}
             />
 
+            {/* Confirm Password */}
             <FormField
               name="confirmPassword"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-800">Confirm Password</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-3 text-gray-400" size={20} />
-                      <Input type="password" {...field} placeholder="Confirm new password" className="pl-10" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                      <Input
+                        type="password"
+                        placeholder="Confirm new password"
+                        className="pl-10 border border-gray-300 placeholder:text-gray-400 px-4 py-2 text-sm"
+                        {...field}
+                      />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -96,12 +122,17 @@ export default function ResetPasswordPage() {
               )}
             />
 
-            <Button type="submit" className="w-full hover:cursor-pointer">
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              className="w-full bg-emerald-500 text-white py-2 text-sm rounded-md hover:bg-emerald-600"
+            >
               Reset Password
             </Button>
           </form>
         </Form>
       </div>
     </div>
+
   );
 }

@@ -15,6 +15,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import { signIn } from "next-auth/react";
+import Image from "next/image";
 
 const Page = () => {
   const [username, setUsername] = useState("");
@@ -69,96 +70,132 @@ const Page = () => {
       setIsSubmitting(false);
     }
   };
-  
+
 
   return (
-    <div className="flex justify-center  items-center min-h-screen bg-gray-50">
-      <div className="p-12 sm:w-full max-w-md sm:p-8 bg-white/10 backdrop-blur-xl border-2 border-emerald-500/40 shadow-lg rounded-2xl">
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">Join U-Buy</h1>
-          <p className="text-gray-600 mt-2 mb-4">Create an account to start bidding</p>
-        </div>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField
-              name="username"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <div className="flex my-1 items-center relative">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-100">
+      {/* Blurred full background image */}
+      <Image
+        src="/authbg.png"
+        alt="Blurred background"
+        fill
+        className="object-cover blur-xl brightness-75 z-0"
+      />
+
+      {/* Split card layout */}
+      <div className="relative z-10 w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 bg-gray-100 backdrop-blur-md shadow-2xl rounded-2xl overflow-hidden mx-2 min-h-[60vh] sm:min-h-[80vh]">
+
+        {/* Form Side */}
+        <div className="flex flex-col justify-center h-full px-8 py-10 sm:px-10">
+          <div className="text-left mb-8">
+            <h1 className="text-4xl font-bold text-gray-900">Join U-Buy</h1>
+            <p className="mt-2 text-gray-600 text-base">Create an account to start bidding</p>
+          </div>
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Username */}
+              <FormField
+                name="username"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-gray-800">Username</FormLabel>
+                    <FormControl>
+                      <div className="flex my-1 items-center relative">
                       <User className="absolute left-3 text-gray-400" size={20} />
                       <Input placeholder="Username" className="pl-10" {...field} onChange={(e) => { field.onChange(e); debounced(e.target.value); }} />
                     </div>
-                  </FormControl>
-                  {isCheckingUsername && <p className="text-sm text-gray-500">Checking availability...</p>}
-                  <p className={`text-sm ${usernameMessage.includes("available") ? "text-green-600" : "text-red-600"}`}>{usernameMessage}</p>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    </FormControl>
+                    {isCheckingUsername && <p className="text-sm text-gray-500">Checking availability...</p>}
+                    <p className={`text-sm ${usernameMessage.includes("available") ? "text-green-600" : "text-red-600"}`}>
+                      {usernameMessage}
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              name="email"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <div className="flex my-1 items-center relative">
+              {/* Email */}
+              <FormField
+                name="email"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-gray-800">Email</FormLabel>
+                    <FormControl>
+                      <div className="flex my-1 items-center relative">
                       <Mail className="absolute left-3 text-gray-400" size={20} />
                       <Input placeholder="Email" className="pl-10" {...field} />
                     </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              name="password"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <div className="flex my-1 items-center relative">
+              {/* Password */}
+              <FormField
+                name="password"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-gray-800">Password</FormLabel>
+                    <FormControl>
+                      <div className="flex my-1 items-center relative">
                       <Lock className="absolute left-3 text-gray-400" size={20} />
                       <Input type="password" placeholder="Password" className="pl-10" {...field} />
                     </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <Button type="submit" disabled={isSubmitting} className="w-full py-2 px-4 hover:cursor-pointer bg-emerald-500 text-white rounded-full shadow-md hover:bg-emerald-600 transition-transform transform hover:scale-105">
-              {isSubmitting ? "Creating account..." : "Sign Up"}
-            </Button>
-          </form>
-        </Form>
+              {/* Sign-Up Button */}
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-emerald-500 text-white py-2 rounded-md text-sm hover:bg-emerald-600"
+              >
+                {isSubmitting ? "Creating account..." : "Sign Up"}
+              </Button>
+            </form>
+          </Form>
 
+          {/* Divider */}
+          <div className="text-center text-gray-500 my-6 text-sm">OR</div>
 
-        
+          {/* Google Sign-Up */}
+          <Button
+            type="button"
+            onClick={() => signIn("google")}
+            className="w-full flex items-center justify-center gap-2 border border-gray-300 bg-white text-gray-800 rounded-md py-2 text-sm hover:bg-gray-100"
+          >
+            <FcGoogle size={24} /> Sign up with Google
+          </Button>
 
-        <div className="text-center text-gray-500 my-4">OR</div>
-        <Button
-          type="button"
-          onClick={() => signIn("google")}
-          className="w-full flex items-center hover:cursor-pointer justify-center gap-2 py-2 px-4 bg-white text-gray-900 border border-gray-300 rounded-full shadow-md hover:bg-gray-100 transition-transform transform hover:scale-105"
-        >
-          <FcGoogle size={24} /> Sign up with Google
-        </Button>
-        
+          {/* Sign-in Link */}
+          <div className="text-center mt-6 text-sm text-gray-500">
+            Already have an account?{" "}
+            <Link href="/sign-in" className="text-emerald-600 font-medium hover:underline">
+              Sign In
+            </Link>
+          </div>
+        </div>
 
-        <div className="text-center mt-6">
-          <p className="text-gray-600">
-            Already have an account? <Link href="/sign-in" className="text-emerald-500 hover:cursor-pointer hover:underline">Sign In</Link>
-          </p>
+        {/* Right Side Image */}
+        <div className="relative hidden md:block">
+          <Image
+            src="/authbg.png"
+            alt="Signup background"
+            fill
+            className="object-cover"
+          />
         </div>
       </div>
     </div>
+
   );
 };
 
