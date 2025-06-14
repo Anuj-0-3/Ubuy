@@ -73,10 +73,10 @@ function Navbar() {
         ) : (
           <>
             <Link href="/sign-in" onClick={() => setIsOpen(false)}>
-              <Button className="bg-slate-100 text-emerald-600" variant='outline'>Login</Button>
+              <Button className="bg-slate-100 w-full text-emerald-600" variant='outline'>Login</Button>
             </Link>
             <Link href="/sign-up" onClick={() => setIsOpen(false)}>
-              <Button className="bg-slate-100 text-emerald-600" variant='outline'>Sign-Up</Button>
+              <Button className="bg-slate-100 w-full text-emerald-600" variant='outline'>Sign-Up</Button>
             </Link>
           </>
         )}

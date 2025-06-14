@@ -39,7 +39,16 @@ export default function HomePage() {
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [loading, setLoading] = useState(true);
   const [remainingTimes, setRemainingTimes] = useState<{ [key: string]: string }>({});
+  const textVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.2, duration: 0.6 },
+    }),
+  };
 
+  // Fetch auctions from the API
   useEffect(() => {
     const fetchAuctions = async () => {
       try {
@@ -56,6 +65,7 @@ export default function HomePage() {
     fetchAuctions();
   }, []);
 
+  // Update remaining times every second
   useEffect(() => {
     const interval = setInterval(() => {
       const updatedTimes: { [key: string]: string } = {};
@@ -75,34 +85,65 @@ export default function HomePage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
-        className="relative bg-gradient-to-b from-emerald-700 to-emerald-500 shadow-lg h-[80vh] flex items-center px-4"
+        className="relative overflow-hidden bg-gradient-to-b from-emerald-700 to-emerald-500 shadow-lg h-[80vh] flex items-center px-4"
       >
-        <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-6xl mx-auto">
+        {/* Animated Blob */}
+        <div className="absolute -top-32 left-52 w-[600px] h-[600px] bg-amber-300 opacity-20 blur-3xl z-0 animate-[blob_8s_infinite]"></div>
 
-          {/* Left Side: Image */}
-          <div className="w-full md:w-1/2 flex justify-center mb-8 md:mb-0">
+        <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-6xl mx-auto z-10">
+          {/* Left: Image with float animation */}
+          <motion.div
+            initial={{ y: 20 }}
+            animate={{ y: [20, -10, 20] }}
+            transition={{ repeat: 0, duration: 3, ease: "easeInOut" }}
+            className="w-full md:w-1/2 flex justify-center mb-8 md:mb-0"
+          >
             <Image
               src="/hero.png"
               alt="Hero Image"
               width={350}
               height={300}
-              className="w-full max-w-[500px] h-auto object-cover"
+              className="w-full max-w-[500px] h-auto object-cover drop-shadow-2xl"
             />
-          </div>
+          </motion.div>
 
-          {/* Right Side: Text & Buttons */}
+          {/* Right: Animated Text */}
           <div className="w-full md:w-1/2 text-white text-center md:text-left">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">Bid, Win & Own Unique Items</h1>
-            <p className="text-lg mb-6">Join live auctions and get the best deals.</p>
-            <div className="flex flex-wrap justify-center md:justify-start gap-4">
+            <motion.h1
+              custom={0}
+              variants={textVariants}
+              initial="hidden"
+              animate="visible"
+              className="text-4xl md:text-5xl font-bold mb-4"
+            >
+              Bid, Win & Own Unique Items
+            </motion.h1>
+            <motion.p
+              custom={1}
+              variants={textVariants}
+              initial="hidden"
+              animate="visible"
+              className="text-lg text-gray-200 mb-6"
+            >
+              Join live auctions and get the best deals.
+            </motion.p>
+
+            {/* Buttons */}
+            <motion.div
+              custom={2}
+              variants={textVariants}
+              initial="hidden"
+              animate="visible"
+              className="flex flex-wrap justify-center md:justify-start gap-4"
+            >
               {session ? (
                 <>
-                  <Button className="bg-emerald-800 hover:cursor-pointer hover:bg-emerald-900">
+                  <Button className="bg-emerald-800 text-base p-4 hover:cursor-pointer hover:bg-emerald-900">
                     Start Bidding
                   </Button>
                   <Button
                     variant="outline"
-                    className="text-emerald-600 hover:cursor-pointer border-white hover:bg-gray-300 hover:text-emerald-800"
+                    className="text-emerald-600 text-base p-4 hover:cursor-pointer border-white hover:bg-gray-300 hover:text-emerald-800"
                   >
                     Sell an Item
                   </Button>
@@ -110,22 +151,24 @@ export default function HomePage() {
               ) : (
                 <>
                   <Link href="/sign-in">
-                    <Button className="bg-white hover:cursor-pointer text-emerald-700 hover:bg-gray-200">
+                    <Button className="bg-white text-base p-4 hover:cursor-pointer text-emerald-700 hover:bg-gray-200">
                       Login to Bid
                     </Button>
                   </Link>
                   <Link href="/sign-up">
-                    <Button variant="outline" className="bg-emerald-700 hover:cursor-pointer text-white hover:bg-gray-400">
+                    <Button
+                      variant="outline"
+                      className="bg-emerald-800 text-base p-4 hover:cursor-pointer text-white hover:bg-gray-400"
+                    >
                       Sign Up
                     </Button>
                   </Link>
                 </>
               )}
-            </div>
+            </motion.div>
           </div>
         </div>
       </motion.div>
-
 
       {/* Live Auctions */}
       <div className="flex py-12 px-6 flex-col bg-gray-50">
@@ -165,7 +208,7 @@ export default function HomePage() {
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.5 }}
                         >
-                          <Card className="p-4 transition-transform duration-300 hover:shadow-xl bg-white shadow-md border-emerald-300">
+                          <Card className="p-4 m-2 transition-transform duration-300 hover:shadow-xl bg-white shadow-md border-emerald-300">
                             <div className="top-3 right-3 text-red-500 text-sm font-semibold px-3 py-1">
                               {timeLeft}
                             </div>
@@ -204,7 +247,6 @@ export default function HomePage() {
         )}
       </div>
 
-
       {/* Mega Auction */}
       <motion.section
         initial={{ opacity: 0 }}
@@ -217,7 +259,6 @@ export default function HomePage() {
         <p className="text-4xl font-semibold" id="countdown">00:45:32</p>
         <p className="mt-4">Hurry up — grab your favorite items before time runs out!</p>
       </motion.section>
-
 
       {/* Featured Categories */}
       <motion.section
@@ -248,13 +289,12 @@ export default function HomePage() {
                   height={150}
                   className="mx-auto mb-2"
                 />
-                <p className="text-gray-800 font-semibold">{category.title}</p>
+                <p className="text-gray-800 text-xl font-semibold">{category.title}</p>
               </motion.div>
             </Link>
           ))}
         </div>
       </motion.section>
-
 
       {/* Auction Stats */}
       <motion.section
@@ -283,7 +323,6 @@ export default function HomePage() {
           ))}
         </div>
       </motion.section>
-
 
       {/* Why Choose Us */}
       <motion.section
