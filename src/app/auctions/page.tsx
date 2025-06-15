@@ -48,8 +48,7 @@ const AllAuctionsPage = () => {
   const categories = ["All", "Art", "Electronics", "Fashion", "Other", "Collectibles"];
   const [categoryFilter, setCategoryFilter] = useState("All");
 
-
-
+  // Fetch all auctions on component mount
   useEffect(() => {
     const fetchAuctions = async () => {
       try {

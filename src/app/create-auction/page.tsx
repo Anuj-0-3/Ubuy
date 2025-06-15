@@ -137,10 +137,11 @@ const CreateAuction = () => {
   };
 
   return (
-    <div className="flex py-10 px-4 sm:px-0 flex-col items-center justify-center min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
       {session ? (
-        <div className="w-full max-w-lg p-6 bg-white border border-gray-200 shadow-lg rounded-2xl">
-          <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
+        <div className="w-full max-w-5xl mx-auto bg-white  p-6 sm:p-10 rounded-2xl shadow-lg ">
+
+          <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-6">
             Create Auction
           </h2>
 
@@ -159,25 +160,44 @@ const CreateAuction = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Title */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Title
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-                placeholder="Enter auction title"
-                className="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Title */}
+              <div>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter auction title"
+                  className="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                />
+              </div>
+
+              {/* Starting Price */}
+              <div>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1">
+                  Starting Price (₹)
+                </label>
+                <input
+                  type="number"
+                  name="startingPrice"
+                  value={formData.startingPrice}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g. 1000"
+                  className="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                />
+              </div>
+
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1">
                 Description
               </label>
               <textarea
@@ -191,27 +211,11 @@ const CreateAuction = () => {
               />
             </div>
 
-            {/* Starting Price */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Starting Price (₹)
-              </label>
-              <input
-                type="number"
-                name="startingPrice"
-                value={formData.startingPrice}
-                onChange={handleChange}
-                required
-                placeholder="e.g. 1000"
-                className="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-              />
-            </div>
-
             {/* Start & End Time */}
-            <div className="flex gap-4">
+            <div className="border-t pt-4 mt-4 flex gap-4">
               {/* Start Time */}
               <div className="w-1/2 space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Start Date & Time</label>
+                <label className="block text-sm sm:text-base font-medium text-gray-700">Start Date & Time</label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <button
@@ -267,7 +271,7 @@ const CreateAuction = () => {
 
               {/* End Time */}
               <div className="w-1/2 space-y-2">
-                <label className="block text-sm font-medium text-gray-700">End Date & Time</label>
+                <label className="block text-sm sm:text-base font-medium text-gray-700">End Date & Time</label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <button
@@ -310,7 +314,7 @@ const CreateAuction = () => {
                       setFormData({ ...formData, endTime: updated.toISOString() });
                     }
                   }}
-                  className="w-full p-2 text-sm bg-white text-gray-800 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  className="w-full p-2 text-sm sm:text-base bg-white text-gray-800 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -318,7 +322,7 @@ const CreateAuction = () => {
 
             {/* Category with shadcn Select */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1">
                 Category
               </label>
               <Select
@@ -336,7 +340,7 @@ const CreateAuction = () => {
                       <SelectItem
                         key={cat}
                         value={cat}
-                        className="cursor-pointer px-4 py-2 text-sm hover:bg-emerald-100 aria-selected:bg-emerald-200"
+                        className="cursor-pointer px-4 py-2 text-sm sm:text-base hover:bg-emerald-100 aria-selected:bg-emerald-200"
                       >
                         {cat}
                       </SelectItem>
@@ -350,7 +354,7 @@ const CreateAuction = () => {
             <div className="flex flex-col items-center">
               <AuctionImageUploader onUpload={handleImageUpload} />
               {formData.images.length > 0 && (
-                <p className="text-sm text-emerald-600 font-medium mt-2">
+                <p className="text-sm sm:text-base text-emerald-600 font-medium mt-2">
                   ✅ {formData.images.length} image(s) uploaded successfully!
                 </p>
               )}
@@ -365,13 +369,10 @@ const CreateAuction = () => {
             </div>
 
             {/* Submit */}
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full hover:cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-full py-3 transition-all"
-            >
-              {loading ? "Creating Auction..." : " Create Auction"}
+            <Button className="w-full p-4 sm:p-6 hover:cursor-pointer  bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-lg">
+              {loading ? "Creating Auction..." : "Create Auction"}
             </Button>
+
           </form>
         </div>
       ) : (
