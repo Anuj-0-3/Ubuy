@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import BiddersTable from "@/components/BiddersTable";
+import { getSession } from "next-auth/react";
 import Pusher from "pusher-js";
 
 type Bidder = {
@@ -15,13 +16,14 @@ type Bidder = {
   bidderName: string;
   amount: number;
   bidTime: string;
+  bidder: { _id: string };
 };
 
 type Auction = {
   _id: string;
   title: string;
   description: string;
-  images: string[]; 
+  images: string[];
   currentPrice: number;
   startingPrice: number;
   category: string;
@@ -38,7 +40,9 @@ export default function AuctionDetailPage() {
   const [loading, setLoading] = useState(true);
   const [bidInputs, setBidInputs] = useState<{ [key: string]: string }>({});
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null); // Store current user ID
 
+  // Handle bid input changes
   const handleBid = async (id: string) => {
     const bidAmount = parseFloat(bidInputs[id]);
     if (isNaN(bidAmount) || bidAmount <= 0) {
@@ -72,6 +76,18 @@ export default function AuctionDetailPage() {
     }
   };
 
+  // Fetch current user ID from session
+  useEffect(() => {
+    async function fetchSession() {
+      const session = await getSession();
+      if (session && session.user) {
+        setCurrentUserId(session.user.id);
+      }
+    }
+    fetchSession();
+  }, []);
+
+  // Fetch auction details when component mounts or id changes
   useEffect(() => {
     async function fetchAuction() {
       setLoading(true);
@@ -90,6 +106,7 @@ export default function AuctionDetailPage() {
     if (id) fetchAuction();
   }, [id]);
 
+  // Set up Pusher subscription for real-time updates
   useEffect(() => {
     const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || "default-cluster",
@@ -140,8 +157,17 @@ export default function AuctionDetailPage() {
 
   const isClosed = auction.status === "closed";
 
+  // Determine winner (the bidder with the highest bid)
+  const winner = isClosed
+    ? auction.bidders.reduce((prev, current) =>
+      prev.amount > current.amount ? prev : current
+    )
+    : null;
+
+  const isWinner = winner && winner.bidder._id.toString() === currentUserId;
+
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+    <div className=" mx-auto p-4 sm:p-6 lg:px-16 lg:py-8">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Side Image with Mini Photo Viewer */}
         <div className="flex flex-col-reverse lg:flex-row items-center gap-4">
@@ -150,9 +176,8 @@ export default function AuctionDetailPage() {
             {auction.images.map((imgUrl, idx) => (
               <div
                 key={idx}
-                className={`relative flex-shrink-0 w-20 h-20 border rounded cursor-pointer overflow-hidden ${
-                  selectedImage === imgUrl ? "ring-2 ring-emerald-500" : "border-gray-300"
-                }`}
+                className={`relative flex-shrink-0 w-20 h-20 border rounded cursor-pointer overflow-hidden ${selectedImage === imgUrl ? "ring-2 ring-emerald-500" : "border-gray-300"
+                  }`}
                 onClick={() => setSelectedImage(imgUrl)}
               >
                 <Image
@@ -173,7 +198,7 @@ export default function AuctionDetailPage() {
                 alt={auction.title}
                 fill
                 className="object-contain"
-                sizes="(max-width: 768px) 100vw, 33vw"
+                sizes=" 100vw, 33vw"
               />
             )}
           </div>
@@ -229,6 +254,20 @@ export default function AuctionDetailPage() {
               >
                 Place Bid
               </Button>
+            </div>
+          )}
+
+          {isClosed && winner && (
+            <div className="border-t border-gray-300 mt-6 py-4">
+              {isWinner ? (
+                <p className="text-green-600 text-base sm:text-lg  font-semibold text-center mt-4">
+                  You have won the auction! Congratulations!
+                </p>
+              ) : (
+                <p className="text-base sm:text-lg font-semibold text-center">
+                  The auction has ended. The winner is <strong>{winner.bidderName}</strong>.
+                </p>
+              )}
             </div>
           )}
 

@@ -20,7 +20,7 @@ export default function ProfileSidebar() {
           {/* Hide toggle button on mobile */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="mb-4 flex items-center justify-start w-full p-2 hover:bg-emerald-200 rounded-full transition md:block hidden"
+            className="mb-4 items-center justify-start w-full p-2 hover:bg-emerald-200 rounded-full transition md:block hidden"
             aria-label="Toggle Panel"
           >
             {isCollapsed ? (
