@@ -17,9 +17,10 @@ export default function ProfileSidebar() {
         className="bg-emerald-100 shadow-lg flex flex-col gap-4 py-4 overflow-hidden"
       >
         <div className="flex flex-col items-center md:items-start px-2">
+          {/* Hide toggle button on mobile */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="mb-4 flex items-center justify-start w-full p-2 hover:bg-emerald-200 rounded-full transition"
+            className="mb-4 flex items-center justify-start w-full p-2 hover:bg-emerald-200 rounded-full transition md:block hidden"
             aria-label="Toggle Panel"
           >
             {isCollapsed ? (
@@ -28,7 +29,7 @@ export default function ProfileSidebar() {
               <ChevronLeft className="w-5 h-5 text-emerald-700" />
             )}
           </button>
-           <Link href="/profile" className="flex items-center gap-2 text-gray-700 hover:text-emerald-700 w-full py-2 px-2 transition-colors rounded-md hover:bg-emerald-200">
+          <Link href="/profile" className="flex items-center gap-2 text-gray-700 hover:text-emerald-700 w-full py-2 px-2 transition-colors rounded-md hover:bg-emerald-200">
             <User className="w-5 h-5" />
             {!isCollapsed && <span>Profile</span>}
           </Link>
@@ -37,9 +38,9 @@ export default function ProfileSidebar() {
             {!isCollapsed && <span>Notifications</span>}
           </Link>
           <Link href="/profile/my-auction" className="flex items-center gap-2 text-gray-700 hover:text-emerald-700 w-full py-2 px-2 transition-colors rounded-md hover:bg-emerald-200">
-          <BadgeIndianRupee className="w-5 h-5" />
-          {!isCollapsed && <span>Created Auction</span>}
-        </Link>
+            <BadgeIndianRupee className="w-5 h-5" />
+            {!isCollapsed && <span>Created Auction</span>}
+          </Link>
         </div>
       </motion.aside>
     </div>
