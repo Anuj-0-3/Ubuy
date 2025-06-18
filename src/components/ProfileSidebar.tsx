@@ -17,7 +17,6 @@ export default function ProfileSidebar() {
         className="bg-emerald-100 shadow-lg flex flex-col gap-4 py-4 overflow-hidden"
       >
         <div className="flex flex-col items-center md:items-start px-2">
-          {/* Toggle button for mobile */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="mb-4 items-center justify-start w-full p-2 hover:bg-emerald-200 rounded-full transition hidden sm:block"
