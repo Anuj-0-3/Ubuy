@@ -147,7 +147,7 @@ const BiddedAuctionsPage = () => {
   return (
     <div className="flex flex-col items-center justify-start min-h-screen bg-gray-50 py-10">
       <div className="text-center mb-10">
-        <h1 className="text-4xl font-extrabold text-gray-900">Bidded Auctions</h1>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900">Bidded Auctions</h1>
         <p className="text-gray-600 mt-2">Here are the auctions you&apos;ve placed bids on</p>
       </div>
 
@@ -241,7 +241,7 @@ const BiddedAuctionsPage = () => {
         <Loader2 className="animate-spin text-emerald-500" size={40} />
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 w-full max-w-6xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-8 sm:px-4 max-w-6xl">
             {currentAuctions.length === 0 ? (
               <p className="text-gray-500">You haven&apos;t placed any bids yet.</p>
             ) : (
@@ -250,7 +250,7 @@ const BiddedAuctionsPage = () => {
                   key={auction._id}
                   className="relative bg-white/10 border border-emerald-400/40 shadow-lg rounded-2xl overflow-hidden"
                 >
-                  <CardContent className="p-6 space-y-4">
+                  <CardContent className="p-6 space-y-2 sm:space-y-4">
                     <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
                     <p className="text-gray-700">{auction.description}</p>
                     <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">

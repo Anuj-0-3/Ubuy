@@ -144,10 +144,10 @@ const CategoryAuctionsPage: React.FC<CategoryAuctionsProps> = ({ category }) => 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen bg-gray-50 py-10">
       <div className="text-center mb-10">
-        <h1 className="text-4xl font-extrabold text-gray-900">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
           {category} Auctions
         </h1>
-        <p className="text-gray-600 mt-2">
+        <p className="text-gray-600 px-4 mt-2">
           Explore live and upcoming auctions in the &quot;{category}&quot;  category.
         </p>
       </div>
@@ -242,7 +242,7 @@ const CategoryAuctionsPage: React.FC<CategoryAuctionsProps> = ({ category }) => 
         <Loader2 className="animate-spin text-emerald-500" size={40} />
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 w-full max-w-6xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-sm sm:w-full px-8 sm:px-4 max-w-6xl">
             {currentAuctions.length === 0 ? (
               <p className="text-gray-500">No auctions found in this category.</p>
             ) : (
@@ -253,13 +253,13 @@ const CategoryAuctionsPage: React.FC<CategoryAuctionsProps> = ({ category }) => 
                 return (
                   <Card
                     key={auction._id}
-                    className="relative bg-white/10 backdrop-blur-md border border-emerald-400/40 shadow-lg rounded-2xl transition-transform duration-300 hover:scale-105 hover:shadow-xl"
+                    className="relative bg-white/10 border border-emerald-400/40 shadow-lg rounded-2xl overflow-hidden"
                   >
                     <div className="absolute top-3 right-3 bg-red-500 text-white text-sm font-semibold px-3 py-1 rounded-full z-10 shadow">
                       {timeLeft}
                     </div>
 
-                    <CardContent className="p-6 space-y-4">
+                    <CardContent className="p-6 space-y-2 sm:space-y-4">
                       <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
                       <p className="text-gray-700">{auction.description}</p>
                       {auction.images && auction.images.length > 0 && (

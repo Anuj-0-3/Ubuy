@@ -115,17 +115,13 @@ const AllAuctionsPage = () => {
       return new Date(b.startTime).getTime() - new Date(a.startTime).getTime();
     });
 
-
-  console.log("Filtered:", filteredAuctions.map(a => a.title));
-
-
   const totalPages = Math.ceil(filteredAuctions.length / ITEMS_PER_PAGE);
   const currentAuctions = filteredAuctions.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen bg-gray-50 py-10">
       <div className="text-center mb-6">
-        <h1 className="text-4xl font-extrabold text-gray-900">All Auctions</h1>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900">All Auctions</h1>
         <p className="text-gray-600 mt-2">Explore live and upcoming auctions</p>
       </div>
 
@@ -219,7 +215,7 @@ const AllAuctionsPage = () => {
         <Loader2 className="animate-spin text-emerald-500" size={40} />
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 w-full max-w-6xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-8 sm:px-4 max-w-6xl">
             {currentAuctions.length === 0 ? (
               <p className="text-gray-500">No auctions found.</p>
             ) : (
@@ -252,7 +248,7 @@ const AllAuctionsPage = () => {
                       {isWatched ? "★" : "☆"}
                     </button>
 
-                    <CardContent className="p-6 space-y-4">
+                    <CardContent className="p-6 space-y-2 sm:space-y-4">
                       <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
                       <p className="text-gray-700">{auction.description}</p>
 
