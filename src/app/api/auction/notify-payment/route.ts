@@ -78,7 +78,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No winner found" }, { status: 400 });
     }
 
-    // ✅ Create a payment link using Cashfree Payment Links API
+    // Update paymentStatus to 'ACTIVE' before creating payment link
+    await Auction.updateOne(
+      { _id: auction._id },
+      { $set: { paymentStatus: "ACTIVE" } }
+    );
+
+    // Create a payment link using Cashfree Payment Links API
     const paymentLinkPayload = {
       link_id: `auction_${auction._id}_${Date.now()}`,
       link_amount: auction.currentPrice || auction.startingPrice || 100,

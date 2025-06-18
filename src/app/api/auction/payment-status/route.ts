@@ -8,18 +8,18 @@ import axios from "axios";
 import User from "@/models/User";
 import AuthUser from "@/models/AuthUser";
 
-
 export async function GET(req: Request) {
   try {
     await dbConnect();
-    console.log("Database connected successfully!");
-
     const url = new URL(req.url);
     const linkId = url.searchParams.get("linkId");
 
     if (!linkId) {
       return NextResponse.json({ error: "Link ID is required" }, { status: 400 });
     }
+
+    // Extract the auctionId from linkId (assuming the format is 'auction_<auctionId>_<timestamp>')
+    const auctionId = linkId.split('_')[1]; // The auctionId is the second part
 
     // Fetch Cashfree payment link status
     const cashfreeResponse = await axios.get(
@@ -33,15 +33,14 @@ export async function GET(req: Request) {
       }
     );
 
-    console.log("Cashfree Payment Link status:", cashfreeResponse.data);
-
     // Check if the payment was successful
     if (cashfreeResponse.data.link_status !== "PAID") {
       return NextResponse.json({ error: "Payment not successful" }, { status: 400 });
     }
 
-    // Fetch the auction using the link ID (or another identifier you want)
+    // Fetch the auction using the auctionId extracted from the linkId
     const auction = await Auction.findOne({
+      _id: auctionId,  // Find the auction by its ID
       "status": "closed",  // Ensure it's a closed auction
       "winner": { $exists: true, $ne: null },  // Ensure there's a winner
     });
@@ -50,6 +49,7 @@ export async function GET(req: Request) {
     if (!auction) {
       return NextResponse.json({ error: "Auction not found for this payment" }, { status: 404 });
     }
+    console.log("Auction found:", auction);
 
     // Fetch the winner's details from either User or AuthUser model
     let winner = null;
@@ -75,14 +75,20 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Winner's email does not match Cashfree response" }, { status: 400 });
     }
 
+    // Update the auction with the payment status set to "PAID"
+    await Auction.updateOne(
+      { _id: auction._id },
+      { $set: { paymentStatus: 'PAID' } }
+    );
+
     // Send a notification to the winner for successful payment
     try {
       const notification = await Notification.create({
-        recipient: winner._id,  
-        recipientModel: winner instanceof User ? "User" : "AuthUser",  
-        type: "payment",  
+        recipient: winner._id,
+        recipientModel: winner instanceof User ? "User" : "AuthUser",
+        type: "payment",
         message: `🎉 Your payment for the auction "${auction.title}" has been successfully received. Thank you for your participation!`,
-        relatedAuction: auction._id,  
+        relatedAuction: auction._id,
       });
 
       console.log("Notification sent:", notification);
@@ -110,3 +116,4 @@ export async function GET(req: Request) {
     );
   }
 }
+

@@ -21,6 +21,7 @@ export interface IAuction extends Document {
   createdByModel: "User" | "AuthUser";
   notified?: boolean;
   winner?: Types.ObjectId;
+  paymentStatus?: "PAID" | "ACTIVE";
 }
 
 const AuctionSchema: Schema = new Schema(
@@ -67,6 +68,7 @@ const AuctionSchema: Schema = new Schema(
     },
     notified: { type: Boolean, default: false },
     winner: { type: Schema.Types.ObjectId, refPath: "bidders.bidderModel" },
+    paymentStatus: { type: String, enum: ["PAID", "ACTIVE"], default: "ACTIVE" },
   },
   {
     timestamps: true,
