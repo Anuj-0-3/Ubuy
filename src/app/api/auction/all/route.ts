@@ -16,6 +16,7 @@ interface Bidder {
   bidderModel?: string;
   amount: number;
 }
+
 export async function GET() {
   try {
     await dbConnect();
@@ -38,18 +39,20 @@ export async function GET() {
       },
     ]);
 
-    //// Filter for closed auctions that haven’t been notified
+    // Filter for closed auctions that haven’t been notified
     const closedAuctions = auctions.filter(
       (auction) => auction.status === "closed" && !auction.notified
     );
 
-
     for (const auction of closedAuctions) {
       if (!auction.bidders || auction.bidders.length === 0) continue;
+
+      // Sort the bidders by amount (highest bid wins)
       const sortedBidders = (auction.bidders as Bidder[]).sort((a, b) => b.amount - a.amount);
       const winner = sortedBidders[0];
 
       if (winner?.bidder?._id && winner?.bidderModel) {
+        // Create a win notification for the winner
         await Notification.create({
           recipient: winner.bidder._id,
           recipientModel: winner.bidderModel,
@@ -57,11 +60,17 @@ export async function GET() {
           message: `🎉 Congratulations! You have won the auction for "${auction.title}".`,
           relatedAuction: auction._id,
         });
+
+        // Update the auction with the winner's ID in the 'winner' field
+        await Auction.updateOne(
+          { _id: auction._id },
+          { $set: { winner: winner.bidder._id } }
+        );
       }
 
-      // Add a 'notified' flag dynamically
+      // Mark the auction as notified
       auction._doc.notified = true;
-      await Auction.updateOne({ _id: auction._id }, { $set: { 'notified': true } });
+      await Auction.updateOne({ _id: auction._id }, { $set: { notified: true } });
     }
 
     return NextResponse.json(auctions, { status: 200 });
@@ -74,3 +83,4 @@ export async function GET() {
     );
   }
 }
+

@@ -9,12 +9,12 @@ import axios from "axios";
 interface Bidder {
   bidder: {
     _id: string;
-    username: string;
     email?: string;
     provider?: string;
   };
   bidderModel: "User" | "AuthUser";
   amount: number;
+  bidderName: string;
 }
 
 interface PopulatedAuction {
@@ -85,7 +85,7 @@ export async function POST(req: Request) {
       link_currency: "INR",
       link_purpose: `Payment for auction: ${auction.title}`,
       customer_details: {
-        customer_name: winner.bidder.username || "Unknown User",
+        customer_name: winner.bidderName || "Unknown User",
         customer_email: winner.bidder.email || "noemail@example.com",
         customer_phone: "9999999999",
       },

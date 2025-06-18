@@ -20,6 +20,7 @@ export interface IAuction extends Document {
   createdBy: Types.ObjectId;
   createdByModel: "User" | "AuthUser";
   notified?: boolean;
+  winner?: Types.ObjectId;
 }
 
 const AuctionSchema: Schema = new Schema(
@@ -65,6 +66,7 @@ const AuctionSchema: Schema = new Schema(
       enum: ["User", "AuthUser"],
     },
     notified: { type: Boolean, default: false },
+    winner: { type: Schema.Types.ObjectId, refPath: "bidders.bidderModel" },
   },
   {
     timestamps: true,
