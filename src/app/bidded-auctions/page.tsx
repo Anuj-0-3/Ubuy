@@ -48,7 +48,7 @@ const BiddedAuctionsPage = () => {
   const { data: session } = useSession();
   const myUserId = session?.user?.id;
   const [search, setSearch] = useState("");
-   const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [sortOption, setSortOption] = useState("endingSoon");
   const categories = ["All", "Art", "Electronics", "Fashion", "Other", "Collectibles"];
   const [categoryFilter, setCategoryFilter] = useState("All");
@@ -82,7 +82,7 @@ const BiddedAuctionsPage = () => {
     window.location.href = `/auctions/${auctionId}`;
   };
 
-    // Search, Filter, and Sort
+  // Search, Filter, and Sort
   const filteredAuctions = auctions
     .filter((a) =>
       (a.title?.toLowerCase() || "").includes(search.toLowerCase()) ||
@@ -96,7 +96,7 @@ const BiddedAuctionsPage = () => {
       return new Date(b.startTime).getTime() - new Date(a.startTime).getTime();
     });
 
-    console.log("Filtered:", filteredAuctions.map(a => a.title));
+  console.log("Filtered:", filteredAuctions.map(a => a.title));
 
   // Handle payment link generation
   const handlePayHere = async (auctionId: string) => {
@@ -151,7 +151,7 @@ const BiddedAuctionsPage = () => {
         <p className="text-gray-600 mt-2">Here are the auctions you&apos;ve placed bids on</p>
       </div>
 
-       {/* Search, Filter, Sort */}
+      {/* Search, Filter, Sort */}
       <form
         onSubmit={(e) => e.preventDefault()}
         className="w-full max-w-6xl px-4 mb-8 overflow-x-auto"
@@ -267,8 +267,23 @@ const BiddedAuctionsPage = () => {
                       )}
                     </div>
                     <div className="text-sm text-gray-600">
-                      <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleString()}</p>
-                      <p><strong>End:</strong> {new Date(auction.endTime).toLocaleString()}</p>
+                      <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                      })}</p>
+
+                      <p><strong>End:</strong> {new Date(auction.endTime).toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                      })}</p>
                       <p><strong>Status:</strong> {auction.status}</p>
                       <p><strong>Current Price:</strong> ₹{auction.currentPrice}</p>
                     </div>

@@ -96,7 +96,7 @@ export default function HomePage() {
             initial={{ y: 20 }}
             animate={{ y: [20, -10, 20] }}
             transition={{ repeat: 0, duration: 3, ease: "easeInOut" }}
-            className="w-full md:w-1/2 flex justify-center mb-8 md:mb-0"
+            className="w-full md:w-1/2 flex justify-center md:justify-start mb-8 md:mb-0"
           >
             <Image
               src="/hero.png"
@@ -108,7 +108,7 @@ export default function HomePage() {
           </motion.div>
 
           {/* Right: Animated Text */}
-          <div className="w-full md:w-1/2 text-white text-center md:text-left">
+          <div className="w-full md:w-1/2  text-white text-center md:text-left">
             <motion.h1
               custom={0}
               variants={textVariants}
@@ -200,6 +200,7 @@ export default function HomePage() {
                   .filter((auction) => auction.status !== "closed")
                   .map((auction) => {
                     const timeLeft = remainingTimes[auction._id] || "Calculating...";
+                    const isClosed = timeLeft === "Closed" || auction.status === "closed";
 
                     return (
                       <SwiperSlide key={auction._id}>
@@ -208,9 +209,10 @@ export default function HomePage() {
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.5 }}
                         >
-                          <Card className="p-4 m-2 transition-transform duration-300 hover:shadow-xl bg-white shadow-md border-emerald-300">
-                            <div className="top-3 right-3 text-red-500 text-sm font-semibold px-3 py-1">
-                              {timeLeft}
+                          <Card className="relative bg-white border border-emerald-200 shadow-md rounded-xl hover:shadow-lg transition">
+                            <div className={`absolute top-3 right-3 text-sm font-semibold px-3 py-1 rounded-full z-10 shadow 
+                              ${isClosed ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}>
+                              {isClosed ? "Closed" : timeLeft}
                             </div>
 
                             <CardContent className="space-y-4">
@@ -228,8 +230,23 @@ export default function HomePage() {
                                 </div>
                               )}
                               <div className="text-sm text-gray-600 space-y-1">
-                                <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleString()}</p>
-                                <p><strong>End:</strong> {new Date(auction.endTime).toLocaleString()}</p>
+                                <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleDateString('en-GB', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                  second: '2-digit'
+                                })}</p>
+
+                                <p><strong>End:</strong> {new Date(auction.endTime).toLocaleDateString('en-GB', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                  second: '2-digit'
+                                })}</p>
                                 <p><strong>Current Price:</strong> ₹{auction.currentPrice}</p>
                               </div>
                               <Link href={`/auctions/${auction._id}`} passHref>

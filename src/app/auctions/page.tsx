@@ -264,8 +264,23 @@ const AllAuctionsPage = () => {
                       )}
 
                       <div className="text-sm text-gray-600 space-y-1">
-                        <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleString()}</p>
-                        <p><strong>End:</strong> {new Date(auction.endTime).toLocaleString()}</p>
+                        <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleDateString('en-GB', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit'
+                        })}</p>
+
+                        <p><strong>End:</strong> {new Date(auction.endTime).toLocaleDateString('en-GB', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit'
+                        })}</p>
                         <p><strong>Category:</strong> {auction.category}</p>
                         <p><strong>Starting Price:</strong> ₹{auction.startingPrice}</p>
                         <p><strong>Current Price:</strong> ₹{auction.currentPrice}</p>
