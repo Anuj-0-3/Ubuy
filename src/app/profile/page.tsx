@@ -14,6 +14,11 @@ type Profile = {
   name?: string;
 };
 
+type AuctionStats = {
+  totalBids: number;
+  auctionsCreated: number;
+  auctionsWon: number;
+};
 
 const ProfilePage = () => {
   const { data: session, status, update } = useSession();
@@ -21,8 +26,35 @@ const ProfilePage = () => {
   const [username, setUsername] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [auctionStats, setAuctionStats] = useState<AuctionStats | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  // Fetch the full profile from your DB
+  useEffect(() => {
+    const fetchAuctionStats = async () => {
+      try {
+        setLoading(true);
+        const auctionStatsRes = await fetch("/api/auction/bidstats");
+        const auctionStatsData = await auctionStatsRes.json();
+
+        if (!auctionStatsRes.ok) {
+          throw new Error(auctionStatsData.error || "Failed to load auction stats");
+        }
+
+        setAuctionStats({
+          totalBids: auctionStatsData.totalBids || 0,
+          auctionsCreated: auctionStatsData.auctionsCreated || 0,
+          auctionsWon: auctionStatsData.auctionsWon || 0,
+        });
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAuctionStats();
+  }, []);
+
   useEffect(() => {
     const fetchProfile = async () => {
       if (!session) return;
@@ -80,7 +112,6 @@ const ProfilePage = () => {
 
       toast.success("Profile updated successfully!");
 
-      // Re-fetch updated profile
       const refreshedProfile = await fetch("/api/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -92,7 +123,6 @@ const ProfilePage = () => {
       const updatedProfile = await refreshedProfile.json();
       setProfile(updatedProfile);
 
-      // Optionally update session data
       await update();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
@@ -110,14 +140,14 @@ const ProfilePage = () => {
     });
 
   return (
-    <div className="flex min-h-[80vh] bg-white relative overflow-hidden">
-      <div className="flex-1 flex items-center justify-center p-4">
+    <div className="flex flex-col sm:flex-row sm:gap-2 items-start bg-gray-50 p-6 min-h-screen">
+      <Card className=" w-full sm:w-2/3 sm:mt-5 sm:mx-10  bg-white shadow-lg rounded-xl">
         {status === "loading" ? (
           <p className="text-gray-700 text-lg animate-pulse">Loading...</p>
         ) : session ? (
-          <Card className="w-full max-w-md bg-white/10 backdrop-blur-lg border border-emerald-500/40 shadow-lg rounded-2xl p-6 text-center">
-            <CardHeader className="flex flex-col items-center">
-              <div className="relative w-24 h-24">
+          <>
+            <CardHeader className="flex flex-col items-center text-center p-6">
+              <div className="relative w-28 h-28 mb-4">
                 {profile?.image ? (
                   <Image
                     src={profile.image}
@@ -127,10 +157,8 @@ const ProfilePage = () => {
                     className="object-cover rounded-full border-4 border-emerald-400 shadow-md"
                   />
                 ) : (
-                  <div
-                    className="flex items-center justify-center w-24 h-24 rounded-full bg-emerald-400 text-white font-bold text-l border-4 border-emerald-400 shadow-md"
-                  >
-                    {profile?.username ? profile.username.charAt(0).toUpperCase() : "Upload profile picture"}
+                  <div className="flex items-center justify-center w-24 h-24 rounded-full bg-emerald-400 text-white font-bold text-xl border-4 border-emerald-400 shadow-md">
+                    {profile?.username ? profile.username.charAt(0).toUpperCase() : "U"}
                   </div>
                 )}
                 <input
@@ -150,7 +178,7 @@ const ProfilePage = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Your name"
-                className="mt-3 text-center font-semibold text-gray-900 bg-transparent border-b border-emerald-400 focus:outline-none focus:border-emerald-600 transition-colors"
+                className="mt-3 text-lg font-semibold text-gray-900 bg-transparent border-b border-emerald-400 focus:outline-none focus:border-emerald-600 transition-colors"
               />
 
               <div className="flex items-center gap-2 text-gray-600 text-sm mt-2">
@@ -159,11 +187,11 @@ const ProfilePage = () => {
               </div>
             </CardHeader>
 
-            <CardContent className="mt-4 flex flex-col gap-2">
+            <CardContent className="p-6 flex flex-row gap-4">
               <Button
                 onClick={handleUpdateProfile}
                 disabled={isUpdating}
-                className="w-full flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-transform transform hover:scale-105"
+                className="w-1/2 flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full"
               >
                 {isUpdating ? "Updating..." : "Update Profile"}
               </Button>
@@ -171,15 +199,15 @@ const ProfilePage = () => {
               <Button
                 onClick={() => signOut()}
                 variant="destructive"
-                className="w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white rounded-full transition-transform transform hover:scale-105"
+                className="w-1/2 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white rounded-full"
               >
                 <LogOut className="w-5 h-5" />
                 Sign Out
               </Button>
             </CardContent>
-          </Card>
+          </>
         ) : (
-          <div className="flex flex-col items-center text-center gap-4">
+          <div className="flex flex-col items-center gap-4">
             <User className="w-20 h-20 text-gray-400" />
             <h2 className="text-2xl font-bold text-gray-900">Welcome!</h2>
             <p className="text-gray-600">Sign in to access your profile</p>
@@ -191,6 +219,32 @@ const ProfilePage = () => {
               Sign in with Google
             </Button>
           </div>
+        )}
+      </Card>
+
+      <div className="mt-6 w-full sm:w-1/3 max-w-xl">
+        <h3 className="text-xl font-bold text-gray-900 mb-4">Auction Stats</h3>
+        {loading ? (
+          <p className="text-gray-700">Loading auction stats...</p>
+        ) : auctionStats ? (
+          <div className="flex gap-2 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6">
+            <div className="bg-emerald-100 p-4 rounded-lg shadow-md">
+              <h4 className="text-lg font-semibold text-gray-700">Total Bids</h4>
+              <p className="text-2xl font-bold text-emerald-600">{auctionStats.totalBids}</p>
+            </div>
+
+            <div className="bg-emerald-100 p-4 rounded-lg shadow-md">
+              <h4 className="text-lg font-semibold text-gray-700">Auctions Created</h4>
+              <p className="text-2xl font-bold text-emerald-600">{auctionStats.auctionsCreated}</p>
+            </div>
+
+            <div className="bg-emerald-100 p-4 rounded-lg shadow-md">
+              <h4 className="text-lg font-semibold text-gray-700">Auctions Won</h4>
+              <p className="text-2xl font-bold text-emerald-600">{auctionStats.auctionsWon}</p>
+            </div>
+          </div>
+        ) : (
+          <p className="text-gray-700">No auction stats available.</p>
         )}
       </div>
     </div>
