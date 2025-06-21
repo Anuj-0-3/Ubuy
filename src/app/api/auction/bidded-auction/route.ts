@@ -9,17 +9,17 @@ import mongoose from "mongoose";
 
 
 interface Bidder {
-        bidder: {
-          _id: mongoose.Types.ObjectId;
-          username: string;
-          email: string;
-        };
-        amount: number;
-      }
+  bidder: {
+    _id: mongoose.Types.ObjectId;
+    username: string;
+    email: string;
+  };
+  amount: number;
+}
 
-      interface AuctionWithBidders extends mongoose.Document {
-        bidders: Bidder[];
-      }
+interface AuctionWithBidders extends mongoose.Document {
+  bidders: Bidder[];
+}
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -66,7 +66,7 @@ export async function GET() {
 
     // Add winnerId for each auction
     const populatedAuctions = auctions.map((auction) => {
-      
+
       const sortedBidders = (auction as AuctionWithBidders).bidders.sort(
         (a: Bidder, b: Bidder) => b.amount - a.amount
       );

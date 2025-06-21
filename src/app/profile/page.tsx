@@ -29,6 +29,7 @@ const ProfilePage = () => {
   const [auctionStats, setAuctionStats] = useState<AuctionStats | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Fetch auction stats when the component mounts
   useEffect(() => {
     const fetchAuctionStats = async () => {
       try {
@@ -55,6 +56,7 @@ const ProfilePage = () => {
     fetchAuctionStats();
   }, []);
 
+  // Fetch user profile when the session is available
   useEffect(() => {
     const fetchProfile = async () => {
       if (!session) return;
@@ -81,6 +83,7 @@ const ProfilePage = () => {
     fetchProfile();
   }, [session]);
 
+// Function to handle profile update
   const handleUpdateProfile = async () => {
     if (!session) {
       toast.error("You must be signed in to update your profile.");
@@ -146,15 +149,15 @@ const ProfilePage = () => {
           <p className="text-gray-700 text-lg animate-pulse">Loading...</p>
         ) : session ? (
           <>
-            <CardHeader className="flex flex-col items-center text-center p-6">
-              <div className="relative w-28 h-28 mb-4">
+            <CardHeader className="flex flex-col items-center text-center ">
+              <div className="relative w-40 h-40 sm:w-52 sm:h-52 mb-4">
                 {profile?.image ? (
                   <Image
                     src={profile.image}
                     alt="Profile"
-                    width={96}
-                    height={96}
-                    className="object-cover rounded-full border-4 border-emerald-400 shadow-md"
+                    width={240}
+                    height={240}
+                    className="object-cover relative w-40 h-40 sm:w-52 sm:h-52 mb-4 overflow-hidden rounded-full border-4 border-emerald-400 shadow-md"
                   />
                 ) : (
                   <div className="flex items-center justify-center w-24 h-24 rounded-full bg-emerald-400 text-white font-bold text-xl border-4 border-emerald-400 shadow-md">
@@ -168,7 +171,7 @@ const ProfilePage = () => {
                   className="absolute inset-0 opacity-0 cursor-pointer"
                   title="Upload a new profile image"
                 />
-                <div className="absolute bottom-0 right-0 bg-emerald-500 p-1 rounded-full shadow cursor-pointer">
+                <div className="absolute bottom-0 right-0 bg-emerald-500 p-2 rounded-full shadow cursor-pointer">
                   <Upload className="w-4 h-4 text-white" />
                 </div>
               </div>
