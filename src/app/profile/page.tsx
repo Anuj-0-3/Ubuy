@@ -83,7 +83,7 @@ const ProfilePage = () => {
     fetchProfile();
   }, [session]);
 
-// Function to handle profile update
+  // Function to handle profile update
   const handleUpdateProfile = async () => {
     if (!session) {
       toast.error("You must be signed in to update your profile.");
@@ -150,19 +150,20 @@ const ProfilePage = () => {
         ) : session ? (
           <>
             <CardHeader className="flex flex-col items-center text-center ">
-              <div className="relative w-40 h-40 sm:w-52 sm:h-52 mb-4">
+              <div className="relative w-32 h-32 sm:w-52 sm:h-52 mb-4">
                 {profile?.image ? (
                   <Image
                     src={profile.image}
                     alt="Profile"
                     width={240}
                     height={240}
-                    className="object-cover relative w-40 h-40 sm:w-52 sm:h-52 mb-4 overflow-hidden rounded-full border-4 border-emerald-400 shadow-md"
+                    className="object-cover relative w-32 h-32 sm:w-52 sm:h-52 mb-4 overflow-hidden rounded-full border-4 border-emerald-400 shadow-md"
                   />
                 ) : (
-                  <div className="flex items-center justify-center w-24 h-24 rounded-full bg-emerald-400 text-white font-bold text-xl border-4 border-emerald-400 shadow-md">
-                    {profile?.username ? profile.username.charAt(0).toUpperCase() : "U"}
+                  <div className="flex items-center justify-center w-32 h-32 sm:w-52 sm:h-52 mb-4 rounded-full bg-emerald-400 text-white font-bold text-xl border-4 border-emerald-400 shadow-md">
+                    {session?.user.name ? session.user.name.charAt(0).toUpperCase() : "U"}
                   </div>
+
                 )}
                 <input
                   type="file"

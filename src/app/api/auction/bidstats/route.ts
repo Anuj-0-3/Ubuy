@@ -20,39 +20,53 @@ interface AuctionPopulated {
 }
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
-
-  if (!session || !session.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  await dbConnect();
-
-  const isAuthUser = session.user.authProvider === "AuthUser";
-  const UserModel = isAuthUser ? AuthUser : User;
-
   try {
+    const session = await getServerSession(authOptions);
+    console.log("Session:", session);
+
+    if (!session || !session.user?.id) {
+      console.error("Unauthorized access: No session or user id");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    await dbConnect();
+
+    const isAuthUser = session.user.authProvider === "AuthUser";
+    const UserModel = isAuthUser ? AuthUser : User;
+
     const user = await UserModel.findById(session.user.id);
     if (!user) {
+      console.error("User not found for id:", session.user.id);
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+    console.log("Fetched user:", user);
 
     const auctionIds = user.biddedauction;
 
+    const validAuctionIds = auctionIds.filter((id: string) =>
+      mongoose.Types.ObjectId.isValid(id)
+    );
+ 
+
     const auctions = await Auction.find({
-      _id: { $in: auctionIds.map((id: string) => new mongoose.Types.ObjectId(id)) },
+      _id: { $in: validAuctionIds.map((id: string) => new mongoose.Types.ObjectId(id)) },
     }).populate([
       {
         path: "bidders.bidder",
         select: "_id username email",
       },
     ]);
+  
 
+    if (!auctions.length) {
+      console.error("No auctions found for the provided IDs:", validAuctionIds);
+      return NextResponse.json({ error: "No auctions found" }, { status: 404 });
+    }
 
     const totalBids = auctions.reduce(
       (total: number, auction: AuctionPopulated) =>
         total + auction.bidders.filter(
-          (bid: Bidder) => bid.bidder.equals(user._id)
+          (bid: Bidder) => bid.bidder && bid.bidder.equals(user._id)
         ).length,
       0
     );
@@ -67,8 +81,11 @@ export async function GET() {
       auctionsWon,
     });
   } catch (error) {
-    const errorMessage = (error as Error).message;
+    console.error("Error during GET request:", error);
+
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ error: "Failed to fetch data", details: errorMessage }, { status: 500 });
   }
 }
+
 
