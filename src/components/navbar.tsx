@@ -1,27 +1,71 @@
 'use client';
 
-import React, { useState } from 'react';
-import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { Button } from './ui/button';
-import { Menu, X } from "lucide-react";
+import { Menu, X, Bell } from "lucide-react";
 import { motion } from 'framer-motion';
+import axios from 'axios';
+import NotificationDropdown from './NotificationDropdown';  // Import NotificationDropdown component
+import Link from 'next/link';
+
+type Notification = {
+  _id: string;
+  type: string;
+  message: string;
+  isRead: boolean;
+  createdAt: string;
+};
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);  // Control the notification dropdown
+  const [notifications, setNotifications] = useState<Notification[]>([]);  // Ensure notifications use the correct type
   const { data: session } = useSession();
 
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const res = await axios.get("/api/notification");
+        setNotifications(res.data.notifications);  // Fetch and set notifications from API
+      } catch (error) {
+        console.error("Failed to load notifications:", error);
+      }
+    };
+
+    if (session) fetchNotifications();  // Fetch notifications if session exists
+  }, [session]);
+
+  const unreadCount = notifications.filter(notification => !notification.isRead).length;
+
   return (
-    <nav className="fixed top-0 left-0 w-full px-8 sm:px-16  z-50 p-6 shadow-md bg-emerald-600 text-white">
+    <nav className="fixed top-0 left-0 w-full px-8 sm:px-16 z-50 p-6 shadow-md bg-emerald-600 text-white">
       <div className="container mx-auto flex justify-between items-center">
         <Link href="/" className="text-xl font-bold">
           <h1 className='text-3xl font-bold text-slate-100 font-sans'>U-Buy</h1>
         </Link>
 
-        {/* Mobile Menu Button */}
-        <button className="md:hidden text-white" onClick={() => setIsOpen(!isOpen)}>
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        {/* Mobile Navigation */}
+        <div className="md:hidden flex items-center space-x-4">
+          {/* Bell Icon for Notifications - Mobile view */}
+          <button
+            onClick={() => setNotificationsOpen(!notificationsOpen)}
+            className="relative p-2 hover:bg-emerald-700 rounded-full"
+          >
+            <Bell className="text-white w-6 h-6" />
+            {/* Badge for unread notifications */}
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+
+          {/* Mobile Menu Button */}
+          <button className="text-white" onClick={() => setIsOpen(!isOpen)}>
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-4">
@@ -43,6 +87,23 @@ function Navbar() {
               </Link>
             </>
           )}
+
+          {/* Bell Icon for Notifications - Desktop view */}
+          <button
+            onClick={() => setNotificationsOpen(!notificationsOpen)}
+            className="relative p-2 hover:bg-emerald-700 rounded-full"
+          >
+            <Bell className="text-white w-6 h-6" />
+            {/* Badge for unread notifications */}
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+
+          {/* Notification Dropdown */}
+          {notificationsOpen && <NotificationDropdown notifications={notifications} onClose={() => setNotificationsOpen(false)} />}
         </div>
       </div>
 
@@ -80,10 +141,30 @@ function Navbar() {
             </Link>
           </>
         )}
+
+        {/* Bell Icon for Notifications - Mobile view */}
+        <button
+          onClick={() => setNotificationsOpen(!notificationsOpen)}
+          className="relative p-2 mt-4 hover:bg-emerald-700 rounded-full "  
+        >
+          <Bell className="text-white w-6 h-6" />
+          {/* Badge for unread notifications */}
+          {unreadCount > 0 && (
+            <span className="absolute top-0  bg-red-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+              {unreadCount}
+            </span>
+          )}
+        </button>
+
+
+        {/* Notification Dropdown for mobile */}
+        {notificationsOpen && <NotificationDropdown notifications={notifications} onClose={() => setNotificationsOpen(false)} />}
       </motion.div>
     </nav>
   );
 }
 
 export default Navbar;
+
+
 

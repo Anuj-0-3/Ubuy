@@ -24,6 +24,7 @@ const ProfilePage = () => {
   const { data: session, status, update } = useSession();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [username, setUsername] = useState("");
+  const [name, setName] = useState("");  // State for the name
   const [isUpdating, setIsUpdating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [auctionStats, setAuctionStats] = useState<AuctionStats | null>(null);
@@ -75,6 +76,7 @@ const ProfilePage = () => {
         if (!res.ok) throw new Error(data.error || "Failed to load profile");
         setProfile(data);
         setUsername(data.username || data.name || "");
+        setName(data.name || ""); // Initialize name with current profile name
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Something went wrong");
       }
@@ -106,6 +108,7 @@ const ProfilePage = () => {
           userId: session.user.id,
           userModel: session.user.authProvider === "credentials" ? "User" : "AuthUser",
           username,
+          name,  // Send the updated name along with username
           imageBase64: imageBase64 || undefined,
         }),
       });
@@ -144,26 +147,25 @@ const ProfilePage = () => {
 
   return (
     <div className="flex flex-col sm:flex-row sm:gap-2 items-start bg-gray-50 p-6 min-h-screen">
-      <Card className=" w-full sm:w-2/3 sm:mt-5 sm:mx-10  bg-white shadow-lg rounded-xl">
+      <Card className="w-full sm:w-2/3 sm:mt-5 sm:mx-10 bg-white shadow-lg rounded-xl">
         {status === "loading" ? (
           <p className="text-gray-700 text-lg animate-pulse">Loading...</p>
         ) : session ? (
           <>
-            <CardHeader className="flex flex-col items-center text-center ">
-              <div className="relative w-32 h-32 sm:w-52 sm:h-52 mb-4">
+            <CardHeader className="flex flex-col items-center text-center">
+              <div className="relative w-32 h-32 sm:w-40 sm:h-40 mb-4">
                 {profile?.image ? (
                   <Image
                     src={profile.image}
                     alt="Profile"
                     width={240}
                     height={240}
-                    className="object-cover relative w-32 h-32 sm:w-52 sm:h-52 mb-4 overflow-hidden rounded-full border-4 border-emerald-400 shadow-md"
+                    className="object-cover relative w-32 h-32 sm:w-40 sm:h-40 mb-4 overflow-hidden rounded-full border-4 border-emerald-400 shadow-md"
                   />
                 ) : (
-                  <div className="flex items-center justify-center w-32 h-32 sm:w-52 sm:h-52 mb-4 rounded-full bg-emerald-400 text-white font-bold text-xl border-4 border-emerald-400 shadow-md">
+                  <div className="flex items-center justify-center w-32 h-32 sm:w-40 sm:h-40 mb-4 rounded-full bg-emerald-400 text-white font-bold text-4xl sm:text-7xl border-4 border-emerald-400 shadow-md">
                     {session?.user.name ? session.user.name.charAt(0).toUpperCase() : "U"}
                   </div>
-
                 )}
                 <input
                   type="file"
@@ -177,12 +179,15 @@ const ProfilePage = () => {
                 </div>
               </div>
 
+              <div className="text-lg font-semibold text-gray-900">{name}</div>
+
+              {/* Name change input field */}
               <input
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Your name"
-                className="mt-3 text-lg font-semibold text-gray-900 bg-transparent border-b border-emerald-400 focus:outline-none focus:border-emerald-600 transition-colors"
+                value=""
+                onChange={(e) => setName(e.target.value)} // Update name state
+                placeholder="Change your username"
+                className="mt-3 text-base sm:text-lg  text-gray-900 bg-transparent border-b border-emerald-400 focus:outline-none focus:border-emerald-600 transition-colors"
               />
 
               <div className="flex items-center gap-2 text-gray-600 text-sm mt-2">
@@ -191,11 +196,11 @@ const ProfilePage = () => {
               </div>
             </CardHeader>
 
-            <CardContent className="p-6 flex flex-row gap-4">
+            <CardContent className="p-4 sm:p-6 flex justify-center flex-row gap-4">
               <Button
                 onClick={handleUpdateProfile}
                 disabled={isUpdating}
-                className="w-1/2 flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full"
+                className="w-5/12 sm:w-1/3  flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full"
               >
                 {isUpdating ? "Updating..." : "Update Profile"}
               </Button>
@@ -203,7 +208,7 @@ const ProfilePage = () => {
               <Button
                 onClick={() => signOut()}
                 variant="destructive"
-                className="w-1/2 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white rounded-full"
+                className="w-5/12 sm:w-1/3 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white rounded-full"
               >
                 <LogOut className="w-5 h-5" />
                 Sign Out
@@ -226,25 +231,25 @@ const ProfilePage = () => {
         )}
       </Card>
 
-      <div className="mt-6 w-full sm:w-1/3 max-w-xl">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">Auction Stats</h3>
+      <div className="mt-6 w-full sm:w-1/3 max-w-xl p-4 text-center  sm:p-8 bg-white shadow-lg rounded-xl">
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Auction Stats</h3>
         {loading ? (
           <p className="text-gray-700">Loading auction stats...</p>
         ) : auctionStats ? (
           <div className="flex gap-2 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6">
-            <div className="bg-emerald-100 p-4 rounded-lg shadow-md">
-              <h4 className="text-lg font-semibold text-gray-700">Total Bids</h4>
-              <p className="text-2xl font-bold text-emerald-600">{auctionStats.totalBids}</p>
+            <div className="bg-emerald-100 border-1 p-2 sm:p-4 rounded-lg shadow-sm ">
+              <p className="text-lg sm:text-2xl font-bold text-emerald-600">{auctionStats.totalBids}</p>
+              <h4 className="text-base sm:text-lg font-semibold text-gray-700">Total Bids</h4>
             </div>
 
-            <div className="bg-emerald-100 p-4 rounded-lg shadow-md">
-              <h4 className="text-lg font-semibold text-gray-700">Auctions Created</h4>
-              <p className="text-2xl font-bold text-emerald-600">{auctionStats.auctionsCreated}</p>
+            <div className="bg-emerald-100 border-1 p-2 sm:p-4 rounded-lg shadow-sm">
+              <p className="text-lg sm:text-2xl font-bold text-emerald-600">{auctionStats.auctionsCreated}</p>
+              <h4 className="text-base sm:text-lg font-semibold text-gray-700">Auctions Created</h4>
             </div>
 
-            <div className="bg-emerald-100 p-4 rounded-lg shadow-md">
-              <h4 className="text-lg font-semibold text-gray-700">Auctions Won</h4>
-              <p className="text-2xl font-bold text-emerald-600">{auctionStats.auctionsWon}</p>
+            <div className="bg-emerald-100 border-1 p-2 sm:p-4 rounded-lg shadow-sm">
+              <p className="text-lg sm:text-2xl font-bold text-emerald-600">{auctionStats.auctionsWon}</p>
+              <h4 className="text-base sm:text-lg font-semibold text-gray-700">Auctions Won</h4>
             </div>
           </div>
         ) : (
@@ -256,3 +261,4 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
+
