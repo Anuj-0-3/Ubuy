@@ -47,19 +47,20 @@ function Navbar() {
 
         {/* Mobile Navigation */}
         <div className="md:hidden flex items-center space-x-4">
-          {/* Bell Icon for Notifications - Mobile view */}
-          <button
-            onClick={() => setNotificationsOpen(!notificationsOpen)}
-            className="relative p-2 hover:bg-emerald-700 rounded-full"
-          >
-            <Bell className="text-white w-6 h-6" />
-            {/* Badge for unread notifications */}
-            {unreadCount > 0 && (
-              <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                {unreadCount}
-              </span>
-            )}
-          </button>
+          {session && (
+            <button
+              onClick={() => setNotificationsOpen(!notificationsOpen)}
+              className="relative p-2 hover:bg-emerald-700 rounded-full"
+            >
+              <Bell className="text-white w-6 h-6" />
+              {/* Badge for unread notifications */}
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+          )}
 
           {/* Mobile Menu Button */}
           <button className="text-white" onClick={() => setIsOpen(!isOpen)}>
@@ -89,18 +90,20 @@ function Navbar() {
           )}
 
           {/* Bell Icon for Notifications - Desktop view */}
-          <button
-            onClick={() => setNotificationsOpen(!notificationsOpen)}
-            className="relative p-2 hover:bg-emerald-700 rounded-full"
-          >
-            <Bell className="text-white w-6 h-6" />
-            {/* Badge for unread notifications */}
-            {unreadCount > 0 && (
-              <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                {unreadCount}
-              </span>
-            )}
-          </button>
+          {session && (
+            <button
+              onClick={() => setNotificationsOpen(!notificationsOpen)}
+              className="relative p-2 hover:bg-emerald-700 rounded-full"
+            >
+              <Bell className="text-white w-6 h-6" />
+              {/* Badge for unread notifications */}
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+          )}
 
           {/* Notification Dropdown */}
           {notificationsOpen && <NotificationDropdown notifications={notifications} onClose={() => setNotificationsOpen(false)} />}
@@ -142,25 +145,10 @@ function Navbar() {
           </>
         )}
 
-        {/* Bell Icon for Notifications - Mobile view */}
-        <button
-          onClick={() => setNotificationsOpen(!notificationsOpen)}
-          className="relative p-2 mt-4 hover:bg-emerald-700 rounded-full "  
-        >
-          <Bell className="text-white w-6 h-6" />
-          {/* Badge for unread notifications */}
-          {unreadCount > 0 && (
-            <span className="absolute top-0  bg-red-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
-              {unreadCount}
-            </span>
-          )}
-        </button>
-
-
-        {/* Notification Dropdown for mobile */}
-        {notificationsOpen && <NotificationDropdown notifications={notifications} onClose={() => setNotificationsOpen(false)} />}
-      </motion.div>
-    </nav>
+      {/* Notification Dropdown for mobile */}
+      {notificationsOpen && <NotificationDropdown notifications={notifications} onClose={() => setNotificationsOpen(false)} />}
+    </motion.div>
+    </nav >
   );
 }
 

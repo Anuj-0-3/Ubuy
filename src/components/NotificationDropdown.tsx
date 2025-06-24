@@ -78,7 +78,7 @@ function NotificationDropdown({ notifications, onClose }: NotificationDropdownPr
 
       {/* See all activity link */}
       <div className="mt-4 text-center">
-        <Link href="/notifications" className="text-sm text-emerald-600 hover:underline">
+        <Link href="/profile/notifications" className="text-sm text-emerald-600 hover:underline">
           See all recent activity
         </Link>
       </div>

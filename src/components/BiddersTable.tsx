@@ -24,7 +24,7 @@ export default function BiddersTable({ bidders }: { bidders: Bidder[] }) {
   }, [bidders]);
 
   return (
-    <div className="w-full overflow-x-auto rounded-lg shadow-md border border-gray-200 bg-white">
+    <div className="w-full overflow-x-auto  shadow-md bg-white">
       <table className="min-w-full text-sm sm:text-base">
         <thead className="bg-gray-100 text-gray-700 font-semibold">
           <tr>
