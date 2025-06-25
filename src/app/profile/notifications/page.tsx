@@ -29,6 +29,7 @@ export default function NotificationPage() {
     }
   };
 
+  // Fetch notifications from the API when the component mounts
   useEffect(() => {
     const fetchNotifications = async () => {
       try {

@@ -15,7 +15,7 @@ type Notification = {
 
 interface NotificationDropdownProps {
   notifications: Notification[];
-  onClose: () => void; // Callback to close the dropdown
+  onClose: () => void;
 }
 
 function NotificationDropdown({ notifications, onClose }: NotificationDropdownProps) {

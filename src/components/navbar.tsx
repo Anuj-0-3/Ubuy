@@ -6,7 +6,7 @@ import { Button } from './ui/button';
 import { Menu, X, Bell } from "lucide-react";
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import NotificationDropdown from './NotificationDropdown';  // Import NotificationDropdown component
+import NotificationDropdown from './NotificationDropdown';
 import Link from 'next/link';
 
 type Notification = {
@@ -19,24 +19,45 @@ type Notification = {
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);  // Control the notification dropdown
-  const [notifications, setNotifications] = useState<Notification[]>([]);  // Ensure notifications use the correct type
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const { data: session } = useSession();
 
+  // Unread count based on current notifications
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+  // Fetch notifications once on initial mount (before marking as read)
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const res = await axios.get("/api/notification");
-        setNotifications(res.data.notifications);  // Fetch and set notifications from API
-      } catch (error) {
-        console.error("Failed to load notifications:", error);
+    const fetchInitialNotifications = async () => {
+      if (session) {
+        try {
+          const res = await axios.get("/api/notification");
+          setNotifications(res.data.notifications);
+        } catch (error) {
+          console.error("Failed to fetch notifications:", error);
+        }
       }
     };
 
-    if (session) fetchNotifications();  // Fetch notifications if session exists
+    fetchInitialNotifications();
   }, [session]);
 
-  const unreadCount = notifications.filter(notification => !notification.isRead).length;
+  // Handle toggle of notification dropdown
+  const handleToggleNotifications = async () => {
+    if (!notificationsOpen && session) {
+      try {
+        // Mark all as read
+        await axios.get("/api/notification/read");
+
+        // Fetch updated notifications after marking read
+        const res = await axios.get("/api/notification");
+        setNotifications(res.data.notifications);
+      } catch (error) {
+        console.error("Error marking/fetching notifications:", error);
+      }
+    }
+    setNotificationsOpen(!notificationsOpen);
+  };
 
   return (
     <nav className="fixed top-0 left-0 w-full px-8 sm:px-16 z-50 p-6 shadow-md bg-emerald-600 text-white">
@@ -49,11 +70,10 @@ function Navbar() {
         <div className="md:hidden flex items-center space-x-4">
           {session && (
             <button
-              onClick={() => setNotificationsOpen(!notificationsOpen)}
+              onClick={handleToggleNotifications}
               className="relative p-2 hover:bg-emerald-700 rounded-full"
             >
               <Bell className="text-white w-6 h-6" />
-              {/* Badge for unread notifications */}
               {unreadCount > 0 && (
                 <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
                   {unreadCount}
@@ -61,8 +81,6 @@ function Navbar() {
               )}
             </button>
           )}
-
-          {/* Mobile Menu Button */}
           <button className="text-white" onClick={() => setIsOpen(!isOpen)}>
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -76,27 +94,24 @@ function Navbar() {
               <Link href="/create-auction" className="hover:text-slate-100">Create Auction</Link>
               <Link href="/bidded-auctions" className="hover:text-slate-100">Bidded Auctions</Link>
               <Link href="/profile" className="hover:text-slate-100">Profile</Link>
-              <Button onClick={() => signOut()} className="bg-slate-100 hover:cursor-pointer text-emerald-600" variant='outline'>Logout</Button>
+              <Button onClick={() => signOut()} className="bg-slate-100 text-emerald-600" variant='outline'>Logout</Button>
             </>
           ) : (
             <>
               <Link href="/sign-in">
-                <Button className="bg-slate-100 hover:cursor-pointer text-emerald-600" variant='outline'>Login</Button>
+                <Button className="bg-slate-100 text-emerald-600" variant='outline'>Login</Button>
               </Link>
               <Link href="/sign-up">
-                <Button className="bg-slate-100 hover:cursor-pointer text-emerald-600" variant='outline'>Sign-Up</Button>
+                <Button className="bg-slate-100 text-emerald-600" variant='outline'>Sign-Up</Button>
               </Link>
             </>
           )}
-
-          {/* Bell Icon for Notifications - Desktop view */}
           {session && (
             <button
-              onClick={() => setNotificationsOpen(!notificationsOpen)}
+              onClick={handleToggleNotifications}
               className="relative p-2 hover:bg-emerald-700 rounded-full"
             >
               <Bell className="text-white w-6 h-6" />
-              {/* Badge for unread notifications */}
               {unreadCount > 0 && (
                 <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
                   {unreadCount}
@@ -104,13 +119,16 @@ function Navbar() {
               )}
             </button>
           )}
-
-          {/* Notification Dropdown */}
-          {notificationsOpen && <NotificationDropdown notifications={notifications} onClose={() => setNotificationsOpen(false)} />}
+          {notificationsOpen && (
+            <NotificationDropdown
+              notifications={notifications}
+              onClose={() => setNotificationsOpen(false)}
+            />
+          )}
         </div>
       </div>
 
-      {/* Mobile Navigation sliding from the right */}
+      {/* Mobile Navigation Drawer */}
       <motion.div
         initial={{ x: '100%' }}
         animate={{ x: isOpen ? 0 : '100%' }}
@@ -122,15 +140,11 @@ function Navbar() {
         </button>
         {session ? (
           <>
-            <Link href="/auctions" className="hover:text-slate-100" onClick={() => setIsOpen(false)}>Auctions</Link>
-            <Link href="/create-auction" className="hover:text-slate-100" onClick={() => setIsOpen(false)}>Create Auction</Link>
-            <Link href="/bidded-auctions" className="hover:text-slate-100" onClick={() => setIsOpen(false)}>Bidded Auction</Link>
-            <Link href="/profile" className="hover:text-slate-100" onClick={() => setIsOpen(false)}>Profile</Link>
-            <Button
-              onClick={() => { signOut(); setIsOpen(false); }}
-              className="bg-slate-100 text-emerald-600"
-              variant='outline'
-            >
+            <Link href="/auctions" onClick={() => setIsOpen(false)}>Auctions</Link>
+            <Link href="/create-auction" onClick={() => setIsOpen(false)}>Create Auction</Link>
+            <Link href="/bidded-auctions" onClick={() => setIsOpen(false)}>Bidded Auctions</Link>
+            <Link href="/profile" onClick={() => setIsOpen(false)}>Profile</Link>
+            <Button onClick={() => { signOut(); setIsOpen(false); }} className="bg-slate-100 text-emerald-600" variant='outline'>
               Logout
             </Button>
           </>
@@ -144,11 +158,14 @@ function Navbar() {
             </Link>
           </>
         )}
-
-      {/* Notification Dropdown for mobile */}
-      {notificationsOpen && <NotificationDropdown notifications={notifications} onClose={() => setNotificationsOpen(false)} />}
-    </motion.div>
-    </nav >
+        {notificationsOpen && (
+          <NotificationDropdown
+            notifications={notifications}
+            onClose={() => setNotificationsOpen(false)}
+          />
+        )}
+      </motion.div>
+    </nav>
   );
 }
 
