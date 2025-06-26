@@ -20,6 +20,7 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 
+
 interface Auction {
   _id: string;
   title: string;
@@ -77,6 +78,31 @@ export default function HomePage() {
 
     return () => clearInterval(interval);
   }, [auctions]);
+
+  // countdown duration 
+  const INITIAL_DURATION = 12 * 60 * 60;
+
+  const [timeLeft, setTimeLeft] = useState(INITIAL_DURATION);
+
+  // Format time into HH:MM:SS
+  const formatTime = (seconds: number) => {
+    const hrs = String(Math.floor(seconds / 3600)).padStart(2, "0");
+    const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+    const secs = String(seconds % 60).padStart(2, "0");
+    return `${hrs}:${mins}:${secs}`;
+  };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) return INITIAL_DURATION; 
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  });
+
 
   return (
     <div className="min-h-screen bg-emerald-100">
@@ -273,7 +299,7 @@ export default function HomePage() {
         className="bg-emerald-800 text-white py-8 text-center"
       >
         <h2 className="text-3xl font-bold mb-2">🔥 Mega Auction Ends In:</h2>
-        <p className="text-4xl font-semibold" id="countdown">00:45:32</p>
+        <p className="text-4xl font-semibold">{formatTime(timeLeft)}</p>
         <p className="mt-4">Hurry up — grab your favorite items before time runs out!</p>
       </motion.section>
 
@@ -288,10 +314,10 @@ export default function HomePage() {
         <h2 className="text-4xl font-semibold text-emerald-800 mb-6 text-center">Explore Categories</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           {[
-            { title: "Electronics", icon: "/electronics.png" },
+            { title: "Electronics", icon: "/Electronics.png" },
             { title: "Collectibles", icon: "/Collectibles.png" },
             { title: "Art", icon: "/Art.png" },
-            { title: "Fashion", icon: "/fashion.png" },
+            { title: "Fashion", icon: "/Fashion.png" },
           ].map((category, i) => (
             <Link key={i} href={`/auctions/by-category/${encodeURIComponent(category.title)}`}>
               <motion.div

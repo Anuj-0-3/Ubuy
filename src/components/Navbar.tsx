@@ -81,7 +81,7 @@ function Navbar() {
               )}
             </button>
           )}
-          <button className="text-white" onClick={() => setIsOpen(!isOpen)}>
+          <button className="text-white" onClick={() => setIsOpen(!isOpen)} aria-label="Menu modal">
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -135,7 +135,7 @@ function Navbar() {
         transition={{ type: 'tween', duration: 0.3 }}
         className="fixed top-0 right-0 h-full w-64 bg-emerald-700 text-white flex flex-col p-6 space-y-4 md:hidden z-50"
       >
-        <button className="self-end mb-4" onClick={() => setIsOpen(false)}>
+        <button className="self-end mb-4" onClick={() => setIsOpen(false)} aria-label="Close modal">
           <X size={24} />
         </button>
         {session ? (

@@ -248,7 +248,7 @@ const BiddedAuctionsPage = () => {
               currentAuctions.map((auction) => (
                 <Card
                   key={auction._id}
-                  className="relative bg-white/10 border border-emerald-400/40 shadow-lg rounded-2xl overflow-hidden"
+                  className="relative min-w-80 bg-white/10 border border-emerald-400/40 shadow-lg rounded-2xl overflow-hidden"
                 >
                   <CardContent className="p-6 space-y-2 sm:space-y-4">
                     <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
