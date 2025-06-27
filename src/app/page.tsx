@@ -95,7 +95,7 @@ export default function HomePage() {
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
-        if (prev <= 1) return INITIAL_DURATION; 
+        if (prev <= 1) return INITIAL_DURATION;
         return prev - 1;
       });
     }, 1000);

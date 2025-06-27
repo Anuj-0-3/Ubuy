@@ -23,10 +23,8 @@ function Navbar() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const { data: session } = useSession();
 
-  // Unread count based on current notifications
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
-  // Fetch notifications once on initial mount (before marking as read)
   useEffect(() => {
     const fetchInitialNotifications = async () => {
       if (session) {
@@ -38,18 +36,13 @@ function Navbar() {
         }
       }
     };
-
     fetchInitialNotifications();
   }, [session]);
 
-  // Handle toggle of notification dropdown
   const handleToggleNotifications = async () => {
     if (!notificationsOpen && session) {
       try {
-        // Mark all as read
         await axios.get("/api/notification/read");
-
-        // Fetch updated notifications after marking read
         const res = await axios.get("/api/notification");
         setNotifications(res.data.notifications);
       } catch (error) {
@@ -71,7 +64,7 @@ function Navbar() {
           {session && (
             <button
               onClick={handleToggleNotifications}
-              className="relative p-2 hover:bg-emerald-700 rounded-full"
+              className="relative p-2 hover:bg-emerald-700 rounded-full group"
             >
               <Bell className="text-white w-6 h-6" />
               {unreadCount > 0 && (
@@ -79,6 +72,11 @@ function Navbar() {
                   {unreadCount}
                 </span>
               )}
+              {/* Tooltip */}
+              <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-emerald-600 text-white text-xs rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                Notifications
+              </div>
+
             </button>
           )}
           <button className="text-white" onClick={() => setIsOpen(!isOpen)} aria-label="Menu modal">
@@ -109,7 +107,7 @@ function Navbar() {
           {session && (
             <button
               onClick={handleToggleNotifications}
-              className="relative p-2 hover:bg-emerald-700 rounded-full"
+              className="relative p-2 hover:bg-emerald-700 rounded-full group"
             >
               <Bell className="text-white w-6 h-6" />
               {unreadCount > 0 && (
@@ -117,6 +115,10 @@ function Navbar() {
                   {unreadCount}
                 </span>
               )}
+              {/* Tooltip */}
+              <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-emerald-600 text-white text-xs rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                Notifications
+              </div>
             </button>
           )}
           {notificationsOpen && (
@@ -170,6 +172,7 @@ function Navbar() {
 }
 
 export default Navbar;
+
 
 
 
