@@ -40,7 +40,36 @@ export default function AuctionDetailPage() {
   const [loading, setLoading] = useState(true);
   const [bidInputs, setBidInputs] = useState<{ [key: string]: string }>({});
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null); // Store current user ID
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [timeLeft, setTimeLeft] = useState('');
+
+  useEffect(() => {
+    const updateCountdown = () => {
+      if (!auction?.endTime) return;
+
+      const now = new Date().getTime();
+      const end = new Date(auction.endTime).getTime();
+      const distance = end - now;
+
+      if (distance < 0) {
+        setTimeLeft('Auction ended');
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
+    };
+
+    updateCountdown(); // initial call
+    const interval = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(interval);
+  }, [auction?.endTime]);
+
 
   // Handle bid input changes
   const handleBid = async (id: string) => {
@@ -155,6 +184,25 @@ export default function AuctionDetailPage() {
     );
   }
 
+  interface IncrementOptions {
+    (currentBid: number): number[];
+  }
+
+  const getIncrementOptions: IncrementOptions = (currentBid) => {
+    if (currentBid < 100) {
+      return [5, 10, 20];
+    } else if (currentBid < 1000) {
+      return [10, 20, 50];
+    } else if (currentBid < 5000) {
+      return [100, 200, 500];
+    } else {
+      return [500, 1000, 2000];
+    }
+  };
+
+
+
+
   const isClosed = auction.status === "closed";
 
   // Determine winner (the bidder with the highest bid)
@@ -165,6 +213,8 @@ export default function AuctionDetailPage() {
     : null;
 
   const isWinner = winner && winner.bidder._id.toString() === currentUserId;
+
+
 
   return (
     <div className=" mx-auto p-4 sm:p-6 lg:px-16 lg:py-8">
@@ -231,30 +281,57 @@ export default function AuctionDetailPage() {
               Current Price: ₹{auction.currentPrice}
             </div>
 
-            <div className="flex items-center gap-2 text-gray-500">
+            <div className="flex items-center gap-2 text-red-600 text-lg font-semibold">
               <Timer className="text-orange-500" />
-              Ends At: {new Date(auction.endTime).toLocaleString()}
+              Time Left: {timeLeft}
             </div>
           </div>
 
           {!isClosed && (
-            <div className="pt-2 space-y-2">
+            <div className="pt-4 space-y-4">
               <Input
                 type="number"
                 placeholder="Your Bid (₹)"
-                className="border border-gray-300 focus:border-emerald-500"
+                className="border border-gray-300 focus:border-emerald-500 px-4 py-3 rounded-lg text-base"
                 value={bidInputs[auction._id] || ""}
                 onChange={(e) =>
                   setBidInputs({ ...bidInputs, [auction._id]: e.target.value })
                 }
               />
-              <Button
-                onClick={() => handleBid(auction._id)}
-                className="w-full hover:cursor-pointer bg-emerald-500 text-white rounded-full hover:bg-emerald-600"
-              >
-                Place Bid
-              </Button>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                {/* Place Bid Button */}
+                <Button
+                  onClick={() => handleBid(auction._id)}
+                  className="w-full sm:w-auto bg-emerald-500 text-white rounded-full px-6 py-3 text-base font-semibold hover:bg-emerald-600 transition duration-200"
+                >
+                  Place Bid
+                </Button>
+                {/* Quick Bid Options */}
+                <div className="flex  items-center justify-center flex-col sm:flex-row  w-full sm:w-auto bg-emerald-500 p-1 rounded-2xl gap-3">
+                  <p className="text-white font-semibold text-center sm:text-left text-base">
+                    Quick Bid: <span className="font-normal">Choose an increment</span>
+                  </p>
+                  <div className="flex flex-wrap sm:flex-nowrap gap-2 justify-center">
+                    {getIncrementOptions(auction.currentPrice).map((inc) => (
+                      <Button
+                        key={inc}
+                        variant="outline"
+                        onClick={() =>
+                          setBidInputs({
+                            ...bidInputs,
+                            [auction._id]: ((parseFloat(bidInputs[auction._id]) || auction.currentPrice) + inc).toString(),
+                          })
+                        }
+                        className="rounded-full border border-gray-300 text-gray-700  hover:bg-gray-100 transition duration-150"
+                      >
+                        +₹{inc}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
+
           )}
 
           {isClosed && winner && (
