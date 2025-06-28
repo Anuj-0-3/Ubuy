@@ -116,7 +116,9 @@ const Page = () => {
               />
 
               {/* Sign-In Button */}
-              <Button type="submit" className="w-full bg-emerald-500 text-white rounded-md py-2 text-sm hover:bg-emerald-600">
+              <Button 
+              type="submit" 
+              className="w-full bg-emerald-500 text-white rounded-md py-2 text-sm hover:bg-emerald-600">
                 Sign In
               </Button>
 

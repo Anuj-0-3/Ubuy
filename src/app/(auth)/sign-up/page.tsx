@@ -73,7 +73,7 @@ const Page = () => {
 
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-100">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden ">
       {/* Blurred full background image */}
       <Image
         src="/authbg.png"
@@ -83,12 +83,12 @@ const Page = () => {
       />
 
       {/* Split card layout */}
-      <div className="relative z-10 w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 bg-gray-100 backdrop-blur-md shadow-2xl rounded-2xl overflow-hidden mx-2 min-h-[60vh] sm:min-h-[80vh]">
+      <div className="relative z-10 w-full max-w-6xl min-h-[60vh] sm:min-h-[80vh] grid grid-cols-1 md:grid-cols-2 bg-gray-100 backdrop-blur-md shadow-2xl rounded-2xl overflow-hidden mx-4">
 
         {/* Form Side */}
-        <div className="flex flex-col justify-center h-full px-8 py-10 sm:px-10">
-          <div className="text-left mb-8">
-            <h1 className="text-4xl font-bold text-gray-900">Join U-Buy</h1>
+        <div className="flex flex-col justify-center h-full px-8 py-12 md:px-12">
+          <div className=" mb-8">
+            <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 leading-tight tracking-tight">Join U-Buy</h1>
             <p className="mt-2 text-gray-600 text-base">Create an account to start bidding</p>
           </div>
 
@@ -102,10 +102,10 @@ const Page = () => {
                   <FormItem>
                     <FormLabel className="text-sm font-medium text-gray-800">Username</FormLabel>
                     <FormControl>
-                      <div className="flex my-1 items-center relative">
-                      <User className="absolute left-3 text-gray-400" size={20} />
-                      <Input placeholder="Username" className="pl-10" {...field} onChange={(e) => { field.onChange(e); debounced(e.target.value); }} />
-                    </div>
+                      <div className="flex items-center relative">
+                        <User className="absolute left-3 text-gray-400" size={20} />
+                        <Input placeholder="Username" className="pl-10 border border-gray-300 focus:border-emerald-500 focus:ring-emerald-500" {...field} onChange={(e) => { field.onChange(e); debounced(e.target.value); }} />
+                      </div>
                     </FormControl>
                     {isCheckingUsername && <p className="text-sm text-gray-500">Checking availability...</p>}
                     <p className={`text-sm ${usernameMessage.includes("available") ? "text-green-600" : "text-red-600"}`}>
@@ -124,10 +124,10 @@ const Page = () => {
                   <FormItem>
                     <FormLabel className="text-sm font-medium text-gray-800">Email</FormLabel>
                     <FormControl>
-                      <div className="flex my-1 items-center relative">
-                      <Mail className="absolute left-3 text-gray-400" size={20} />
-                      <Input placeholder="Email" className="pl-10" {...field} />
-                    </div>
+                      <div className="flex items-center relative">
+                        <Mail className="absolute left-3 text-gray-400" size={20} />
+                        <Input placeholder="Email" className="pl-10 border border-gray-300 focus:border-emerald-500 focus:ring-emerald-500" {...field} />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -142,16 +142,15 @@ const Page = () => {
                   <FormItem>
                     <FormLabel className="text-sm font-medium text-gray-800">Password</FormLabel>
                     <FormControl>
-                      <div className="flex my-1 items-center relative">
-                      <Lock className="absolute left-3 text-gray-400" size={20} />
-                      <Input type="password" placeholder="Password" className="pl-10" {...field} />
-                    </div>
+                      <div className="flex items-center relative">
+                        <Lock className="absolute left-3 text-gray-400" size={20} />
+                        <Input type="password" placeholder="Password" className="pl-10 border border-gray-300 focus:border-emerald-500 focus:ring-emerald-500" {...field} />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
               {/* Sign-Up Button */}
               <Button
                 type="submit"
@@ -163,16 +162,13 @@ const Page = () => {
             </form>
           </Form>
 
-          {/* Divider */}
-          <div className="text-center text-gray-500 my-6 text-sm">OR</div>
-
-          {/* Google Sign-Up */}
+          {/* Google Sign-In */}
           <Button
             type="button"
             onClick={() => signIn("google")}
-            className="w-full flex items-center justify-center gap-2 border border-gray-300 bg-white text-gray-800 rounded-md py-2 text-sm hover:bg-gray-100"
+            className="w-full flex items-center justify-center border border-gray-300 bg-white text-gray-800 rounded-md py-2 text-sm hover:bg-gray-100 mt-4" // added margin top here
           >
-            <FcGoogle size={24} /> Sign up with Google
+            <FcGoogle size={20} /> Sign in with Google
           </Button>
 
           {/* Sign-in Link */}
