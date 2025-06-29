@@ -8,6 +8,7 @@ import {
   UserIcon,
   ShieldCheckIcon,
   Loader2,
+  Flame,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getRemainingTime } from "@/utils/time";
@@ -20,7 +21,6 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
-
 
 interface Auction {
   _id: string;
@@ -35,6 +35,8 @@ interface Auction {
   status: "active" | "closed";
   createdBy: string;
 }
+
+
 
 export default function HomePage() {
   const { data: session } = useSession();
@@ -106,9 +108,9 @@ export default function HomePage() {
 
 
   return (
-    <div className="min-h-screen bg-emerald-100">
+    <main className="min-h-screen bg-emerald-100">
       {/* Hero Section */}
-      <motion.div
+      <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -165,12 +167,12 @@ export default function HomePage() {
             >
               {session ? (
                 <>
-                  <Button className="bg-emerald-800 text-base p-4 hover:cursor-pointer hover:bg-emerald-900">
+                  <Button className="bg-emerald-800 text-base p-2 sm:p-4 hover:cursor-pointer hover:bg-emerald-900">
                     Start Bidding
                   </Button>
                   <Button
                     variant="outline"
-                    className="text-emerald-600 text-base p-4 hover:cursor-pointer border-white hover:bg-gray-300 hover:text-emerald-800"
+                    className="text-emerald-600 text-base p-2 sm:p-4 hover:cursor-pointer border-white hover:bg-gray-300 hover:text-emerald-800"
                   >
                     Sell an Item
                   </Button>
@@ -178,14 +180,14 @@ export default function HomePage() {
               ) : (
                 <>
                   <Link href="/sign-in">
-                    <Button className="bg-white text-base p-4 hover:cursor-pointer text-emerald-700 hover:bg-gray-200">
+                    <Button className="bg-white text-base p-2 sm:p-4 hover:cursor-pointer text-emerald-700 hover:bg-gray-200">
                       Login to Bid
                     </Button>
                   </Link>
                   <Link href="/sign-up">
                     <Button
                       variant="outline"
-                      className="bg-emerald-800 text-base p-4 hover:cursor-pointer text-white hover:bg-gray-400"
+                      className="bg-emerald-800 text-base p-2 sm:p-4 hover:cursor-pointer text-white hover:bg-gray-400"
                     >
                       Sign Up
                     </Button>
@@ -195,101 +197,117 @@ export default function HomePage() {
             </motion.div>
           </div>
         </div>
-      </motion.div>
+      </motion.section>
 
       {/* Live Auctions */}
-      <div className="flex py-12 px-6 flex-col bg-gray-50">
-        <h2 className="text-2xl font-semibold text-emerald-800 mb-6">
-          Live Auctions
-          <span className="inline-block p-2 ml-2 w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
-        </h2>
+      <section className="relative overflow-hidden bg-gray-50 py-12 px-6">
+        {/* Background SVG */}
+        <div className="absolute inset-0 z-0 opacity-10 sm:opacity-5 pointer-events-none">
+          <Image
+            src="/topography.svg"
+            alt="Banquet Hall Background"
+            fill
+            priority
+            quality={75}
+            className="object-cover object-[20%_0%]"
+          />
+        </div>
 
-        {loading ? (
-          <Loader2 className="animate-spin text-emerald-500" size={40} />
-        ) : (
-          <div className="w-full max-w-6xl mx-auto">
-            {auctions.filter((a) => a.status !== "closed").length === 0 ? (
-              <p className="text-gray-500">No live auctions available.</p>
-            ) : (
-              <Swiper
-                slidesPerView={1}
-                spaceBetween={20}
-                breakpoints={{
-                  640: { slidesPerView: 1 },
-                  768: { slidesPerView: 2 },
-                  1024: { slidesPerView: 3 },
-                }}
-                navigation
-                modules={[Navigation]}
-                className="py-4"
-              >
-                {auctions
-                  .filter((auction) => auction.status !== "closed")
-                  .map((auction) => {
-                    const timeLeft = remainingTimes[auction._id] || "Calculating...";
-                    const isClosed = timeLeft === "Closed" || auction.status === "closed";
+        <div className="relative z-10">
+          <h2 className="text-2xl sm:text-3xl px-2 sm:px-8  font-semibold text-emerald-800 mb-6">
+            Live Auctions
+            <span className="inline-block p-2 ml-2 w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
+          </h2>
 
-                    return (
-                      <SwiperSlide key={auction._id}>
-                        <motion.div
-                          initial={{ opacity: 0, y: 30 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.5 }}
-                        >
-                          <Card className="relative bg-white border border-emerald-200 shadow-md rounded-xl hover:shadow-lg transition">
-                            <div className={`absolute top-3 right-3 text-sm font-semibold px-3 py-1 rounded-full z-10 shadow 
-                              ${isClosed ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}>
-                              {isClosed ? "Closed" : timeLeft}
-                            </div>
+          {loading ? (
+            <Loader2 className="animate-spin text-emerald-500" size={40} />
+          ) : (
+            <div className="w-full max-w-6xl mx-auto">
+              {auctions.filter((a) => a.status !== "closed").length === 0 ? (
+                <p className="text-gray-500">No live auctions available.</p>
+              ) : (
+                <Swiper
+                  slidesPerView={1}
+                  spaceBetween={20}
+                  breakpoints={{
+                    640: { slidesPerView: 1 },
+                    768: { slidesPerView: 2 },
+                    1024: { slidesPerView: 3 },
+                  }}
+                  navigation
+                  modules={[Navigation]}
+                  className="py-4"
+                >
+                  {auctions
+                    .filter((auction) => auction.status !== "closed")
+                    .map((auction) => {
+                      const timeLeft = remainingTimes[auction._id] || "Calculating...";
+                      const isClosed = timeLeft === "Closed" || auction.status === "closed";
 
-                            <CardContent className="space-y-4">
-                              <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
-                              <p className="text-gray-700">{auction.description}</p>
-                              {auction.images && auction.images.length > 0 && (
-                                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
-                                  <Image
-                                    src={auction.images[0]}
-                                    alt={auction.title}
-                                    fill
-                                    className="object-cover"
-                                    sizes="(max-width: 768px) 100vw, 33vw"
-                                  />
-                                </div>
-                              )}
-                              <div className="text-sm text-gray-600 space-y-1">
-                                <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleDateString('en-GB', {
-                                  day: '2-digit',
-                                  month: '2-digit',
-                                  year: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                  second: '2-digit'
-                                })}</p>
-
-                                <p><strong>End:</strong> {new Date(auction.endTime).toLocaleDateString('en-GB', {
-                                  day: '2-digit',
-                                  month: '2-digit',
-                                  year: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                  second: '2-digit'
-                                })}</p>
-                                <p><strong>Current Price:</strong> ₹{auction.currentPrice}</p>
+                      return (
+                        <SwiperSlide key={auction._id}>
+                          <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 }}
+                          >
+                            <Card className="relative bg-white border border-emerald-200 shadow-md rounded-xl hover:shadow-lg transition">
+                              <div className={`absolute top-3 right-3 text-sm font-semibold px-3 py-1 rounded-full z-10 shadow 
+                          ${isClosed ? "bg-red-500 text-white" : "bg-emerald-500 text-white"}`}>
+                                {isClosed ? "Closed" : timeLeft}
                               </div>
-                              <Link href={`/auctions/${auction._id}`} passHref>
-                                <Button className="w-full hover:cursor-pointer bg-indigo-500 text-white rounded-full hover:bg-indigo-600 ">Explore More</Button>
-                              </Link>
-                            </CardContent>
-                          </Card>
-                        </motion.div>
-                      </SwiperSlide>
-                    );
-                  })}
-              </Swiper>
-            )}
-          </div>
-        )}
-      </div>
+
+                              <CardContent className="space-y-4">
+                                <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
+                                <p className="text-gray-700">{auction.description}</p>
+                                {auction.images && auction.images.length > 0 && (
+                                  <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
+                                    <Image
+                                      src={auction.images[0]}
+                                      alt={auction.title}
+                                      fill
+                                      className="object-cover"
+                                      sizes="(max-width: 768px) 100vw, 33vw"
+                                    />
+                                  </div>
+                                )}
+                                <div className="text-sm text-gray-600 space-y-1">
+                                  <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleDateString('en-GB', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    second: '2-digit'
+                                  })}</p>
+
+                                  <p><strong>End:</strong> {new Date(auction.endTime).toLocaleDateString('en-GB', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    second: '2-digit'
+                                  })}</p>
+                                  <p><strong>Current Price:</strong> ₹{auction.currentPrice}</p>
+                                </div>
+                                <Link href={`/auctions/${auction._id}`} passHref>
+                                  <Button className="w-full hover:cursor-pointer bg-indigo-500 text-white rounded-full hover:bg-indigo-600">
+                                    Explore More
+                                  </Button>
+                                </Link>
+                              </CardContent>
+                            </Card>
+                          </motion.div>
+                        </SwiperSlide>
+                      );
+                    })}
+                </Swiper>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* Mega Auction */}
       <motion.section
@@ -299,9 +317,13 @@ export default function HomePage() {
         viewport={{ once: true }}
         className="bg-emerald-800 text-white py-8 text-center"
       >
-        <h2 className="text-3xl font-bold mb-2">🔥 Mega Auction Ends In:</h2>
+        <h2 className="text-2xl sm:text-3xl flex flex-wrap items-center justify-center font-bold mb-2">
+          <Flame className="w-6 h-6 sm:w-8 sm:h-8 fill-amber-400 text-orange-500 mr-2" />
+          Mega Auction Ends In:
+        </h2>
+
         <p className="text-4xl font-semibold">{formatTime(timeLeft)}</p>
-        <p className="mt-4">Hurry up — grab your favorite items before time runs out!</p>
+        <p className="mt-4 px-8">Hurry up — grab your favorite items before time runs out!</p>
       </motion.section>
 
       {/* Featured Categories */}
@@ -328,7 +350,8 @@ export default function HomePage() {
               >
                 <Image
                   src={category.icon}
-                  alt={category.title}
+                  alt=""
+                  aria-hidden="true"
                   width={250}
                   height={150}
                   className="mx-auto mb-2"
@@ -415,7 +438,7 @@ export default function HomePage() {
         <h2 className="text-2xl font-semibold mb-4">Stay Updated!</h2>
         <p className="mb-6">Subscribe to our newsletter to get the latest auction alerts.</p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Input
+           <Input
             type="email"
             placeholder="Enter your email"
             className="px-4 py-2 bg-white rounded-md text-emerald-700 w-full sm:w-64 placeholder:text-gray-400"
@@ -423,7 +446,7 @@ export default function HomePage() {
           <Button className="bg-white hover:cursor-pointer text-emerald-700 hover:bg-emerald-100">Subscribe</Button>
         </div>
       </motion.section>
-    </div>
+    </main>
   );
 }
 

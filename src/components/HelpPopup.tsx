@@ -1,3 +1,4 @@
+'use client';
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { HelpCircle, X } from "lucide-react";
@@ -75,6 +76,7 @@ export default function HelpChatBot() {
         <button
           onClick={() => setOpen(true)}
           className="bg-emerald-600 text-white p-3 rounded-full shadow-lg hover:bg-emerald-700"
+          aria-label="Open help chatbot"
         >
           <HelpCircle size={24} />
         </button>

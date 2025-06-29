@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Loader2, IndianRupee, Timer, Tag } from "lucide-react";
+import { Loader2, IndianRupee, Timer, Tag, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +40,7 @@ export default function AuctionDetailPage() {
   const [loading, setLoading] = useState(true);
   const [bidInputs, setBidInputs] = useState<{ [key: string]: string }>({});
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null); // For modal
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState('');
 
@@ -64,14 +65,11 @@ export default function AuctionDetailPage() {
       setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
     };
 
-    updateCountdown(); // initial call
+    updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
-
     return () => clearInterval(interval);
   }, [auction?.endTime]);
 
-
-  // Handle bid input changes
   const handleBid = async (id: string) => {
     const bidAmount = parseFloat(bidInputs[id]);
     if (isNaN(bidAmount) || bidAmount <= 0) {
@@ -87,9 +85,7 @@ export default function AuctionDetailPage() {
       });
 
       const result = await res.json();
-      if (!res.ok) {
-        throw new Error(result.error || "Failed to place bid");
-      }
+      if (!res.ok) throw new Error(result.error || "Failed to place bid");
 
       toast.success("Bid placed successfully!");
 
@@ -105,27 +101,21 @@ export default function AuctionDetailPage() {
     }
   };
 
-  // Fetch current user ID from session
   useEffect(() => {
     async function fetchSession() {
       const session = await getSession();
-      if (session && session.user) {
-        setCurrentUserId(session.user.id);
-      }
+      if (session && session.user) setCurrentUserId(session.user.id);
     }
     fetchSession();
   }, []);
 
-  // Fetch auction details when component mounts or id changes
   useEffect(() => {
     async function fetchAuction() {
       setLoading(true);
       try {
         const res = await fetch(`/api/auction/${id}/details`);
         const data = await res.json();
-        if (data.success) {
-          setAuction(data.auction);
-        }
+        if (data.success) setAuction(data.auction);
       } catch (err) {
         console.error("Failed to fetch auction:", err);
       }
@@ -135,7 +125,6 @@ export default function AuctionDetailPage() {
     if (id) fetchAuction();
   }, [id]);
 
-  // Set up Pusher subscription for real-time updates
   useEffect(() => {
     const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || "default-cluster",
@@ -163,7 +152,6 @@ export default function AuctionDetailPage() {
     };
   }, [id]);
 
-  // Set default selected image when auction data loads
   useEffect(() => {
     if (auction?.images && auction.images.length > 0) {
       setSelectedImage(auction.images[0]);
@@ -179,47 +167,28 @@ export default function AuctionDetailPage() {
   }
 
   if (!auction) {
-    return (
-      <div className="text-center mt-10 text-gray-500">Auction not found.</div>
-    );
+    return <div className="text-center mt-10 text-gray-500">Auction not found.</div>;
   }
 
-  interface IncrementOptions {
-    (currentBid: number): number[];
-  }
-
-  const getIncrementOptions: IncrementOptions = (currentBid) => {
-    if (currentBid < 100) {
-      return [5, 10, 20];
-    } else if (currentBid < 1000) {
-      return [10, 20, 50];
-    } else if (currentBid < 5000) {
-      return [100, 200, 500];
-    } else {
-      return [500, 1000, 2000];
-    }
+  const getIncrementOptions = (currentBid: number): number[] => {
+    if (currentBid < 100) return [5, 10, 20];
+    if (currentBid < 1000) return [10, 20, 50];
+    if (currentBid < 5000) return [100, 200, 500];
+    return [500, 1000, 2000];
   };
 
-
-
-
   const isClosed = auction.status === "closed";
-
-  // Determine winner (the bidder with the highest bid)
   const winner = isClosed
     ? auction.bidders.reduce((prev, current) =>
       prev.amount > current.amount ? prev : current
     )
     : null;
-
   const isWinner = winner && winner.bidder._id.toString() === currentUserId;
 
-
-
   return (
-    <div className=" mx-auto p-4 sm:p-6 lg:px-16 lg:py-8">
+    <div className="mx-auto p-4 sm:p-6 lg:px-16 lg:py-8">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Left Side Image with Mini Photo Viewer */}
+        {/* Left Side Image Viewer */}
         <div className="flex flex-col-reverse lg:flex-row items-center gap-4">
           {/* Thumbnails */}
           <div className="flex lg:flex-col sm:gap-2 overflow-x-auto lg:overflow-y-auto">
@@ -241,14 +210,17 @@ export default function AuctionDetailPage() {
           </div>
 
           {/* Main Image */}
-          <div className="flex-1 relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
+          <div
+            className="flex-1 relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300 cursor-zoom-in"
+            onClick={() => setZoomedImage(selectedImage)}
+          >
             {selectedImage && (
               <Image
                 src={selectedImage}
                 alt={auction.title}
                 fill
                 className="object-contain"
-                sizes=" 100vw, 33vw"
+                sizes="100vw, 33vw"
               />
             )}
           </div>
@@ -256,34 +228,22 @@ export default function AuctionDetailPage() {
 
         {/* Right Side Content */}
         <div className="space-y-6">
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            {auction.title}
-          </h1>
-
+          <h1 className="text-3xl font-bold">{auction.title}</h1>
           <p className="text-gray-600">{auction.description}</p>
 
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-lg font-semibold text-gray-800">
-              <Tag className="text-purple-500" />
-              Category:{" "}
-              <span className="font-medium text-gray-600">
-                {auction.category}
-              </span>
+              <Tag className="text-purple-500" /> Category:{" "}
+              <span className="font-medium text-gray-600">{auction.category}</span>
             </div>
-
             <div className="flex items-center gap-2 text-lg font-semibold text-gray-800">
-              <IndianRupee className="text-blue-500" />
-              Starting Price: ₹{auction.startingPrice}
+              <IndianRupee className="text-blue-500" /> Starting Price: ₹{auction.startingPrice}
             </div>
-
             <div className="flex items-center gap-2 text-lg font-semibold">
-              <IndianRupee className="text-green-600" />
-              Current Price: ₹{auction.currentPrice}
+              <IndianRupee className="text-green-600" /> Current Price: ₹{auction.currentPrice}
             </div>
-
             <div className="flex items-center gap-2 text-red-600 text-lg font-semibold">
-              <Timer className="text-orange-500" />
-              Time Left: {timeLeft}
+              <Timer className="text-orange-500" /> Time Left: {timeLeft}
             </div>
           </div>
 
@@ -299,15 +259,14 @@ export default function AuctionDetailPage() {
                 }
               />
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                {/* Place Bid Button */}
                 <Button
                   onClick={() => handleBid(auction._id)}
                   className="w-full sm:w-auto bg-emerald-500 text-white rounded-full px-6 py-3 text-base font-semibold hover:bg-emerald-600 transition duration-200"
                 >
                   Place Bid
                 </Button>
-                {/* Quick Bid Options */}
-                <div className="flex  items-center justify-center flex-col sm:flex-row  w-full sm:w-auto bg-emerald-500 p-1 rounded-2xl gap-3">
+
+                <div className="flex items-center justify-center flex-col sm:flex-row w-full sm:w-auto bg-emerald-500 p-1 rounded-2xl gap-3">
                   <p className="text-white font-semibold text-center sm:text-left text-base">
                     Quick Bid: <span className="font-normal">Choose an increment</span>
                   </p>
@@ -319,10 +278,12 @@ export default function AuctionDetailPage() {
                         onClick={() =>
                           setBidInputs({
                             ...bidInputs,
-                            [auction._id]: ((parseFloat(bidInputs[auction._id]) || auction.currentPrice) + inc).toString(),
+                            [auction._id]: (
+                              (parseFloat(bidInputs[auction._id]) || auction.currentPrice) + inc
+                            ).toString(),
                           })
                         }
-                        className="rounded-full border border-gray-300 text-gray-700  hover:bg-gray-100 transition duration-150"
+                        className="rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition duration-150"
                       >
                         +₹{inc}
                       </Button>
@@ -331,13 +292,12 @@ export default function AuctionDetailPage() {
                 </div>
               </div>
             </div>
-
           )}
 
           {isClosed && winner && (
             <div className="border-t border-gray-300 mt-6 py-4">
               {isWinner ? (
-                <p className="text-green-600 text-base sm:text-lg  font-semibold text-center mt-4">
+                <p className="text-green-600 text-base sm:text-lg font-semibold text-center mt-4">
                   You have won the auction! Congratulations!
                 </p>
               ) : (
@@ -349,16 +309,44 @@ export default function AuctionDetailPage() {
           )}
 
           <div className="border rounded-lg overflow-hidden mt-6">
-            <h2 className="bg-gray-100 border  flex justify-center px-4 py-2 font-semibold tracking-wide text-xl md:text-2xl">
+            <h2 className="bg-gray-100 border flex justify-center px-4 py-2 font-semibold tracking-wide text-xl md:text-2xl">
               Top 5 Bidders
             </h2>
             <BiddersTable bidders={auction.bidders} />
           </div>
         </div>
       </div>
+
+      {/* Image Zoom Modal */}
+      {zoomedImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+          onClick={() => setZoomedImage(null)}
+        >
+          <div
+            className="relative max-w-3xl w-full px-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setZoomedImage(null)}
+              className="absolute z-50 top-4 sm:top-0 sm:right-0 right-4 text-white bg-black bg-opacity-60 rounded-full p-2 hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black transition"
+            >
+              <X className="w-6 h-6 z-50" />
+            </button>
+            <div className="relative w-full h-[80vh]">
+              <Image
+                src={zoomedImage}
+                alt="Zoomed"
+                fill
+                className="object-contain"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
-
 
 
