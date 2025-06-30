@@ -241,7 +241,7 @@ const BiddedAuctionsPage = () => {
         <Loader2 className="animate-spin text-emerald-500" size={40} />
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-8 sm:px-4 max-w-6xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-sm sm:w-full px-8 sm:px-4 max-w-6xl">
             {currentAuctions.length === 0 ? (
               <p className="text-gray-500">You haven&apos;t placed any bids yet.</p>
             ) : (

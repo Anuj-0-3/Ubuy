@@ -44,7 +44,6 @@ const AllAuctionsPage = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortOption, setSortOption] = useState("endingSoon");
-  const [watchlist, setWatchlist] = useState<string[]>([]);
   const categories = ["All", "Art", "Electronics", "Fashion", "Other", "Collectibles"];
   const [categoryFilter, setCategoryFilter] = useState("All");
 
@@ -128,75 +127,72 @@ const AllAuctionsPage = () => {
       {/* Search, Filter, Sort */}
       <form
         onSubmit={(e) => e.preventDefault()}
-        className="w-full max-w-6xl px-4 mb-8 overflow-x-auto"
+        className="w-full max-w-6xl px-4 mb-8"
       >
-        <div className="flex flex-wrap sm:flex-nowrap gap-4 sm:gap-6 items-center bg-white/80 backdrop-blur border border-gray-200 rounded-2xl p-4 shadow-sm transition-all duration-300 ease-in-out">
+        <div className="flex flex-wrap gap-4 sm:gap-6 items-center bg-white/80 backdrop-blur border border-gray-200 rounded-2xl p-4 shadow-sm transition-all duration-300 ease-in-out">
 
-          {/* Search Input */}
-          <div className="relative flex-1 min-w-[200px]">
-            <span className="absolute left-3 top-2.5 text-gray-400"><Search className="w-4 h-4" /></span>
+          {/* Search Input - flex-grow more */}
+          <div className="relative flex-[2] min-w-[150px]">
+            <span className="absolute left-3 top-2.5 text-gray-400">
+              <Search className="w-4 h-4" />
+            </span>
             <Input
               type="text"
               placeholder="Search auctions..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 pr-4 py-2 text-sm rounded-full border-gray-300 focus:ring-2 focus:ring-emerald-400"
+              className="pl-9 pr-4 py-2 text-sm rounded-full border-gray-300 focus:ring-2 focus:ring-emerald-400 w-full"
             />
           </div>
 
           {/* Status Filter */}
-          <div className="min-w-[130px]">
+          <div className="flex-1 min-w-[120px]">
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full rounded-full border border-gray-300 bg-white text-gray-800 shadow-sm hover:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent className="bg-white border border-gray-200 rounded-xl shadow-lg">
-                <SelectItem value="all" className="cursor-pointer px-4 py-2 text-sm focus:bg-emerald-400 hover:bg-emerald-400 aria-selected:bg-emerald-300">All Status</SelectItem>
-                <SelectItem value="active" className="cursor-pointer px-4 py-2 text-sm focus:bg-emerald-400 hover:bg-emerald-400 aria-selected:bg-emerald-300">Active</SelectItem>
-                <SelectItem value="closed" className="cursor-pointer px-4 py-2 text-sm focus:bg-emerald-400 hover:bg-emerald-400 aria-selected:bg-emerald-300">Closed</SelectItem>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="closed">Closed</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Category Filter */}
-          <div className="min-w-[150px]">
+          <div className="flex-1 min-w-[140px]">
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-full rounded-full border border-gray-300 bg-white text-gray-800 shadow-sm hover:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent className="bg-white border border-gray-200 rounded-xl shadow-lg">
                 {categories.map((cat) => (
-                  <SelectItem
-                    key={cat}
-                    value={cat}
-                    className="cursor-pointer px-4 py-2 text-sm hover:bg-emerald-400 focus:bg-emerald-400 aria-selected:bg-emerald-300"
-                  >
+                  <SelectItem key={cat} value={cat}>
                     {cat === "All" ? "All Categories" : cat}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-
           </div>
 
           {/* Sort Option */}
-          <div className="min-w-[130px]">
+          <div className="flex-1 min-w-[120px]">
             <Select value={sortOption} onValueChange={setSortOption}>
               <SelectTrigger className="w-full rounded-full border border-gray-300 bg-white text-gray-800 shadow-sm hover:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                 <SelectValue placeholder="Sort By" />
               </SelectTrigger>
               <SelectContent className="bg-white border border-gray-200 rounded-xl shadow-lg">
-                <SelectItem value="endingSoon" className="cursor-pointer px-4 py-2 text-sm hover:bg-emerald-400 focus:bg-emerald-400 aria-selected:bg-emerald-300">Ending Soon</SelectItem>
-                <SelectItem value="newest" className="cursor-pointer px-4 py-2 text-sm hover:bg-emerald-400 focus:bg-emerald-400 aria-selected:bg-emerald-300">Newest</SelectItem>
+                <SelectItem value="endingSoon">Ending Soon</SelectItem>
+                <SelectItem value="newest">Newest</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/*  Reset Filters */}
-          <div className="min-w-[130px]">
+          {/* Clear Filters Button - flex-grow less */}
+          <div className="flex-[0.5] min-w-[100px]">
             <Button
               variant="outline"
-              className="w-full text-white hover:text-gray-100 hover:cursor-pointer text-sm rounded-full bg-red-500 border-gray-300 hover:bg-red-600"
+              className="w-full text-white text-sm rounded-full bg-red-500 hover:bg-red-600 border-none flex items-center justify-center gap-2"
               onClick={() => {
                 setSearch("");
                 setStatusFilter("all");
@@ -204,65 +200,50 @@ const AllAuctionsPage = () => {
                 setSortOption("endingSoon");
               }}
             >
-              <X className="w-4 h-4 text-white" />
-              Clear Filters
+              <X className="w-4 h-4" />
+              Clear
             </Button>
           </div>
         </div>
       </form>
 
+
+
       {loading ? (
         <Loader2 className="animate-spin text-emerald-500" size={40} />
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-8 sm:px-4 max-w-6xl">
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-sm sm:w-full px-8 sm:px-4 max-w-6xl">
             {currentAuctions.length === 0 ? (
-              <p className="text-gray-500">No auctions found.</p>
+              <p className="text-gray-500">No auctions found in this category.</p>
             ) : (
               currentAuctions.map((auction) => {
                 const timeLeft = remainingTimes[auction._id] || "Calculating...";
                 const isClosed = timeLeft === "Closed" || auction.status === "closed";
-                const isWatched = watchlist.includes(auction._id);
 
                 return (
                   <Card
                     key={auction._id}
-                    className="relative bg-white border border-emerald-200 shadow-md rounded-xl hover:shadow-lg transition"
+                    className="relative bg-white/10 border border-emerald-400/40 shadow-lg rounded-2xl overflow-hidden"
                   >
-                    <div className={`absolute top-3 right-3 text-sm font-semibold px-3 py-1 rounded-full z-10 shadow 
-                      ${isClosed ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}>
-                      {isClosed ? "Closed" : timeLeft}
+                    <div className="absolute top-3 right-3 bg-emerald-500 text-white text-sm font-semibold px-3 py-1 rounded-full z-10 shadow">
+                      {timeLeft}
                     </div>
-
-                    <button
-                      onClick={() =>
-                        setWatchlist((prev) =>
-                          prev.includes(auction._id)
-                            ? prev.filter((id) => id !== auction._id)
-                            : [...prev, auction._id]
-                        )
-                      }
-                      className="absolute top-3 left-3 z-10 text-yellow-400 hover:text-yellow-500 text-xl"
-                      title={isWatched ? "Remove from Watchlist" : "Add to Watchlist"}
-                    >
-                      {isWatched ? "★" : "☆"}
-                    </button>
 
                     <CardContent className="p-6 space-y-2 sm:space-y-4">
                       <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
                       <p className="text-gray-700">{auction.description}</p>
-
-                      {auction.images?.length > 0 && (
+                      {auction.images && auction.images.length > 0 && (
                         <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
                           <Image
                             src={auction.images[0]}
                             alt={auction.title}
                             fill
                             className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 33vw"
                           />
                         </div>
                       )}
-
                       <div className="text-sm text-gray-600 space-y-1">
                         <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleDateString('en-GB', {
                           day: '2-digit',
@@ -281,11 +262,15 @@ const AllAuctionsPage = () => {
                           minute: '2-digit',
                           second: '2-digit'
                         })}</p>
-                        <p><strong>Category:</strong> {auction.category}</p>
+                        <p>
+                          <strong>Status:</strong>{" "}
+                          <span className={isClosed ? "text-red-500 font-semibold" : "text-green-600 font-semibold"}>
+                            {isClosed ? "Closed" : "Active"}
+                          </span>
+                        </p>
                         <p><strong>Starting Price:</strong> ₹{auction.startingPrice}</p>
                         <p><strong>Current Price:</strong> ₹{auction.currentPrice}</p>
-                        <p><strong>Status:</strong> <span className={isClosed ? "text-red-500" : "text-green-600"}>{isClosed ? "Closed" : "Active"}</span></p>
-                        {auction.highestBidder && <p><strong>Highest Bidder:</strong> {auction.highestBidder}</p>}
+                        <p><strong>Category:</strong> {auction.category}</p>
                       </div>
 
                       {!isClosed && (
@@ -293,16 +278,20 @@ const AllAuctionsPage = () => {
                           <Input
                             type="number"
                             placeholder="Your Bid (₹)"
+                            className="border border-gray-300 focus:border-emerald-500"
                             value={bidInputs[auction._id] || ""}
                             onChange={(e) =>
                               setBidInputs({ ...bidInputs, [auction._id]: e.target.value })
                             }
                           />
-                          <Button onClick={() => handleBid(auction._id)} className="w-full bg-emerald-500 text-white rounded-full hover:bg-emerald-600">
+                          <Button
+                            onClick={() => handleBid(auction._id)}
+                            className="w-full bg-emerald-500 text-white rounded-full hover:bg-emerald-600"
+                          >
                             Place Bid
                           </Button>
-                          <Link href={`/auctions/${auction._id}`}>
-                            <Button className="w-full bg-indigo-500 text-white rounded-full hover:bg-indigo-600">Explore More</Button>
+                          <Link href={`/auctions/${auction._id}`} passHref>
+                            <Button className="w-full hover:cursor-pointer bg-indigo-500 text-white rounded-full hover:bg-indigo-600">Explore More</Button>
                           </Link>
                         </div>
                       )}
@@ -312,6 +301,7 @@ const AllAuctionsPage = () => {
               })
             )}
           </div>
+
 
           {/* Pagination */}
           <div className="flex justify-center mt-10 space-x-4">

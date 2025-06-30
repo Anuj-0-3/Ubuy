@@ -329,9 +329,9 @@ export default function AuctionDetailPage() {
           >
             <button
               onClick={() => setZoomedImage(null)}
-              className="absolute z-50 top-4 sm:top-0 sm:right-0 right-4 text-white bg-black bg-opacity-60 rounded-full p-2 hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black transition"
+              className="absolute cursor-pointer z-50 top-4 sm:top-0 sm:right-0 right-4 text-white bg-black bg-opacity-60 rounded-full p-2 hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black transition"
             >
-              <X className="w-6 h-6 z-50" />
+              <X className=" w-6 h-6 z-50" />
             </button>
             <div className="relative w-full h-[80vh]">
               <Image
