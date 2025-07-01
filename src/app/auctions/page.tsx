@@ -16,7 +16,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select"
-
+import { Heart } from "lucide-react";
 
 interface Auction {
   _id: string;
@@ -46,6 +46,9 @@ const AllAuctionsPage = () => {
   const [sortOption, setSortOption] = useState("endingSoon");
   const categories = ["All", "Art", "Electronics", "Fashion", "Other", "Collectibles"];
   const [categoryFilter, setCategoryFilter] = useState("All");
+  const [wishlist, setWishlist] = useState<string[]>([]);
+  const [, setWishlistLoading] = useState(false);
+
 
   // Fetch all auctions on component mount
   useEffect(() => {
@@ -64,6 +67,20 @@ const AllAuctionsPage = () => {
   }, []);
 
   useEffect(() => {
+    const fetchWishlist = async () => {
+      try {
+        const res = await fetch("/api/auction/wishlist/fetch");
+        const data = await res.json();
+        if (data.wishlist) {
+            const wishlistAuctionIds: string[] = data.wishlist.map((item: { auction: { _id: string } }) => item.auction._id);
+          setWishlist(wishlistAuctionIds);
+        }
+      } catch (err) {
+        console.error("Error fetching wishlist", err);
+      }
+    };
+    fetchWishlist();
+
     const interval = setInterval(() => {
       const updatedTimes: { [key: string]: string } = {};
       auctions.forEach((auction) => {
@@ -99,6 +116,47 @@ const AllAuctionsPage = () => {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
     }
   };
+
+  const handleAddToWishlist = async (auctionId: string) => {
+    setWishlistLoading(true);
+    try {
+      const res = await fetch("/api/auction/wishlist/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ auctionId }),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Failed to add to wishlist");
+
+      setWishlist((prev) => [...prev, auctionId]);
+      toast.success(result.message || "Added to wishlist!");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Something went wrong");
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
+
+  const handleRemoveFromWishlist = async (auctionId: string) => {
+    setWishlistLoading(true);
+    try {
+      const res = await fetch("/api/auction/wishlist/delete", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ auctionId }),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Failed to remove from wishlist");
+
+      setWishlist((prev) => prev.filter((id) => id !== auctionId));
+      toast.success(result.message || "Removed from wishlist!");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Something went wrong");
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
+
 
   // Search, Filter, and Sort
   const filteredAuctions = auctions
@@ -206,14 +264,11 @@ const AllAuctionsPage = () => {
           </div>
         </div>
       </form>
-
-
-
       {loading ? (
         <Loader2 className="animate-spin text-emerald-500" size={40} />
       ) : (
         <>
-           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-sm sm:w-full px-8 sm:px-4 max-w-6xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-sm sm:w-full px-8 sm:px-4 max-w-6xl">
             {currentAuctions.length === 0 ? (
               <p className="text-gray-500">No auctions found in this category.</p>
             ) : (
@@ -226,9 +281,31 @@ const AllAuctionsPage = () => {
                     key={auction._id}
                     className="relative bg-white/10 border border-emerald-400/40 shadow-lg rounded-2xl overflow-hidden"
                   >
+                    {/* Wishlist Button - top left */}
+                    <div className="absolute top-3 left-3 z-10">
+                      {wishlist.includes(auction._id) ? (
+                        <Heart
+                          onClick={() => handleRemoveFromWishlist(auction._id)}
+                          className="w-6 h-6 text-emerald-500 cursor-pointer hover:scale-110 transition-transform"
+                          fill="currentColor"
+                          stroke="currentColor"
+                        />
+                      ) : (
+                        <Heart
+                          onClick={() => handleAddToWishlist(auction._id)}
+                          className="w-6 h-6 text-emerald-500 cursor-pointer hover:scale-110 transition-transform"
+                          fill="none"
+                          stroke="currentColor"
+                        />
+                      )}
+                    </div>
+
+
+                    {/* Time Badge - top right */}
                     <div className="absolute top-3 right-3 bg-emerald-500 text-white text-sm font-semibold px-3 py-1 rounded-full z-10 shadow">
                       {timeLeft}
                     </div>
+
 
                     <CardContent className="p-6 space-y-2 sm:space-y-4">
                       <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>

@@ -22,7 +22,6 @@ interface AuctionPopulated {
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    console.log("Session:", session);
 
     if (!session || !session.user?.id) {
       console.error("Unauthorized access: No session or user id");
@@ -39,28 +38,24 @@ export async function GET() {
       console.error("User not found for id:", session.user.id);
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-    console.log("Fetched user:", user);
 
-    const auctionIds = user.biddedauction;
+    const auctionIds = user.biddedauction || [];
 
     const validAuctionIds = auctionIds.filter((id: string) =>
       mongoose.Types.ObjectId.isValid(id)
     );
- 
 
-    const auctions = await Auction.find({
-      _id: { $in: validAuctionIds.map((id: string) => new mongoose.Types.ObjectId(id)) },
-    }).populate([
-      {
-        path: "bidders.bidder",
-        select: "_id username email",
-      },
-    ]);
-  
+    let auctions: AuctionPopulated[] = [];
 
-    if (!auctions.length) {
-      console.error("No auctions found for the provided IDs:", validAuctionIds);
-      return NextResponse.json({ error: "No auctions found" }, { status: 404 });
+    if (validAuctionIds.length > 0) {
+      auctions = await Auction.find({
+        _id: { $in: validAuctionIds.map((id: string) => new mongoose.Types.ObjectId(id)) },
+      }).populate([
+        {
+          path: "bidders.bidder",
+          select: "_id username email",
+        },
+      ]);
     }
 
     const totalBids = auctions.reduce(
@@ -73,7 +68,9 @@ export async function GET() {
 
     const auctionsCreated = await Auction.countDocuments({ createdBy: user._id });
 
-    const auctionsWon = auctions.filter((auction) => auction.winner?.toString() === user._id.toString()).length;
+    const auctionsWon = auctions.filter(
+      (auction) => auction.winner?.toString() === user._id.toString()
+    ).length;
 
     return NextResponse.json({
       totalBids,
@@ -87,5 +84,4 @@ export async function GET() {
     return NextResponse.json({ error: "Failed to fetch data", details: errorMessage }, { status: 500 });
   }
 }
-
 

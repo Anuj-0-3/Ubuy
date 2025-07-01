@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, Bell, ChevronLeft, BadgeIndianRupee, User } from "lucide-react";
+import { Menu, Bell, ChevronLeft, BadgeIndianRupee, User, Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Link from "next/link";
@@ -12,6 +12,7 @@ export default function ProfileSidebar() {
     { href: "/profile", icon: <User className="w-5 h-5" />, label: "Profile" },
     { href: "/profile/notifications", icon: <Bell className="w-5 h-5" />, label: "Notifications" },
     { href: "/profile/my-auction", icon: <BadgeIndianRupee className="w-5 h-5" />, label: "Created Auction" },
+    { href: "/profile/wishlist", icon: <Heart className="w-5 h-5" />, label: "Wishlist" }, 
   ];
 
   return (
@@ -57,7 +58,7 @@ export default function ProfileSidebar() {
 
               {/* Tooltip for menu items */}
               {isCollapsed && (
-                <div className="absolute left-full top-1/2 ml-2 -translate-y-1/2 px-3 py-1 bg-emerald-600 text-white text-xs rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap ">
+                <div className="absolute left-full top-1/2 ml-2 -translate-y-1/2 px-3 py-1 bg-emerald-600 text-white text-xs rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
                   {item.label}
                 </div>
               )}
@@ -68,3 +69,4 @@ export default function ProfileSidebar() {
     </div>
   );
 }
+

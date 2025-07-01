@@ -1,4 +1,3 @@
-// models/Notification.ts
 import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface INotification extends Document {
