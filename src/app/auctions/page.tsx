@@ -15,8 +15,9 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import { Heart } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Auction {
   _id: string;
@@ -43,14 +44,17 @@ const AllAuctionsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [sortOption, setSortOption] = useState("endingSoon");
+  const [, setSortOption] = useState("endingSoon");
   const categories = ["All", "Art", "Electronics", "Fashion", "Other", "Collectibles"];
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [, setWishlistLoading] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [priceRange, setPriceRange] = useState(0);
+  const [quickPriceFilter, setQuickPriceFilter] = useState("");
 
 
-  // Fetch all auctions on component mount
+  // Fetch auctions
   useEffect(() => {
     const fetchAuctions = async () => {
       try {
@@ -66,13 +70,14 @@ const AllAuctionsPage = () => {
     fetchAuctions();
   }, []);
 
+  // Fetch wishlist and timers
   useEffect(() => {
     const fetchWishlist = async () => {
       try {
         const res = await fetch("/api/auction/wishlist/fetch");
         const data = await res.json();
         if (data.wishlist) {
-            const wishlistAuctionIds: string[] = data.wishlist.map((item: { auction: { _id: string } }) => item.auction._id);
+          const wishlistAuctionIds: string[] = data.wishlist.map((item: { auction: { _id: string } }) => item.auction._id);
           setWishlist(wishlistAuctionIds);
         }
       } catch (err) {
@@ -157,8 +162,7 @@ const AllAuctionsPage = () => {
     }
   };
 
-
-  // Search, Filter, and Sort
+  // Filtered auctions
   const filteredAuctions = auctions
     .filter((a) =>
       (a.title?.toLowerCase() || "").includes(search.toLowerCase()) ||
@@ -166,6 +170,12 @@ const AllAuctionsPage = () => {
     )
     .filter((a) => statusFilter === "all" || a.status === statusFilter)
     .filter((a) => categoryFilter === "All" || a.category === categoryFilter)
+    .filter((a) => {
+      if (quickPriceFilter === "under500") return a.currentPrice <= 500;
+      if (quickPriceFilter === "500to1000") return a.currentPrice > 500 && a.currentPrice <= 1000;
+      if (quickPriceFilter === "above1000") return a.currentPrice > 1000;
+      return a.currentPrice <= priceRange || priceRange === 0;
+    })
     .sort((a, b) => {
       if (a.status === "active" && b.status === "closed") return -1;
       if (a.status === "closed" && b.status === "active") return 1;
@@ -176,223 +186,271 @@ const AllAuctionsPage = () => {
   const currentAuctions = filteredAuctions.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen bg-gray-50 py-10">
-      <div className="text-center mb-6">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900">All Auctions</h1>
-        <p className="text-gray-600 mt-2">Explore live and upcoming auctions</p>
+    <div className="w-full mx-auto px-6 sm:px-12 py-10">
+
+      {/* Search Bar at Top */}
+      <div className="w-full mb-4">
+        <div className="relative w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto">
+          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+            <Search className="w-5 h-5" />
+          </span>
+          <Input
+            type="text"
+            placeholder="Search auctions..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10 pr-4 py-2 text-sm rounded-full border-gray-300 focus:ring-2 focus:ring-emerald-400 w-full"
+          />
+        </div>
       </div>
 
-      {/* Search, Filter, Sort */}
-      <form
-        onSubmit={(e) => e.preventDefault()}
-        className="w-full max-w-6xl px-4 mb-8"
-      >
-        <div className="flex flex-wrap gap-4 sm:gap-6 items-center bg-white/80 backdrop-blur border border-gray-200 rounded-2xl p-4 shadow-sm transition-all duration-300 ease-in-out">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Sidebar Filters (PC) */}
+        <aside className="hidden lg:block p-4  space-y-4">
+          <h3 className="text-lg font-semibold">Filters</h3>
+          {renderFilters()}
+        </aside>
 
-          {/* Search Input - flex-grow more */}
-          <div className="relative flex-[2] min-w-[150px]">
-            <span className="absolute left-3 top-2.5 text-gray-400">
-              <Search className="w-4 h-4" />
-            </span>
-            <Input
-              type="text"
-              placeholder="Search auctions..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 pr-4 py-2 text-sm rounded-full border-gray-300 focus:ring-2 focus:ring-emerald-400 w-full"
-            />
-          </div>
-
-          {/* Status Filter */}
-          <div className="flex-1 min-w-[120px]">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full rounded-full border border-gray-300 bg-white text-gray-800 shadow-sm hover:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                <SelectValue placeholder="All Status" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-200 rounded-xl shadow-lg">
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="closed">Closed</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Category Filter */}
-          <div className="flex-1 min-w-[140px]">
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-full rounded-full border border-gray-300 bg-white text-gray-800 shadow-sm hover:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-200 rounded-xl shadow-lg">
-                {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat === "All" ? "All Categories" : cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Sort Option */}
-          <div className="flex-1 min-w-[120px]">
-            <Select value={sortOption} onValueChange={setSortOption}>
-              <SelectTrigger className="w-full rounded-full border border-gray-300 bg-white text-gray-800 shadow-sm hover:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                <SelectValue placeholder="Sort By" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-200 rounded-xl shadow-lg">
-                <SelectItem value="endingSoon">Ending Soon</SelectItem>
-                <SelectItem value="newest">Newest</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Clear Filters Button - flex-grow less */}
-          <div className="flex-[0.5] min-w-[100px]">
-            <Button
-              variant="outline"
-              className="w-full text-white text-sm rounded-full bg-red-500 hover:bg-red-600 border-none flex items-center justify-center gap-2"
-              onClick={() => {
-                setSearch("");
-                setStatusFilter("all");
-                setCategoryFilter("All");
-                setSortOption("endingSoon");
-              }}
-            >
-              <X className="w-4 h-4" />
-              Clear
-            </Button>
-          </div>
+        {/* Mobile Filters Toggle */}
+        <div className="block lg:hidden mb-4">
+          <Button onClick={() => setShowFilters(true)} className="w-full bg-emerald-500 text-white rounded-full">
+            Show Filters
+          </Button>
         </div>
-      </form>
-      {loading ? (
-        <Loader2 className="animate-spin text-emerald-500" size={40} />
-      ) : (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-sm sm:w-full px-8 sm:px-4 max-w-6xl">
-            {currentAuctions.length === 0 ? (
-              <p className="text-gray-500">No auctions found in this category.</p>
-            ) : (
-              currentAuctions.map((auction) => {
-                const timeLeft = remainingTimes[auction._id] || "Calculating...";
-                const isClosed = timeLeft === "Closed" || auction.status === "closed";
 
-                return (
-                  <Card
-                    key={auction._id}
-                    className="relative bg-white/10 border border-emerald-400/40 shadow-lg rounded-2xl overflow-hidden"
-                  >
-                    {/* Wishlist Button - top left */}
-                    <div className="absolute top-3 left-3 z-10">
-                      {wishlist.includes(auction._id) ? (
-                        <Heart
-                          onClick={() => handleRemoveFromWishlist(auction._id)}
-                          className="w-6 h-6 text-emerald-500 cursor-pointer hover:scale-110 transition-transform"
-                          fill="currentColor"
-                          stroke="currentColor"
-                        />
-                      ) : (
-                        <Heart
-                          onClick={() => handleAddToWishlist(auction._id)}
-                          className="w-6 h-6 text-emerald-500 cursor-pointer hover:scale-110 transition-transform"
-                          fill="none"
-                          stroke="currentColor"
-                        />
-                      )}
-                    </div>
+        {/* Auctions Grid */}
+        <main className="lg:col-span-3">
+          {loading ? (
+            <Loader2 className="animate-spin text-emerald-500 mx-auto" size={40} />
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {currentAuctions.length === 0 ? (
+                  <p className="text-gray-500">No auctions found.</p>
+                ) : (
+                  currentAuctions.map((auction) => renderAuctionCard(auction))
+                )}
+              </div>
 
+              {/* Pagination */}
+              <div className="flex justify-center mt-10 space-x-4">
+                <Button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>Previous</Button>
+                <span className="text-gray-700">{`Page ${currentPage} of ${totalPages}`}</span>
+                <Button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Next</Button>
+              </div>
+            </>
+          )}
+        </main>
+      </div>
 
-                    {/* Time Badge - top right */}
-                    <div className="absolute top-3 right-3 bg-emerald-500 text-white text-sm font-semibold px-3 py-1 rounded-full z-10 shadow">
-                      {timeLeft}
-                    </div>
+      {/* Mobile Filters Drawer */}
+      <AnimatePresence>
+        {showFilters && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-end"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            {/* Transparent backdrop */}
+            <div
+              className="absolute inset-0 bg-black/80  bg-opacity-20"
+              onClick={() => setShowFilters(false)}
+            />
 
+            {/* Sliding filter panel */}
+            <motion.div
+              className="relative bg-white rounded-t-xl w-full p-3 max-h-[80vh] overflow-y-auto space-y-3"
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">Filters</h3>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowFilters(false)}
+                  className="bg-red-500 text-white hover:bg-red-600"
+                >
+                  Close
+                </Button>
+              </div>
+              {renderFilters()}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-                    <CardContent className="p-6 space-y-2 sm:space-y-4">
-                      <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
-                      <p className="text-gray-700">{auction.description}</p>
-                      {auction.images && auction.images.length > 0 && (
-                        <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
-                          <Image
-                            src={auction.images[0]}
-                            alt={auction.title}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, 33vw"
-                          />
-                        </div>
-                      )}
-                      <div className="text-sm text-gray-600 space-y-1">
-                        <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleDateString('en-GB', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit'
-                        })}</p>
-
-                        <p><strong>End:</strong> {new Date(auction.endTime).toLocaleDateString('en-GB', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit'
-                        })}</p>
-                        <p>
-                          <strong>Status:</strong>{" "}
-                          <span className={isClosed ? "text-red-500 font-semibold" : "text-green-600 font-semibold"}>
-                            {isClosed ? "Closed" : "Active"}
-                          </span>
-                        </p>
-                        <p><strong>Starting Price:</strong> ₹{auction.startingPrice}</p>
-                        <p><strong>Current Price:</strong> ₹{auction.currentPrice}</p>
-                        <p><strong>Category:</strong> {auction.category}</p>
-                      </div>
-
-                      {!isClosed && (
-                        <div className="pt-2 space-y-2">
-                          <Input
-                            type="number"
-                            placeholder="Your Bid (₹)"
-                            className="border border-gray-300 focus:border-emerald-500"
-                            value={bidInputs[auction._id] || ""}
-                            onChange={(e) =>
-                              setBidInputs({ ...bidInputs, [auction._id]: e.target.value })
-                            }
-                          />
-                          <Button
-                            onClick={() => handleBid(auction._id)}
-                            className="w-full bg-emerald-500 text-white rounded-full hover:bg-emerald-600"
-                          >
-                            Place Bid
-                          </Button>
-                          <Link href={`/auctions/${auction._id}`} passHref>
-                            <Button className="w-full hover:cursor-pointer bg-indigo-500 text-white rounded-full hover:bg-indigo-600">Explore More</Button>
-                          </Link>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                );
-              })
-            )}
-          </div>
-
-
-          {/* Pagination */}
-          <div className="flex justify-center mt-10 space-x-4">
-            <Button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>Previous</Button>
-            <span className="text-gray-700">{`Page ${currentPage} of ${totalPages}`}</span>
-            <Button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Next</Button>
-          </div>
-        </>
-      )}
     </div>
   );
+
+  // Renders filters block
+  function renderFilters() {
+    return (
+      <>
+
+        {/* Status Filter */}
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-full rounded-full border-gray-300">
+            <SelectValue placeholder="All Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="closed">Closed</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Category Filter */}
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger className="w-full rounded-full border-gray-300">
+            <SelectValue placeholder="All Categories" />
+          </SelectTrigger>
+          <SelectContent>
+            {categories.map((cat) => (
+              <SelectItem key={cat} value={cat}>
+                {cat === "All" ? "All Categories" : cat}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Price Slider */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Max Price: ₹{priceRange || "Any"}</label>
+          <input
+            type="range"
+            min="0"
+            max="5000"
+            step="100"
+            value={priceRange}
+            onChange={(e) => {
+              setPriceRange(parseInt(e.target.value));
+              setQuickPriceFilter("");
+            }}
+            className="w-full"
+          />
+        </div>
+
+        {/* Quick Price Filters */}
+        <div className="flex flex-wrap gap-2">
+          {["under500", "500to1000", "above1000"].map((range) => (
+            <Button
+              key={range}
+              size="sm"
+              variant={quickPriceFilter === range ? "default" : "outline"}
+              onClick={() => {
+                setQuickPriceFilter(range);
+                setPriceRange(0);
+              }}
+            >
+              {range === "under500" && "Under ₹500"}
+              {range === "500to1000" && "₹500 - ₹1000"}
+              {range === "above1000" && "Above ₹1000"}
+            </Button>
+          ))}
+        </div>
+
+        {/* Clear Filters */}
+        <Button
+          variant="outline"
+          className="w-full text-white bg-red-500 hover:bg-red-600 rounded-full"
+          onClick={() => {
+            setSearch("");
+            setStatusFilter("all");
+            setCategoryFilter("All");
+            setSortOption("endingSoon");
+            setPriceRange(0);
+            setQuickPriceFilter("");
+          }}
+        >
+          <X className="w-4 h-4 mr-2" /> Clear Filters
+        </Button>
+      </>
+    );
+  }
+
+  // Renders single auction card
+  function renderAuctionCard(auction: Auction) {
+    const timeLeft = remainingTimes[auction._id] || "Calculating...";
+    const isClosed = timeLeft === "Closed" || auction.status === "closed";
+
+    return (
+      <Card key={auction._id} className="relative bg-white/10 border border-emerald-400/40 shadow-lg rounded-2xl overflow-hidden">
+        {/* Wishlist Button */}
+        <div className="absolute top-3 left-3 z-10">
+          {wishlist.includes(auction._id) ? (
+            <Heart
+              onClick={() => handleRemoveFromWishlist(auction._id)}
+              className="w-6 h-6 text-emerald-500 cursor-pointer hover:scale-110 transition-transform"
+              fill="currentColor"
+              stroke="currentColor"
+            />
+          ) : (
+            <Heart
+              onClick={() => handleAddToWishlist(auction._id)}
+              className="w-6 h-6 text-emerald-500 cursor-pointer hover:scale-110 transition-transform"
+              fill="none"
+              stroke="currentColor"
+            />
+          )}
+        </div>
+
+        {/* Time Badge */}
+        <div className="absolute top-3 right-3 bg-emerald-500 text-white text-sm font-semibold px-3 py-1 rounded-full z-10 shadow">
+          {timeLeft}
+        </div>
+
+        <CardContent className="p-6 space-y-2 sm:space-y-4">
+          <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
+          <p className="text-gray-700">{auction.description}</p>
+
+          {auction.images && auction.images.length > 0 && (
+            <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
+              <Image
+                src={auction.images[0]}
+                alt={auction.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 33vw"
+              />
+            </div>
+          )}
+
+          <div className="text-sm text-gray-600 space-y-1">
+            <p><strong>Starting Price:</strong> ₹{auction.startingPrice}</p>
+            <p><strong>Current Price:</strong> ₹{auction.currentPrice}</p>
+            <p><strong>Category:</strong> {auction.category}</p>
+          </div>
+
+          {!isClosed && (
+            <div className="pt-2 space-y-2">
+              <Input
+                type="number"
+                placeholder="Your Bid (₹)"
+                className="border border-gray-300 focus:border-emerald-500"
+                value={bidInputs[auction._id] || ""}
+                onChange={(e) => setBidInputs({ ...bidInputs, [auction._id]: e.target.value })}
+              />
+              <Button
+                onClick={() => handleBid(auction._id)}
+                className="w-full bg-emerald-500 text-white rounded-full hover:bg-emerald-600"
+              >
+                Place Bid
+              </Button>
+              <Link href={`/auctions/${auction._id}`} passHref>
+                <Button className="w-full bg-indigo-500 text-white rounded-full hover:bg-indigo-600">
+                  Explore More
+                </Button>
+              </Link>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
 };
 
 export default AllAuctionsPage;
-
-
-
