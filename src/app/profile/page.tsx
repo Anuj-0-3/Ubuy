@@ -24,11 +24,13 @@ const ProfilePage = () => {
   const { data: session, status, update } = useSession();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [username, setUsername] = useState("");
-  const [name, setName] = useState("");  // State for the name
+  const [name, setName] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [auctionStats, setAuctionStats] = useState<AuctionStats | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [createdAtFormatted, setCreatedAtFormatted] = useState<string>("");
+
 
   // Fetch auction stats when the component mounts
   useEffect(() => {
@@ -74,9 +76,17 @@ const ProfilePage = () => {
 
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed to load profile");
+
         setProfile(data);
         setUsername(data.username || data.name || "");
-        setName(data.name || ""); // Initialize name with current profile name
+        setName(data.name || "");
+
+        const formattedDate = new Date(data.createdAt).toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric',
+        });
+        setCreatedAtFormatted(formattedDate);
+
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Something went wrong");
       }
@@ -84,6 +94,7 @@ const ProfilePage = () => {
 
     fetchProfile();
   }, [session]);
+
 
   // Function to handle profile update
   const handleUpdateProfile = async () => {
@@ -180,6 +191,9 @@ const ProfilePage = () => {
               </div>
 
               <div className="text-lg font-semibold text-gray-900">{name}</div>
+              <div className=" text-gray-600 text-sm">
+                <p>Member since: <span className="font-semibold">{createdAtFormatted}</span></p>
+              </div>
 
               {/* Name change input field */}
               <input

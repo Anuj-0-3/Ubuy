@@ -3,6 +3,7 @@ import dbConnect from "@/lib/dbConnect";
 import Auction from "@/models/Auction";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../(user-auth)/auth/[...nextauth]/options";
+import Notification from "@/models/Notification";
 
 const verifyCaptcha = async (token: string): Promise<boolean> => {
   const secret = process.env.TURNSTILE_SECRET_KEY!;
@@ -76,6 +77,18 @@ export async function POST(req: Request) {
       createdByModel: createdByModel,
       notified: false,
     });
+
+     //sending notification to the current highest bidder
+      await Notification.create({
+        recipient: session.user.id,
+        recipientModel: session.user.authProvider,
+        type: "create",
+        message: `Your auction ${newAuction.title} was created successfully.`,
+        relatedAuction: newAuction._id,
+      });
+    
+      console.log("Notification sent to current bidder:", session.user.id);
+    
 
     return NextResponse.json(
       { message: "Auction created successfully", auction: newAuction },
