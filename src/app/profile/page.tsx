@@ -7,6 +7,7 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { LogOut, LogIn, Mail, User, Upload } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
+import Link from "next/link";
 
 type Profile = {
   image?: string;
@@ -156,6 +157,9 @@ const ProfilePage = () => {
       reader.onerror = reject;
     });
 
+  // Get userId from session if available
+  const userId = session?.user?.id;
+
   return (
     <div className="flex flex-col sm:flex-row sm:gap-2 items-start bg-gray-50 p-6 min-h-screen">
       <Card className="w-full sm:w-2/3 sm:mt-5 sm:mx-10 bg-white shadow-lg rounded-xl">
@@ -245,31 +249,59 @@ const ProfilePage = () => {
         )}
       </Card>
 
-      <div className="mt-6 w-full sm:w-1/3 max-w-xl p-4 text-center  sm:p-8 bg-white shadow-lg rounded-xl">
+      <div className="mt-6 w-full sm:w-1/3 max-w-xl p-4 text-center sm:p-8 bg-white shadow-lg rounded-xl">
         <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Auction Stats</h3>
         {loading ? (
           <p className="text-gray-700">Loading auction stats...</p>
         ) : auctionStats ? (
-          <div className="flex gap-2 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6">
-            <div className="bg-emerald-100 border-1 p-2 sm:p-4 rounded-lg shadow-sm ">
-              <p className="text-lg sm:text-2xl font-bold text-emerald-600">{auctionStats.totalBids}</p>
-              <h4 className="text-base sm:text-lg font-semibold text-gray-700">Total Bids</h4>
+          <div className="flex flex-col items-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+              <div className="bg-emerald-100 border-1 p-2 sm:p-4 rounded-lg shadow-sm">
+                <p className="text-lg sm:text-2xl font-bold text-emerald-600">{auctionStats.totalBids}</p>
+                <h4 className="text-base sm:text-lg font-semibold text-gray-700">Total Bids</h4>
+              </div>
+
+              <div className="bg-emerald-100 border-1 p-2 sm:p-4 rounded-lg shadow-sm">
+                <p className="text-lg sm:text-2xl font-bold text-emerald-600">{auctionStats.auctionsCreated}</p>
+                <h4 className="text-base sm:text-lg font-semibold text-gray-700">Auctions Created</h4>
+              </div>
+
+              <div className="bg-emerald-100 border-1 p-2 sm:p-4 rounded-lg shadow-sm">
+                <p className="text-lg sm:text-2xl font-bold text-emerald-600">{auctionStats.auctionsWon}</p>
+                <h4 className="text-base sm:text-lg font-semibold text-gray-700">Auctions Won</h4>
+              </div>
             </div>
 
-            <div className="bg-emerald-100 border-1 p-2 sm:p-4 rounded-lg shadow-sm">
-              <p className="text-lg sm:text-2xl font-bold text-emerald-600">{auctionStats.auctionsCreated}</p>
-              <h4 className="text-base sm:text-lg font-semibold text-gray-700">Auctions Created</h4>
-            </div>
-
-            <div className="bg-emerald-100 border-1 p-2 sm:p-4 rounded-lg shadow-sm">
-              <p className="text-lg sm:text-2xl font-bold text-emerald-600">{auctionStats.auctionsWon}</p>
-              <h4 className="text-base sm:text-lg font-semibold text-gray-700">Auctions Won</h4>
+            {/* Share Public Profile */}
+            <div className="mt-4 w-full">
+              <h4 className="text-base sm:text-lg font-semibold text-gray-700 mb-2">Share your Public Profile</h4>
+              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                <Link
+                  href={`/public-profile/${userId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-emerald-500 text-white px-4 py-2 rounded-full hover:bg-emerald-600 transition"
+                >
+                  View Public Profile
+                </Link>
+                <button
+                  onClick={() => {
+                    const publicProfileUrl = `${window.location.origin}/public-profile/${userId}`;
+                    navigator.clipboard.writeText(publicProfileUrl);
+                    alert("Public profile link copied to clipboard!");
+                  }}
+                  className="bg-gray-200 text-gray-800 px-4 py-2 rounded-full hover:bg-gray-300 transition"
+                >
+                  Copy Link
+                </button>
+              </div>
             </div>
           </div>
         ) : (
           <p className="text-gray-700">No auction stats available.</p>
         )}
       </div>
+
     </div>
   );
 };
