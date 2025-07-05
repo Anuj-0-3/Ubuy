@@ -8,6 +8,14 @@ import { toast } from "sonner";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useSession, signIn } from "next-auth/react";
+import {
+    WhatsappShareButton,
+    WhatsappIcon,
+    TelegramShareButton,
+    TelegramIcon,
+    LinkedinShareButton,
+    LinkedinIcon,
+} from 'react-share';
 
 interface Stats {
     totalBids: number;
@@ -29,6 +37,14 @@ export default function PublicProfilePage() {
     const userId = params?.userId as string | undefined;
     const [profile, setProfile] = useState<PublicProfile | null>(null);
     const [loading, setLoading] = useState(true);
+    const [publicProfileUrl, setPublicProfileUrl] = useState("");
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            setPublicProfileUrl(`${window.location.origin}/public-profile/${userId}`);
+        }
+    }, [userId]);
+
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -104,12 +120,11 @@ export default function PublicProfilePage() {
         year: "numeric",
     });
 
-    console.log(formattedDate);
     return (
         <div className="flex flex-col items-center bg-gray-50 p-6 min-h-screen">
             <Card className="w-full max-w-md bg-white shadow-lg rounded-xl">
                 <CardHeader className="flex flex-col items-center text-center">
-                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 mb-4 rounded-full overflow-hidden border-4 border-emerald-500 shadow-md">
+                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 mb-4 rounded-full overflow-hidden shadow-md">
                         {profileImage ? (
                             <Image
                                 src={profileImage}
@@ -125,7 +140,7 @@ export default function PublicProfilePage() {
                     </div>
 
                     <h1 className="text-2xl font-bold text-gray-900 mb-1">{username}</h1>
-                     <p className="text-gray-600 text-sm">
+                    <p className="text-gray-600 text-sm">
                         Member since: <span className="font-semibold">{formattedDate}</span>
                     </p>
                 </CardHeader>
@@ -167,18 +182,28 @@ export default function PublicProfilePage() {
                         <h4 className="text-base sm:text-lg font-semibold text-gray-700 mb-2">
                             Share this Profile
                         </h4>
-                        <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                            <button
+                        <div className="flex items-center justify-center flex-wrap gap-2 mb-4">
+                            <WhatsappShareButton url={publicProfileUrl}>
+                                <WhatsappIcon size={32} round />
+                            </WhatsappShareButton>
+                            <TelegramShareButton url={publicProfileUrl}>
+                                <TelegramIcon size={32} round />
+                            </TelegramShareButton>
+                            <LinkedinShareButton url={publicProfileUrl}>
+                                <LinkedinIcon size={32} round />
+                            </LinkedinShareButton>
+                            <Button
+                                variant="outline"
                                 type="button"
                                 onClick={() => {
                                     const publicProfileUrl = `${window.location.origin}/public-profile/${userId}`;
                                     navigator.clipboard.writeText(publicProfileUrl);
                                     toast.success("Public profile link copied to clipboard!");
                                 }}
-                                className="bg-gray-200 text-gray-800 px-4 py-2 rounded-full hover:bg-gray-300 transition"
+                                className="bg-gray-200 hover:cursor-pointer text-gray-800 px-4 py-2 rounded-full hover:bg-gray-300 transition"
                             >
                                 Copy Link
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </CardContent>

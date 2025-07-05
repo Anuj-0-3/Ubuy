@@ -8,6 +8,14 @@ import { LogOut, LogIn, Mail, User, Upload } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
 import Link from "next/link";
+import {
+  WhatsappShareButton,
+  WhatsappIcon,
+  TelegramShareButton,
+  TelegramIcon,
+  LinkedinShareButton,
+  LinkedinIcon,
+} from 'react-share';
 
 type Profile = {
   image?: string;
@@ -160,6 +168,15 @@ const ProfilePage = () => {
   // Get userId from session if available
   const userId = session?.user?.id;
 
+
+  const [publicProfileUrl, setPublicProfileUrl] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setPublicProfileUrl(`${window.location.origin}/public-profile/${userId}`);
+    }
+  }, [userId]);
+
   return (
     <div className="flex flex-col sm:flex-row sm:gap-2 items-start bg-gray-50 p-6 min-h-screen">
       <Card className="w-full sm:w-2/3 sm:mt-5 sm:mx-10 bg-white shadow-lg rounded-xl">
@@ -272,28 +289,39 @@ const ProfilePage = () => {
               </div>
             </div>
 
-            {/* Share Public Profile */}
-            <div className="mt-4 w-full">
-              <h4 className="text-base sm:text-lg font-semibold text-gray-700 mb-2">Share your Public Profile</h4>
-              <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                <Link
+             <Link
                   href={`/public-profile/${userId}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-emerald-500 text-white px-4 py-2 rounded-full hover:bg-emerald-600 transition"
+                  className="bg-emerald-500 mt-4 text-white px-4 py-2 rounded-full hover:bg-emerald-600 transition"
                 >
                   View Public Profile
                 </Link>
-                <button
+
+            {/* Share Public Profile */}
+            <div className=" w-full">
+              <h4 className="text-base sm:text-lg font-semibold text-gray-700 mb-2">Share your Public Profile</h4>
+              <div className="flex items-center justify-center flex-wrap gap-2 mb-4">
+                <WhatsappShareButton url={publicProfileUrl}>
+                  <WhatsappIcon size={32} round />
+                </WhatsappShareButton>
+                <TelegramShareButton url={publicProfileUrl}>
+                  <TelegramIcon size={32} round />
+                </TelegramShareButton>
+                <LinkedinShareButton url={publicProfileUrl}>
+                  <LinkedinIcon size={32} round />
+                </LinkedinShareButton>              
+                <Button
+                  variant="outline"
                   onClick={() => {
                     const publicProfileUrl = `${window.location.origin}/public-profile/${userId}`;
                     navigator.clipboard.writeText(publicProfileUrl);
-                    alert("Public profile link copied to clipboard!");
+                    toast.success("Public profile link copied to clipboard!");
                   }}
-                  className="bg-gray-200 text-gray-800 px-4 py-2 rounded-full hover:bg-gray-300 transition"
+                  className="bg-gray-200 hover:cursor-pointer text-gray-800 px-4 py-2 rounded-full hover:bg-gray-300 transition"
                 >
                   Copy Link
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -307,4 +335,3 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
-

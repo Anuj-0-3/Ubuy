@@ -20,8 +20,7 @@ interface AuctionPopulated {
 export async function GET(req: Request, { params }: { params: { userId: string } }) {
   try {
     await dbConnect();
-
-    const { userId } = params;
+    const { userId } = await params;
 
     if (!userId) {
       return NextResponse.json(
@@ -73,11 +72,16 @@ export async function GET(req: Request, { params }: { params: { userId: string }
       (auction) => auction.winner?.toString() === user._id.toString()
     ).length;
 
-    // Ensure default image or username if missing
+    
     const username = user.name || "Unnamed User";
     const profileImage = user.image ;
-    const createdAtFormatted = new Date(user.createdAt).toLocaleDateString();
-
+    const createdAtFormatted = user.createdAt
+  ? new Date(user.createdAt).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    })
+  : "N/A";
 
     return NextResponse.json({
       id: user._id,
