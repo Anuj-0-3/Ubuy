@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { Loader2, LogIn } from "lucide-react";
+import { Loader2, LogIn, Gavel, PlusCircle, Trophy } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
@@ -150,7 +150,8 @@ export default function PublicProfilePage() {
                         Auction Stats
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                        <div className="bg-emerald-100 p-4 rounded-lg shadow-sm text-center">
+                        <div className="bg-emerald-100 p-4 rounded-lg shadow-sm text-center flex flex-col items-center">
+                            <Gavel className="w-8 h-8 text-emerald-600 mb-2" />
                             <p className="text-lg sm:text-2xl font-bold text-emerald-600">
                                 {stats.totalBids}
                             </p>
@@ -159,7 +160,8 @@ export default function PublicProfilePage() {
                             </p>
                         </div>
 
-                        <div className="bg-emerald-100 p-4 rounded-lg shadow-sm text-center">
+                        <div className="bg-emerald-100 p-4 rounded-lg shadow-sm text-center flex flex-col items-center">
+                            <PlusCircle className="w-8 h-8 text-emerald-600 mb-2" />
                             <p className="text-lg sm:text-2xl font-bold text-emerald-600">
                                 {stats.auctionsCreated}
                             </p>
@@ -168,7 +170,8 @@ export default function PublicProfilePage() {
                             </p>
                         </div>
 
-                        <div className="bg-emerald-100 p-4 rounded-lg shadow-sm text-center">
+                        <div className="bg-emerald-100 p-4 rounded-lg shadow-sm text-center flex flex-col items-center">
+                            <Trophy className="w-8 h-8 text-emerald-600 mb-2" />
                             <p className="text-lg sm:text-2xl font-bold text-emerald-600">
                                 {stats.auctionsWon}
                             </p>

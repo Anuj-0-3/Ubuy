@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { Button } from './ui/button';
 import { Menu, X, Bell } from "lucide-react";
 import { motion } from 'framer-motion';
@@ -56,7 +56,7 @@ function Navbar() {
     <nav className="fixed top-0 left-0 w-full px-8 sm:px-16 z-50 p-6 shadow-md bg-emerald-600 text-white">
       <div className="container mx-auto flex justify-between items-center">
         <Link href="/" className="text-xl font-bold">
-          <h1 className='text-3xl font-bold text-slate-100 font-sans'>U-Buy</h1>
+          <h1 className='sm:text-4xl text-3xl font-bold text-slate-100 font-sans'>U-Buy</h1>
         </Link>
 
         {/* Mobile Navigation */}
@@ -85,14 +85,13 @@ function Navbar() {
         </div>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="hidden md:flex text-base  items-center space-x-8">
           {session ? (
             <>
               <Link href="/auctions" className="hover:text-slate-100">Auctions</Link>
               <Link href="/create-auction" className="hover:text-slate-100">Create Auction</Link>
               <Link href="/bidded-auctions" className="hover:text-slate-100">Bidded Auctions</Link>
               <Link href="/profile" className="hover:text-slate-100">Profile</Link>
-              <Button onClick={() => signOut()} className="bg-slate-100 text-emerald-600" variant='outline'>Logout</Button>
             </>
           ) : (
             <>
@@ -146,9 +145,6 @@ function Navbar() {
             <Link href="/create-auction" onClick={() => setIsOpen(false)}>Create Auction</Link>
             <Link href="/bidded-auctions" onClick={() => setIsOpen(false)}>Bidded Auctions</Link>
             <Link href="/profile" onClick={() => setIsOpen(false)}>Profile</Link>
-            <Button onClick={() => { signOut(); setIsOpen(false); }} className="bg-slate-100 text-emerald-600" variant='outline'>
-              Logout
-            </Button>
           </>
         ) : (
           <>

@@ -4,27 +4,28 @@ import { Menu, Bell, ChevronLeft, BadgeIndianRupee, User, Heart } from "lucide-r
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function ProfileSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const pathname = usePathname();
 
   const menuItems = [
-    { href: "/profile", icon: <User className="w-5 h-5" />, label: "Profile" },
-    { href: "/profile/notifications", icon: <Bell className="w-5 h-5" />, label: "Notifications" },
-    { href: "/profile/my-auction", icon: <BadgeIndianRupee className="w-5 h-5" />, label: "Created Auction" },
-    { href: "/profile/wishlist", icon: <Heart className="w-5 h-5" />, label: "Wishlist" }, 
+    { href: "/profile", icon: User, label: "Profile" },
+    { href: "/profile/notifications", icon: Bell, label: "Notifications" },
+    { href: "/profile/my-auction", icon: BadgeIndianRupee, label: "Created Auction" },
+    { href: "/profile/wishlist", icon: Heart, label: "Wishlist" },
   ];
+
 
   return (
     <div className="flex min-h-[80vh] bg-white relative overflow-visible">
-      {/* Side Panel */}
       <motion.aside
         animate={{ width: isCollapsed ? 64 : 240 }}
         transition={{ duration: 0.3 }}
         className="bg-emerald-100 shadow-lg flex flex-col gap-4 py-4 overflow-visible relative"
       >
         <div className="flex flex-col items-center md:items-start px-2">
-          {/* Collapse/Expand Button with tooltip */}
           <div className="relative group w-full hidden sm:block">
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
@@ -32,9 +33,9 @@ export default function ProfileSidebar() {
               aria-label="Toggle Panel"
             >
               {isCollapsed ? (
-                <Menu className="w-5 h-5 text-emerald-700" />
+                <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-700" />
               ) : (
-                <ChevronLeft className="w-5 h-5 text-emerald-700" />
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-700" />
               )}
             </button>
 
@@ -45,25 +46,33 @@ export default function ProfileSidebar() {
             )}
           </div>
 
-          {/* Menu Links with tooltips */}
-          {menuItems.map((item, idx) => (
-            <div key={idx} className="relative group w-full">
-              <Link
-                href={item.href}
-                className="flex items-center justify-center sm:justify-start gap-2 text-gray-700 hover:text-emerald-700 w-full py-2 px-2 transition-colors rounded-md hover:bg-emerald-200"
-              >
-                {item.icon}
-                {!isCollapsed && <span>{item.label}</span>}
-              </Link>
+          {menuItems.map((item, idx) => {
+            const isActive = pathname === item.href;
+            const Icon = item.icon;
+            return (
+              <div key={idx} className="relative group w-full">
+                <Link
+                  href={item.href}
+                  className={`flex items-center justify-center sm:justify-start gap-2 w-full p-2 rounded-md transition-colors
+                  ${isActive ? "bg-emerald-300 text-emerald-800 font-semibold" : "text-gray-700 hover:text-emerald-700 hover:bg-emerald-200"}
+        `}
+                >
+                  <Icon
+                    className={`w-5 h-5 sm:w-6 sm:h-6 ${isActive ? "text-emerald-800 fill-emerald-500" : "text-gray-700 group-hover:text-emerald-700"
+                      }`}
+                  />
+                  {!isCollapsed && <span>{item.label}</span>}
+                </Link>
 
-              {/* Tooltip for menu items */}
-              {isCollapsed && (
-                <div className="absolute left-full top-1/2 ml-2 -translate-y-1/2 px-3 py-1 bg-emerald-600 text-white text-xs rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                  {item.label}
-                </div>
-              )}
-            </div>
-          ))}
+                {isCollapsed && (
+                  <div className="absolute left-full top-1/2 ml-2 -translate-y-1/2 px-3 py-1 bg-emerald-600 text-white text-xs rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                    {item.label}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
         </div>
       </motion.aside>
     </div>

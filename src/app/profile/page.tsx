@@ -4,7 +4,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { LogOut, LogIn, Mail, User, Upload, Plus, Check } from "lucide-react";
+import { LogOut, LogIn, Mail, User, Upload, Plus, Check, Gavel, Trophy, PlusCircle, PackageOpen } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -262,8 +262,7 @@ const ProfilePage = () => {
                   <span>{session.user?.email}</span>
                 </div>
               </CardHeader>
-
-              <CardContent className="p-4 sm:p-6 flex justify-center flex-row gap-4">
+              <CardContent className="p-2 sm:p-1 flex justify-center flex-row gap-4">
                 <Button
                   onClick={handleUpdateProfile}
                   disabled={isUpdating}
@@ -298,16 +297,16 @@ const ProfilePage = () => {
           )}
         </Card>
 
-        <div className="bg-white shadow-lg rounded-xl p-6 mb-6">
+        <div className="bg-white border-2 border-gray-200 shadow-lg rounded-xl p-6 mb-6">
           <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Recent Activity</h3>
           {recentActivities.length === 0 ? (
-            <p className="text-gray-600">No recent activity yet.</p>
+            <p className="text-gray-600 flex gap-4"><PackageOpen/> Participate in auctions to see your activity here!</p>
           ) : (
             <ul className="space-y-3">
               {recentActivities.map((activity, index) => {
                 const isWin = activity.type === "win";
                 const isCreate = activity.type === "create";
-                const auctionTitle = activity.message?.match(/"(.+?)"/)?.[1]; 
+                const auctionTitle = activity.message?.match(/"(.+?)"/)?.[1];
 
                 return (
                   <li
@@ -341,28 +340,32 @@ const ProfilePage = () => {
         </div>
       </div>
 
-      <div className=" flex flex-col gap-6 h-full w-full sm:w-1/3 max-w-xl p-4 text-center sm:p-8 bg-white shadow-lg rounded-xl">
-        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Auction Stats</h3>
+      <div className=" flex flex-col gap-4 h-full w-full sm:w-1/3 max-w-xl p-4 text-center sm:p-4 sm:px-6 bg-white border-2 border-gray-200 shadow-lg rounded-xl">
+        <h3 className="text-lg sm:text-2xl font-bold text-gray-900 mb-3">Auction Stats</h3>
         {loading ? (
           <p className="text-gray-700">Loading auction stats...</p>
         ) : auctionStats ? (
           <div className="flex flex-col items-center gap-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
-              <div className="bg-emerald-100 border-1 p-2 sm:p-4 rounded-lg shadow-sm">
+              <div className="bg-emerald-100 border-1 p-2 sm:p-4 rounded-lg shadow-sm flex flex-col items-center">
+                <Gavel className="w-8 h-8 text-emerald-600 mb-2" />
                 <p className="text-lg sm:text-2xl font-bold text-emerald-600">{auctionStats.totalBids}</p>
                 <h4 className="text-base sm:text-lg font-semibold text-gray-700">Total Bids</h4>
               </div>
 
-              <div className="bg-emerald-100 border-1 p-2 sm:p-4 rounded-lg shadow-sm">
+              <div className="bg-emerald-100 border-1 p-2 sm:p-4 rounded-lg shadow-sm flex flex-col items-center">
+                <PlusCircle className="w-8 h-8 text-emerald-600 mb-2" />
                 <p className="text-lg sm:text-2xl font-bold text-emerald-600">{auctionStats.auctionsCreated}</p>
                 <h4 className="text-base sm:text-lg font-semibold text-gray-700">Auctions Created</h4>
               </div>
 
-              <div className="bg-emerald-100 border-1 p-2 sm:p-4 rounded-lg shadow-sm">
+              <div className="bg-emerald-100 border-1 p-2 sm:p-4 rounded-lg shadow-sm flex flex-col items-center">
+                <Trophy className="w-8 h-8 text-emerald-600 mb-2" />
                 <p className="text-lg sm:text-2xl font-bold text-emerald-600">{auctionStats.auctionsWon}</p>
                 <h4 className="text-base sm:text-lg font-semibold text-gray-700">Auctions Won</h4>
               </div>
             </div>
+
 
             <Link
               href={`/public-profile/${userId}`}
