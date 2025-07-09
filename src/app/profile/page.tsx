@@ -4,7 +4,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { LogOut, LogIn, Mail, User, Upload, Plus, Check, Gavel, Trophy, PlusCircle, PackageOpen } from "lucide-react";
+import { LogOut, LogIn, Mail, User, Upload, Gavel, Trophy, PlusCircle, Pencil } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -16,6 +16,7 @@ import {
   LinkedinShareButton,
   LinkedinIcon,
 } from 'react-share';
+import RecentActivity from "@/components/RecentActivity";
 
 type Profile = {
   image?: string;
@@ -28,17 +29,6 @@ type AuctionStats = {
   auctionsCreated: number;
   auctionsWon: number;
 };
-
-interface NotificationData {
-  id: string;
-  type: "create-bid" | "win" | string;
-  message: string;
-  createdAt: string;
-}
-
-interface NotificationsResponse {
-  notifications: NotificationData[];
-}
 
 
 const ProfilePage = () => {
@@ -53,7 +43,7 @@ const ProfilePage = () => {
   const [createdAtFormatted, setCreatedAtFormatted] = useState<string>("");
   const userId = session?.user?.id;
   const [publicProfileUrl, setPublicProfileUrl] = useState("");
-  const [recentActivities, setRecentActivities] = useState<NotificationData[]>([]);
+  const [isEditingName, setIsEditingName] = useState(false);
 
   // Fetch auction stats when the component mounts
   useEffect(() => {
@@ -117,29 +107,6 @@ const ProfilePage = () => {
 
     fetchProfile();
   }, [session]);
-
-  // Fetch recent activities when the component mounts
-  useEffect(() => {
-    const fetchRecentActivities = async () => {
-      try {
-        const res = await fetch("/api/notification");
-        const data = await res.json();
-
-        if (!res.ok) throw new Error(data.error || "Failed to load notifications");
-
-        const filtered: NotificationData[] = (data as NotificationsResponse).notifications
-          .filter((n: NotificationData) => ["create-bid", "win"].includes(n.type))
-          .sort((a: NotificationData, b: NotificationData) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-          .slice(0, 3);
-
-        setRecentActivities(filtered);
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Error loading activity");
-      }
-    };
-
-    fetchRecentActivities();
-  }, []);
 
   // Function to handle profile update
   const handleUpdateProfile = async () => {
@@ -210,7 +177,7 @@ const ProfilePage = () => {
 
   return (
     <div className="flex flex-col sm:flex-row sm:gap-2 bg-gray-50 p-6 min-h-screen">
-      <div className="flex flex-col gap-6 w-full sm:w-2/3 ">
+      <div className="flex flex-col gap-6 w-full sm:w-2/3">
         <Card className="bg-white shadow-lg rounded-xl">
           {status === "loading" ? (
             <p className="text-gray-700 text-lg animate-pulse p-6">Loading...</p>
@@ -224,13 +191,14 @@ const ProfilePage = () => {
                       alt="Profile"
                       width={240}
                       height={240}
-                      className="object-cover relative w-32 h-32 sm:w-40 sm:h-40 mb-4 overflow-hidden rounded-full border-4 border-emerald-400 shadow-md"
+                      className="object-cover w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-emerald-400 shadow-md"
                     />
                   ) : (
-                    <div className="flex items-center justify-center w-32 h-32 sm:w-40 sm:h-40 mb-4 rounded-full bg-emerald-400 text-white font-bold text-4xl sm:text-7xl border-4 border-emerald-400 shadow-md">
+                    <div className="flex items-center justify-center w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-emerald-400 text-white font-bold text-4xl sm:text-7xl border-4 border-emerald-400 shadow-md">
                       {session?.user.name ? session.user.name.charAt(0).toUpperCase() : "U"}
                     </div>
                   )}
+
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -238,32 +206,50 @@ const ProfilePage = () => {
                     className="absolute inset-0 opacity-0 cursor-pointer"
                     title="Upload a new profile image"
                   />
-                  <div className="absolute bottom-0 right-0 bg-emerald-500 p-2 rounded-full shadow cursor-pointer">
+                  <div className="absolute bottom-0 right-4 bg-emerald-600 px-3 border-white border-1 py-1 rounded-full shadow-md cursor-pointer flex items-center gap-1">
                     <Upload className="w-4 h-4 text-white" />
+                    <span className="text-xs text-white hidden sm:inline">Upload Photo</span>
                   </div>
                 </div>
 
-                <div className="text-lg font-semibold text-gray-900">{name}</div>
-                <div className=" text-gray-600 text-sm">
-                  <p>Member since: <span className="font-semibold">{createdAtFormatted}</span></p>
-                </div>
+                <p className="text-gray-600 text-sm">
+                  Joined: <span className="font-semibold">{createdAtFormatted}</span>
+                </p>
 
-                {/* Name change input field */}
-                <input
-                  type="text"
-                  value=""
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Change your username"
-                  className="mt-3 text-base sm:text-lg  text-gray-900 bg-transparent border-b border-emerald-400 focus:outline-none focus:border-emerald-600 transition-colors"
-                />
+                {/* Name section */}
+                <div className="flex items-center justify-center gap-2 mt-2">
+                  {!isEditingName ? (
+                    <>
+                      <h2 className="text-lg sm:text-xl font-semibold text-gray-800">{name || "Your Name"}</h2>
+                      <button
+                        onClick={() => setIsEditingName(true)}
+                        className="text-gray-500 hover:text-emerald-600 transition"
+                        aria-label="Edit name"
+                      >
+                        <Pencil className="w-5 h-5" />
+                      </button>
+                    </>
+                  ) : (
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      onBlur={() => setIsEditingName(false)}
+                      autoFocus
+                      placeholder="Enter your name"
+                      className="text-base sm:text-lg font-semibold text-center bg-transparent border-b border-emerald-400 focus:outline-none focus:border-emerald-600 transition-colors"
+                    />
+                  )}
+                </div>
 
                 <div className="flex items-center gap-2 text-gray-600 text-sm mt-2">
                   <Mail className="w-5 h-5 text-emerald-500" />
                   <span>{session.user?.email}</span>
                 </div>
               </CardHeader>
-              <CardContent className="p-2 sm:p-1 flex justify-center flex-row gap-4">
-                <Button
+
+              <CardContent className="p-4 flex justify-center gap-4">
+               <Button
                   onClick={handleUpdateProfile}
                   disabled={isUpdating}
                   className="w-5/12 sm:w-1/3  flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full"
@@ -282,7 +268,7 @@ const ProfilePage = () => {
               </CardContent>
             </>
           ) : (
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col items-center gap-4 p-6">
               <User className="w-20 h-20 text-gray-400" />
               <h2 className="text-2xl font-bold text-gray-900">Welcome!</h2>
               <p className="text-gray-600">Sign in to access your profile</p>
@@ -291,95 +277,58 @@ const ProfilePage = () => {
                 className="bg-emerald-500 text-white hover:bg-emerald-600 rounded-full px-6 py-2 transition-transform transform hover:scale-105 shadow-md"
               >
                 <LogIn className="w-5 h-5 mr-2" />
-                Sign in with Google
+                Sign 
               </Button>
             </div>
           )}
         </Card>
-
-        <div className="bg-white border-2 border-gray-200 shadow-lg rounded-xl p-6 mb-6">
-          <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Recent Activity</h3>
-          {recentActivities.length === 0 ? (
-            <p className="text-gray-600 flex gap-4"><PackageOpen/> Participate in auctions to see your activity here!</p>
-          ) : (
-            <ul className="space-y-3">
-              {recentActivities.map((activity, index) => {
-                const isWin = activity.type === "win";
-                const isCreate = activity.type === "create";
-                const auctionTitle = activity.message?.match(/"(.+?)"/)?.[1];
-
-                return (
-                  <li
-                    key={index}
-                    className="bg-white border border-gray-200 px-4 py-3 rounded-lg shadow-sm hover:shadow transition"
-                  >
-                    <div className="flex items-center space-x-2">
-                      {isWin && (
-                        <div className="flex items-center text-green-600">
-                          <Check className="h-5 border-2 border-green-600 rounded-full w-5 mr-1" />
-                          <p className="text-sm font-medium">
-                            <span className="font-semibold">Won</span> {auctionTitle && <>on {auctionTitle}</>}
-                          </p>
-                        </div>
-                      )}
-
-                      {isCreate && (
-                        <div className="flex items-center text-blue-600">
-                          <Plus className="h-5 border-2 border-blue-600 rounded-full w-5 mr-1" />
-                          <p className="text-sm font-medium">
-                            <span className="font-semibold">Auction Created</span>
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
+        <RecentActivity />
       </div>
 
-      <div className=" flex flex-col gap-4 h-full w-full sm:w-1/3 max-w-xl p-4 text-center sm:p-4 sm:px-6 bg-white border-2 border-gray-200 shadow-lg rounded-xl">
-        <h3 className="text-lg sm:text-2xl font-bold text-gray-900 mb-3">Auction Stats</h3>
+      <div className="flex flex-col gap-6 h-full w-full sm:w-1/3 max-w-xl p-6 bg-white border-2 border-gray-200 shadow-lg rounded-xl">
+        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 text-center">Auction Stats</h3>
+
         {loading ? (
-          <p className="text-gray-700">Loading auction stats...</p>
+          <p className="text-gray-700 text-center">Loading auction stats...</p>
         ) : auctionStats ? (
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
-              <div className="bg-emerald-100 border-1 p-2 sm:p-4 rounded-lg shadow-sm flex flex-col items-center">
-                <Gavel className="w-8 h-8 text-emerald-600 mb-2" />
+              {/* Total Bids */}
+              <div className="bg-emerald-100 p-4 rounded-lg shadow-sm flex flex-col items-center">
+                <Gavel className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-600 mb-2" />
                 <p className="text-lg sm:text-2xl font-bold text-emerald-600">{auctionStats.totalBids}</p>
-                <h4 className="text-base sm:text-lg font-semibold text-gray-700">Total Bids</h4>
+                <h4 className="text-lg font-semibold text-gray-700">Total Bids</h4>
               </div>
 
-              <div className="bg-emerald-100 border-1 p-2 sm:p-4 rounded-lg shadow-sm flex flex-col items-center">
-                <PlusCircle className="w-8 h-8 text-emerald-600 mb-2" />
+              {/* Auctions Created */}
+              <div className="bg-emerald-100 p-4 rounded-lg shadow-sm flex flex-col items-center">
+                <PlusCircle className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-600 mb-2" />
                 <p className="text-lg sm:text-2xl font-bold text-emerald-600">{auctionStats.auctionsCreated}</p>
-                <h4 className="text-base sm:text-lg font-semibold text-gray-700">Auctions Created</h4>
+                <h4 className="text-lg font-semibold text-gray-700">Auctions Created</h4>
               </div>
 
-              <div className="bg-emerald-100 border-1 p-2 sm:p-4 rounded-lg shadow-sm flex flex-col items-center">
-                <Trophy className="w-8 h-8 text-emerald-600 mb-2" />
+              {/* Auctions Won */}
+              <div className="bg-emerald-100 p-4 rounded-lg shadow-sm flex flex-col items-center">
+                <Trophy className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-600 mb-2" />
                 <p className="text-lg sm:text-2xl font-bold text-emerald-600">{auctionStats.auctionsWon}</p>
-                <h4 className="text-base sm:text-lg font-semibold text-gray-700">Auctions Won</h4>
+                <h4 className="text-lg font-semibold text-gray-700">Auctions Won</h4>
               </div>
             </div>
 
-
+            {/* View Public Profile Button */}
             <Link
               href={`/public-profile/${userId}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-emerald-500 mt-4 text-white px-4 py-2 rounded-full hover:bg-emerald-600 transition"
+              className="bg-emerald-500 text-white px-6 py-1 rounded-full hover:bg-emerald-600 transition"
             >
               View Public Profile
             </Link>
 
             {/* Share Public Profile */}
-            <div className=" w-full">
-              <h4 className="text-base sm:text-lg font-semibold text-gray-700 mb-2">Share your Public Profile</h4>
-              <div className="flex items-center justify-center flex-wrap gap-2 mb-4">
+            <div className="w-full">
+              <h4 className="text-lg font-semibold text-gray-700 mb-2 text-center">Share your Public Profile</h4>
+              <div className="flex items-center justify-center flex-wrap gap-3">
                 <WhatsappShareButton url={publicProfileUrl}>
                   <WhatsappIcon size={32} round />
                 </WhatsappShareButton>
@@ -396,7 +345,7 @@ const ProfilePage = () => {
                     navigator.clipboard.writeText(publicProfileUrl);
                     toast.success("Public profile link copied to clipboard!");
                   }}
-                  className="bg-gray-200 hover:cursor-pointer text-gray-800 px-4 py-2 rounded-full hover:bg-gray-300 transition"
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-full transition"
                 >
                   Copy Link
                 </Button>
@@ -404,10 +353,9 @@ const ProfilePage = () => {
             </div>
           </div>
         ) : (
-          <p className="text-gray-700">No auction stats available.</p>
+          <p className="text-gray-700 text-center">No auction stats available.</p>
         )}
       </div>
-
     </div>
   );
 };
