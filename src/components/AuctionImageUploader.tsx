@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
-import { UploadCloud, CheckCircle, XCircle } from "lucide-react";
+import { UploadCloud, CheckCircle, XCircle, Info } from "lucide-react";
 
 interface AuctionImageUploaderProps {
   onUpload: (imageUrls: string[]) => void;
@@ -20,8 +20,17 @@ const AuctionImageUploader: React.FC<AuctionImageUploaderProps> = ({ onUpload })
   const UPLOADIMG = process.env.NEXT_PUBLIC_UPLOAD_API || "/api/upload";
 
   const validateFile = (file: File) => {
-    const validTypes = ["image/jpeg", "image/png", "image/gif"];
-    return validTypes.includes(file.type);
+    const validTypes = ["image/jpeg", "image/png"];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (!validTypes.includes(file.type)) {
+      setError("Invalid file type. Only JPG and PNG allowed.");
+      return false;
+    }
+    if (file.size > maxSize) {
+      setError("File too large. Maximum size is 5MB per image.");
+      return false;
+    }
+    return true;
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,10 +45,11 @@ const AuctionImageUploader: React.FC<AuctionImageUploaderProps> = ({ onUpload })
   };
 
   const processNewFiles = (files: File[]) => {
+    setError(null);
     const validFiles = files.filter(validateFile);
 
     if (validFiles.length + images.length > 5) {
-      setError("You can upload up to 5 images.");
+      setError("You can upload up to 5 images total.");
       return;
     }
 
@@ -77,7 +87,7 @@ const AuctionImageUploader: React.FC<AuctionImageUploaderProps> = ({ onUpload })
           setUploadedUrls((prev) => [...prev, ...response.urls]);
           setProgress(0);
         } else {
-          setError("Unexpected response format.");
+          setError("Unexpected server response.");
         }
       } else {
         setError("Upload failed: " + xhr.responseText);
@@ -94,7 +104,10 @@ const AuctionImageUploader: React.FC<AuctionImageUploaderProps> = ({ onUpload })
 
   return (
     <div className="p-6 border rounded-lg shadow-lg w-full">
-      <h2 className="text-xl text-center font-semibold mb-4">Upload up to 5 Images</h2>
+      <h2 className="text-xl text-center font-semibold mb-2">Upload Images</h2>
+      <p className="text-xs text-center text-gray-500 mb-4 flex items-center justify-center gap-1">
+        <Info className="w-4 h-4" /> Max 5 images; JPG/PNG only; 5MB each
+      </p>
 
       <div
         className="border-2 border-dashed p-6 rounded-lg bg-gray-50 mb-4 flex flex-col items-center justify-center hover:bg-gray-100 transition cursor-pointer"
@@ -104,14 +117,14 @@ const AuctionImageUploader: React.FC<AuctionImageUploaderProps> = ({ onUpload })
       >
         <UploadCloud className="w-10 h-10 text-gray-500 mb-2" />
         <p className="text-sm sm:text-base text-center text-gray-600 font-medium">
-          Drag & Drop or Click to Upload (max 5)
+          Drag & Drop or Click to Upload
         </p>
         <input
           type="file"
           ref={fileInputRef}
           onChange={handleFileChange}
           className="hidden"
-          accept="image/*"
+          accept="image/jpeg,image/png"
           multiple
         />
       </div>

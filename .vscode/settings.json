@@ -4,6 +4,7 @@
         "myauction",
         "nextauth",
         "sonner",
+        "UPLOADIMG",
         "verificationcode"
     ]
 }
