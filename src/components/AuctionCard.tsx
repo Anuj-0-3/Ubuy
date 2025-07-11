@@ -71,6 +71,13 @@ export default function AuctionCard({ auction }: AuctionCardProps) {
 
   const isClosed = timeLeft === "Closed" || auction.status === "closed";
 
+  const getBadgeColor = () => {
+    if (isClosed) return "bg-gray-500";
+    if (timeLeft.includes("h") && parseInt(timeLeft) < 24) return "bg-yellow-500";
+    return "bg-emerald-500";
+  };
+
+
   return (
     <Card className="relative bg-white/10 border border-emerald-400/40 shadow-lg rounded-2xl overflow-hidden">
       {/* Wishlist Button */}
@@ -84,9 +91,10 @@ export default function AuctionCard({ auction }: AuctionCardProps) {
       </div>
 
       {/* Time Badge */}
-      <div className="absolute top-3 right-3 bg-emerald-500 text-white text-sm font-semibold px-3 py-1 rounded-full z-10 shadow">
-        {timeLeft}
+      <div className={`absolute top-3 right-3 ${getBadgeColor()} text-white text-sm font-semibold px-3 py-1 rounded-full z-10 shadow`}>
+        {isClosed ? "Closed" : timeLeft}
       </div>
+
 
       <CardContent className="p-6 space-y-2 sm:space-y-4">
         <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
@@ -106,9 +114,10 @@ export default function AuctionCard({ auction }: AuctionCardProps) {
 
         <div className="text-sm text-gray-600 space-y-1">
           <p><strong>Starting Price:</strong> ₹{auction.startingPrice}</p>
-          <p><strong>Current Price:</strong> ₹{auction.currentPrice}</p>
+          <p><strong>Current Price:</strong> <span className="text-emerald-600 text-semibold">₹{auction.currentPrice}</span></p>
           <p><strong>Category:</strong> {auction.category}</p>
         </div>
+
 
         {!isClosed && (
           <div className="pt-2 space-y-2">
@@ -121,12 +130,13 @@ export default function AuctionCard({ auction }: AuctionCardProps) {
             />
             <Button
               onClick={handleBid}
-              className="w-full bg-emerald-500 text-white rounded-full hover:bg-emerald-600"
+              className="w-full bg-emerald-500 hover:cursor-pointer text-white rounded-full hover:bg-emerald-600 hover:animate-pulse"
             >
               Place Bid
             </Button>
+
             <Link href={`/auctions/${auction._id}`} passHref>
-              <Button className="w-full bg-indigo-500 text-white rounded-full hover:bg-indigo-600">
+              <Button className="w-full hover:cursor-pointer bg-indigo-500 text-white rounded-full hover:bg-indigo-600">
                 Explore More
               </Button>
             </Link>
