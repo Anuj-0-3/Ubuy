@@ -1,37 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import AuctionCard from "@/components/AuctionCard";
+import Filters from "@/components/Filters";
+import FilterDrawer from "@/components/FilterDrawer";
+import { Loader2, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Search, X } from "lucide-react";
-import Link from "next/link";
 import { toast } from "sonner";
-import { getRemainingTime } from "@/utils/time";
-import Image from "next/image";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select"
+
+const ITEMS_PER_PAGE = 9;
+
 interface Auction {
   _id: string;
   title: string;
   description: string;
+  status: "active" | "closed";
+  category: string;
+  currentPrice: number;
   images: string[];
   startingPrice: number;
-  currentPrice: number;
-  category: string;
-  highestBidder?: string;
-  startTime: string;
   endTime: string;
-  status: "active" | "closed";
-  createdBy: string;
 }
-
-const ITEMS_PER_PAGE = 9;
 
 interface CategoryAuctionsProps {
   category: string;
@@ -40,75 +30,33 @@ interface CategoryAuctionsProps {
 const CategoryAuctionsPage: React.FC<CategoryAuctionsProps> = ({ category }) => {
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [bidInputs, setBidInputs] = useState<{ [key: string]: string }>({});
-  const [remainingTimes, setRemainingTimes] = useState<{ [key: string]: string }>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [sortOption, setSortOption] = useState("endingSoon");
-  const categories = ["All", "Art", "Electronics", "Fashion", "Other", "Collectibles"];
   const [categoryFilter, setCategoryFilter] = useState("All");
+  const [priceRange, setPriceRange] = useState(0);
+  const [quickPriceFilter, setQuickPriceFilter] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [, setSortOption] = useState("endingSoon");
 
-  useEffect(() => {
-    const fetchCategoryAuctions = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`/api/auction/bycategory?category=${encodeURIComponent(category)}`);
-        const data = await res.json();
-        setAuctions(data);
-      } catch (err) {
-        console.error("Error fetching auctions by category", err);
-        toast.error("Failed to load auctions for this category.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCategoryAuctions();
-  }, [category]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const updatedTimes: { [key: string]: string } = {};
-      auctions.forEach((auction) => {
-        updatedTimes[auction._id] = getRemainingTime(auction.endTime);
-      });
-      setRemainingTimes(updatedTimes);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [auctions]);
-
-  const handleBid = async (id: string) => {
-    const bidAmount = parseFloat(bidInputs[id]);
-    if (isNaN(bidAmount) || bidAmount <= 0) {
-      toast.error("Please enter a valid bid amount.");
-      return;
-    }
-
+  const fetchAuctions = async () => {
     try {
-      const res = await fetch(`/api/auction/bid/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bidAmount }),
-      });
-
-      const result = await res.json();
-      if (!res.ok) {
-        throw new Error(result.error || "Failed to place bid");
-      }
-
-      toast.success("Bid placed successfully!");
-      // Refresh auctions list
-      const updated = await fetch(`/api/auction/bycategory?category=${encodeURIComponent(category)}`);
-      setAuctions(await updated.json());
-      setBidInputs({ ...bidInputs, [id]: "" });
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Something went wrong");
+      setLoading(true);
+      const res = await fetch(`/api/auction/bycategory?category=${encodeURIComponent(category)}`);
+      const data = await res.json();
+      setAuctions(data);
+    } catch (err) {
+      console.error("Error fetching category auctions", err);
+      toast.error("Failed to load auctions for this category.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Search, Filter, and Sort
+  useEffect(() => {
+    fetchAuctions();
+  }, [category]);
+
   const filteredAuctions = auctions
     .filter((a) =>
       (a.title?.toLowerCase() || "").includes(search.toLowerCase()) ||
@@ -116,225 +64,112 @@ const CategoryAuctionsPage: React.FC<CategoryAuctionsProps> = ({ category }) => 
     )
     .filter((a) => statusFilter === "all" || a.status === statusFilter)
     .filter((a) => categoryFilter === "All" || a.category === categoryFilter)
-    .sort((a, b) => {
-      if (a.status === "active" && b.status === "closed") return -1;
-      if (a.status === "closed" && b.status === "active") return 1;
-      return new Date(b.startTime).getTime() - new Date(a.startTime).getTime();
+    .filter((a) => {
+      if (quickPriceFilter === "under500") return a.currentPrice <= 500;
+      if (quickPriceFilter === "500to1000") return a.currentPrice > 500 && a.currentPrice <= 1000;
+      if (quickPriceFilter === "above1000") return a.currentPrice > 1000;
+      return a.currentPrice <= priceRange || priceRange === 0;
     });
 
-
-  console.log("Filtered:", filteredAuctions.map(a => a.title));
-
-
-  // Pagination logic
-  const indexOfLastAuction = currentPage * ITEMS_PER_PAGE;
-  const indexOfFirstAuction = indexOfLastAuction - ITEMS_PER_PAGE;
-  const currentAuctions = auctions.slice(indexOfFirstAuction, indexOfLastAuction);
-
-  const totalPages = Math.ceil(auctions.length / ITEMS_PER_PAGE);
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
+  const totalPages = Math.ceil(filteredAuctions.length / ITEMS_PER_PAGE);
+  const currentAuctions = filteredAuctions.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen bg-gray-50 py-10">
-      <div className="text-center mb-10">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
-          {category} Auctions
-        </h1>
-        <p className="text-gray-600 px-4 mt-2">
-          Explore live and upcoming auctions in the &quot;{category}&quot;  category.
-        </p>
-      </div>
+    <div className="w-full mx-auto px-6 sm:px-12 py-10">
 
-      {/* Search, Filter, Sort */}
-      <form
-        onSubmit={(e) => e.preventDefault()}
-        className="w-full max-w-6xl px-4 mb-8"
-      >
-        <div className="flex flex-wrap gap-4 sm:gap-6 items-center bg-white/80 backdrop-blur border border-gray-200 rounded-2xl p-4 shadow-sm transition-all duration-300 ease-in-out">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Sidebar Filters (Desktop) */}
+        <aside className="hidden lg:block p-4 space-y-4">
+          <h3 className="text-lg font-semibold">Filters</h3>
+          <Filters
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            categoryFilter={categoryFilter}
+            setCategoryFilter={setCategoryFilter}
+            priceRange={priceRange}
+            setPriceRange={setPriceRange}
+            quickPriceFilter={quickPriceFilter}
+            setQuickPriceFilter={setQuickPriceFilter}
+            setSearch={setSearch}
+            setSortOption={setSortOption}
+          />
+        </aside>
 
-          {/* Search Input - flex-grow more */}
-          <div className="relative flex-[2] min-w-[150px]">
-            <span className="absolute left-3 top-2.5 text-gray-400">
-              <Search className="w-4 h-4" />
-            </span>
-            <Input
-              type="text"
-              placeholder="Search auctions..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 pr-4 py-2 text-sm rounded-full border-gray-300 focus:ring-2 focus:ring-emerald-400 w-full"
-            />
+        {/* Auctions List */}
+        <main className="lg:col-span-3">
+          {/* Search Bar */}
+          <div className="mb-6">
+            <div className="relative w-full">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <Search className="w-5 h-5" />
+              </span>
+              <Input
+                type="text"
+                placeholder="Search auctions..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10 pr-4 py-2 text-sm rounded-xl border border-emerald-400 focus:ring-emerald-400 w-full"
+              />
+            </div>
           </div>
 
-          {/* Status Filter */}
-          <div className="flex-1 min-w-[120px]">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full rounded-full border border-gray-300 bg-white text-gray-800 shadow-sm hover:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                <SelectValue placeholder="All Status" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-200 rounded-xl shadow-lg">
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="closed">Closed</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Category Filter */}
-          <div className="flex-1 min-w-[140px]">
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-full rounded-full border border-gray-300 bg-white text-gray-800 shadow-sm hover:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-200 rounded-xl shadow-lg">
-                {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat === "All" ? "All Categories" : cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Sort Option */}
-          <div className="flex-1 min-w-[120px]">
-            <Select value={sortOption} onValueChange={setSortOption}>
-              <SelectTrigger className="w-full rounded-full border border-gray-300 bg-white text-gray-800 shadow-sm hover:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                <SelectValue placeholder="Sort By" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-200 rounded-xl shadow-lg">
-                <SelectItem value="endingSoon">Ending Soon</SelectItem>
-                <SelectItem value="newest">Newest</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Clear Filters Button - flex-grow less */}
-          <div className="flex-[0.5] min-w-[100px]">
+          {/* Mobile Filters Toggle */}
+          <div className="block lg:hidden mb-4">
             <Button
-              variant="outline"
-              className="w-full text-white text-sm rounded-full bg-red-500 hover:bg-red-600 border-none flex items-center justify-center gap-2"
-              onClick={() => {
-                setSearch("");
-                setStatusFilter("all");
-                setCategoryFilter("All");
-                setSortOption("endingSoon");
-              }}
+              onClick={() => setShowFilters(true)}
+              className="w-full bg-emerald-500 text-white rounded-full"
             >
-              <X className="w-4 h-4" />
-              Clear
+              Show Filters
             </Button>
           </div>
-        </div>
-      </form>
 
-      {loading ? (
-        <Loader2 className="animate-spin text-emerald-500" size={40} />
-      ) : (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-sm sm:w-full px-8 sm:px-4 max-w-6xl">
-            {currentAuctions.length === 0 ? (
-              <p className="text-gray-500">No auctions found in this category.</p>
-            ) : (
-              currentAuctions.map((auction) => {
-                const timeLeft = remainingTimes[auction._id] || "Calculating...";
-                const isClosed = timeLeft === "Closed" || auction.status === "closed";
+          {loading ? (
+            <Loader2 className="animate-spin text-emerald-500 mx-auto" size={40} />
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {currentAuctions.length === 0 ? (
+                  <p className="text-gray-500">No auctions found.</p>
+                ) : (
+                  currentAuctions.map((auction) => (
+                    <AuctionCard key={auction._id} auction={auction} />
+                  ))
+                )}
+              </div>
 
-                return (
-                  <Card
-                    key={auction._id}
-                    className="relative bg-white/10 border border-emerald-400/40 shadow-lg rounded-2xl overflow-hidden"
-                  >
-                    <div className="absolute top-3 right-3 bg-emerald-500 text-white text-sm font-semibold px-3 py-1 rounded-full z-10 shadow">
-                      {timeLeft}
-                    </div>
+              {/* Pagination */}
+              <div className="flex justify-center mt-10 space-x-4">
+                <Button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                  Previous
+                </Button>
+                <span className="text-gray-700">{`Page ${currentPage} of ${totalPages}`}</span>
+                <Button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
+                  Next
+                </Button>
+              </div>
+            </>
+          )}
+        </main>
+      </div>
 
-                    <CardContent className="p-6 space-y-2 sm:space-y-4">
-                      <h2 className="text-xl font-bold text-gray-900">{auction.title}</h2>
-                      <p className="text-gray-700">{auction.description}</p>
-                      {auction.images && auction.images.length > 0 && (
-                        <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
-                          <Image
-                            src={auction.images[0]}
-                            alt={auction.title}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, 33vw"
-                          />
-                        </div>
-                      )}
-                      <div className="text-sm text-gray-600 space-y-1">
-                        <p><strong>Start:</strong> {new Date(auction.startTime).toLocaleDateString('en-GB', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit'
-                        })}</p>
-
-                        <p><strong>End:</strong> {new Date(auction.endTime).toLocaleDateString('en-GB', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit'
-                        })}</p>
-                        <p>
-                          <strong>Status:</strong>{" "}
-                          <span className={isClosed ? "text-red-500 font-semibold" : "text-green-600 font-semibold"}>
-                            {isClosed ? "Closed" : "Active"}
-                          </span>
-                        </p>
-                        <p><strong>Starting Price:</strong> ₹{auction.startingPrice}</p>
-                        <p><strong>Current Price:</strong> ₹{auction.currentPrice}</p>
-                        <p><strong>Category:</strong> {auction.category}</p>
-                      </div>
-
-                      {!isClosed && (
-                        <div className="pt-2 space-y-2">
-                          <Input
-                            type="number"
-                            placeholder="Your Bid (₹)"
-                            className="border border-gray-300 focus:border-emerald-500"
-                            value={bidInputs[auction._id] || ""}
-                            onChange={(e) =>
-                              setBidInputs({ ...bidInputs, [auction._id]: e.target.value })
-                            }
-                          />
-                          <Button
-                            onClick={() => handleBid(auction._id)}
-                            className="w-full bg-emerald-500 text-white rounded-full hover:bg-emerald-600"
-                          >
-                            Place Bid
-                          </Button>
-                          <Link href={`/auctions/${auction._id}`} passHref>
-                            <Button className="w-full hover:cursor-pointer bg-indigo-500 text-white rounded-full hover:bg-indigo-600">Explore More</Button>
-                          </Link>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                );
-              })
-            )}
-          </div>
-
-          <div className="flex justify-center mt-8 space-x-4">
-            <Button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</Button>
-            <span className="text-gray-700 font-medium">{`Page ${currentPage} of ${totalPages}`}</span>
-            <Button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</Button>
-          </div>
-        </>
-      )}
+      {/* Mobile Filters Drawer */}
+      <FilterDrawer isOpen={showFilters} onClose={() => setShowFilters(false)}>
+        <Filters
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          categoryFilter={categoryFilter}
+          setCategoryFilter={setCategoryFilter}
+          priceRange={priceRange}
+          setPriceRange={setPriceRange}
+          quickPriceFilter={quickPriceFilter}
+          setQuickPriceFilter={setQuickPriceFilter}
+          setSearch={setSearch}
+          setSortOption={setSortOption}
+        />
+      </FilterDrawer>
     </div>
   );
 };

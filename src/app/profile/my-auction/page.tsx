@@ -137,7 +137,7 @@ const MyAuctionsPage = () => {
                   key={auction._id}
                   className="relative bg-white/10 border border-emerald-400/40 shadow-lg rounded-2xl overflow-hidden"
                 >
-                  {/* 🔴 Top-right Delete Icon */}
+                  {/*  Top-right Delete Icon */}
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
@@ -145,7 +145,7 @@ const MyAuctionsPage = () => {
                         className="absolute top-2 right-2 p-2 rounded-full text-red-500 hover:bg-red-100"
                         onClick={() => setDeleteId(auction._id)}
                       >
-                        <Trash2 className="w-5 h-5" />
+                        <Trash2 className="w-5 h-5 sm:w-6 sm:h-6" />
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
