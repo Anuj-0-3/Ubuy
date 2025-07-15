@@ -72,8 +72,8 @@ export default function NotificationPage() {
         </div>;
       default:
         return (
-          <div>
-            <BellIcon className="text-emerald-600" />
+          <div className="flex flex-col items-center">
+            <BellIcon className="text-emerald-600 " />
             <p className="text-sm text-emerald-600 ">General</p>
           </div>
         );
@@ -122,12 +122,12 @@ export default function NotificationPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className={`flex xs:flex-row items-center gap-2 xs:gap-4 bg-white p-3 xs:p-4 rounded-lg shadow hover:shadow-md transition-all ${
+              className={`flex xs:flex-row items-center justify-center gap-2 xs:gap-4 bg-white p-3 xs:p-4 rounded-lg shadow hover:shadow-md transition-all ${
                 note.isRead ? "opacity-60" : ""
               }`}
             >
-              <div className="p-2 bg-emerald-100 rounded-full">{getIcon(note.type)}</div>
-              <div className="flex-1">
+              <div className="p-2 bg-emerald-100 flex items-center justify-center rounded-full">{getIcon(note.type)}</div>
+              <div className="flex-1 ">
                 <p
                   className="text-gray-800 font-medium"
                   dangerouslySetInnerHTML={{ __html: note.message }}

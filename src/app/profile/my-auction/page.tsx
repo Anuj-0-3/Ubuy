@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -140,13 +140,15 @@ const MyAuctionsPage = () => {
                   {/*  Top-right Delete Icon */}
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="absolute top-2 right-2 p-2 rounded-full text-red-500 hover:bg-red-100"
+                      <button
+                        type="button"
+                        className="absolute top-5 right-5 p-2 hover:cursor-pointer  rounded-full text-red-500 hover:bg-red-100"
                         onClick={() => setDeleteId(auction._id)}
+                        title="Delete auction"
+                        aria-label="Delete auction"
                       >
-                        <Trash2 className="w-5 h-5 sm:w-6 sm:h-6" />
-                      </Button>
+                        <Trash2Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                      </button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
@@ -174,7 +176,7 @@ const MyAuctionsPage = () => {
                       {auction.images && auction.images.length > 0 && (
                         <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-gray-300">
                           <Image
-                            src={auction.images[0]} 
+                            src={auction.images[0]}
                             alt={auction.title}
                             fill
                             className="object-cover"

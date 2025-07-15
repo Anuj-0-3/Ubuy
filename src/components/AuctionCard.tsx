@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { getRemainingTime } from "@/utils/time";
+import { useSession } from "next-auth/react";
 
 interface Auction {
   _id: string;
@@ -28,6 +29,7 @@ export default function AuctionCard({ auction }: AuctionCardProps) {
   const [bidInput, setBidInput] = useState("");
   const [timeLeft, setTimeLeft] = useState(getRemainingTime(auction.endTime));
   const [wishlist, setWishlist] = useState<string[]>([]);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -58,8 +60,12 @@ export default function AuctionCard({ auction }: AuctionCardProps) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
     }
   };
-
   const toggleWishlist = () => {
+    if (!session) {
+      toast("Please log in to add to wishlist.");
+      return;
+    }
+
     if (wishlist.includes(auction._id)) {
       setWishlist(wishlist.filter((id) => id !== auction._id));
       toast("Removed from wishlist");
@@ -79,7 +85,7 @@ export default function AuctionCard({ auction }: AuctionCardProps) {
 
 
   return (
-    <Card className="relative bg-white/10 border border-emerald-400/40 shadow-lg rounded-2xl overflow-hidden">
+    <Card className="relative bg-white border border-emerald-400/40 shadow-lg rounded-2xl overflow-hidden">
       {/* Wishlist Button */}
       <div className="absolute top-3 left-3 z-10">
         <Heart
@@ -121,25 +127,48 @@ export default function AuctionCard({ auction }: AuctionCardProps) {
 
         {!isClosed && (
           <div className="pt-2 space-y-2">
-            <Input
-              type="number"
-              placeholder="Your Bid (₹)"
-              className="border border-gray-300 focus:border-emerald-500"
-              value={bidInput}
-              onChange={(e) => setBidInput(e.target.value)}
-            />
-            <Button
-              onClick={handleBid}
-              className="w-full bg-emerald-500 hover:cursor-pointer text-white rounded-full hover:bg-emerald-600 hover:animate-pulse"
-            >
-              Place Bid
-            </Button>
-
-            <Link href={`/auctions/${auction._id}`} passHref>
-              <Button className="w-full hover:cursor-pointer bg-indigo-500 text-white rounded-full hover:bg-indigo-600">
-                Explore More
-              </Button>
-            </Link>
+            {session ? (
+              <>
+                <Input
+                  type="number"
+                  placeholder="Your Bid (₹)"
+                  className="border border-gray-300 bg-white focus:border-emerald-500"
+                  value={bidInput}
+                  onChange={(e) => setBidInput(e.target.value)}
+                />
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleBid}
+                    className="flex-1 bg-emerald-500 text-white rounded-full hover:bg-emerald-600"
+                  >
+                    Place Bid
+                  </Button>
+                  <div className="flex-1">
+                    <Link href={`/auctions/${auction._id}`} passHref>
+                      <Button className="w-full bg-indigo-500 text-white rounded-full hover:bg-indigo-600">
+                        Explore More
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => toast("Please log in to place a bid.")}
+                  className="flex-1 bg-emerald-400 text-white rounded-full hover:bg-emerald-500"
+                >
+                  Log in to Bid
+                </Button>
+                <div className="flex-1">
+                  <Link href={`/auctions/${auction._id}`} passHref>
+                    <Button className="w-full bg-indigo-500 text-white rounded-full hover:bg-indigo-600">
+                      Explore More
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </CardContent>

@@ -55,7 +55,7 @@ const CategoryAuctionsPage: React.FC<CategoryAuctionsProps> = ({ category }) => 
 
   useEffect(() => {
     fetchAuctions();
-  }, [category]);
+  }, []);
 
   const filteredAuctions = auctions
     .filter((a) =>
