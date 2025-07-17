@@ -1,10 +1,7 @@
-// Refactored HomePage with improvements in reusability, scalability, SEO, and performance
 "use client";
 
-import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
-import AuctionCard from "@/components/AuctionCard";
 import { HeroSection } from "@/components/Home/HeroSection";
 import { AuctionSection } from "@/components/Home/AuctionSection";
 import MegaAuction from "@/components/Home/MegaAuction";
@@ -34,7 +31,7 @@ export default function HomePage() {
         <meta property="og:image" content="/preview.jpg" />
       </Head>
 
-      <HeroSection session={session} />
+      <HeroSection session={session ?? undefined} />
       <AuctionSection auctions={auctions} loading={loading} />
       <MegaAuction />
       <Categories />

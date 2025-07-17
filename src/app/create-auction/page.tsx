@@ -82,7 +82,7 @@ export default function CreateAuction() {
     setStartDate(start);
     setEndDate(end);
     setEndTime(getLocalTimeString(end));
-  }, []);
+  }, [startTime]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -194,7 +194,7 @@ export default function CreateAuction() {
         {session ? (
           <div className="w-full max-w-5xl mx-auto bg-white p-6 sm:p-10 rounded-2xl shadow-lg">
             <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-6">Create Auction</h2>
-            <form onSubmit={handleSubmit} className="space-y-5" aria-disabled={loading}>
+            <form onSubmit={handleSubmit} className="space-y-5" >
               <fieldset disabled={loading} className="space-y-5">
                 {/* Title & Price */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
