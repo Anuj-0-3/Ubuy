@@ -4,8 +4,9 @@ import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { BadgePercent, Hammer, HammerIcon, ShieldCheck, ShieldCheckIcon, TrophyIcon, UsersIcon } from "lucide-react";
+import Head from 'next/head';
 
-const MotionLink = motion(Link);
+const MotionLink = motion.create(Link);
 
 export default function AboutPage() {
   const { data: session } = useSession();
@@ -33,6 +34,13 @@ export default function AboutPage() {
 
   return (
     <div className="bg-gray-50 min-h-screen pt-16 ">
+      <Head>
+        <title>About Ubuy | Trusted Online Auctions</title>
+        <meta name="description" content="Learn more about Ubuy's mission, secure auction features, and how to start bidding today." />
+        <meta property="og:title" content="About Ubuy" />
+        <meta property="og:description" content="Discover Ubuy's benefits, features, and how to win amazing deals via online auctions." />
+        <link rel="canonical" href="https://ubuy-theta.vercel.app//about" />
+      </Head>
       <motion.section
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}

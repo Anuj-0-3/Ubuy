@@ -7,17 +7,16 @@ export default withAuth(
   },
   {
     pages: {
-      signIn: "/sign-in", // Redirect to sign-in page if not authenticated
+      signIn: "/sign-in",
     },
     callbacks: {
       authorized: ({ token }) => {
-        return !!token; // Ensure token exists
+        return !!token;
       },
     },
   }
 );
 
-// Define protected routes
 export const config = {
-  matcher: ["/dashboard/:path*", "/profile/:path*"], // Protect specific routes
+  matcher: [ "/profile/:path*","/create-auction","/bidded-auctions"], 
 };

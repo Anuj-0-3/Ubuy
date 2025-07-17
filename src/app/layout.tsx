@@ -11,7 +11,23 @@ export const metadata = {
     template: '%s | U-Buy',
   },
   description: 'Join live auctions and bid on unique items across categories with U-Buy.',
+  openGraph: {
+    title: 'U-Buy - Online Auction Platform',
+    description: 'Join live auctions and bid on unique items across categories with U-Buy.',
+    url: 'https://ubuy-theta.vercel.app/',
+    images: [
+      {
+        url: '/preview.jpg',
+        width: 800,
+        height: 600,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
 };
+
 
 import { ReactNode } from "react";
 
