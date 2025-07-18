@@ -23,9 +23,10 @@ interface Auction {
 
 interface AuctionCardProps {
   auction: Auction;
+  showWishlist?: boolean;
 }
 
-export default function AuctionCard({ auction }: AuctionCardProps) {
+export default function AuctionCard({ auction,showWishlist = true  }: AuctionCardProps) {
   const [bidInput, setBidInput] = useState("");
   const [timeLeft, setTimeLeft] = useState(getRemainingTime(auction.endTime));
   const [wishlist, setWishlist] = useState<string[]>([]);
@@ -87,6 +88,7 @@ export default function AuctionCard({ auction }: AuctionCardProps) {
   return (
     <Card className="relative bg-white border border-emerald-400/40 shadow-lg rounded-2xl overflow-hidden">
       {/* Wishlist Button */}
+      {showWishlist &&(
       <div className="absolute top-3 left-3 z-10">
         <Heart
           onClick={toggleWishlist}
@@ -95,6 +97,7 @@ export default function AuctionCard({ auction }: AuctionCardProps) {
           stroke="currentColor"
         />
       </div>
+      )}
 
       {/* Time Badge */}
       <div className={`absolute top-3 right-3 ${getBadgeColor()} text-white text-sm font-semibold px-3 py-1 rounded-full z-10 shadow`}>
