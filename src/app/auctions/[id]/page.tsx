@@ -30,6 +30,13 @@ type Auction = {
   endTime: string;
   status: string;
   bidders: Bidder[];
+  createdBy: string; // only the ID
+};
+
+type Creator = {
+  _id: string;
+  name: string;
+  image?: string;
 };
 
 export default function AuctionDetailPage() {
@@ -37,12 +44,13 @@ export default function AuctionDetailPage() {
   const id = params?.id as string | undefined;
 
   const [auction, setAuction] = useState<Auction | null>(null);
+  const [creatorData, setCreatorData] = useState<Creator | null>(null);
   const [loading, setLoading] = useState(true);
   const [bidInputs, setBidInputs] = useState<{ [key: string]: string }>({});
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [zoomedImage, setZoomedImage] = useState<string | null>(null); // For modal
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [timeLeft, setTimeLeft] = useState('');
+  const [timeLeft, setTimeLeft] = useState("");
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -53,7 +61,7 @@ export default function AuctionDetailPage() {
       const distance = end - now;
 
       if (distance < 0) {
-        setTimeLeft('Auction ended');
+        setTimeLeft("Auction ended");
         return;
       }
 
@@ -93,6 +101,13 @@ export default function AuctionDetailPage() {
       const updatedData = await updatedRes.json();
       if (updatedData.success) {
         setAuction(updatedData.auction);
+
+        // fetch creator info
+        if (updatedData.auction.createdBy) {
+          const creatorRes = await fetch(`/api/public/${updatedData.auction.createdBy}`);
+          const creatorJson = await creatorRes.json();
+          if (creatorJson.success) setCreatorData(creatorJson.user);
+        }
       }
 
       setBidInputs({ ...bidInputs, [id]: "" });
@@ -115,7 +130,16 @@ export default function AuctionDetailPage() {
       try {
         const res = await fetch(`/api/auction/${id}/details`);
         const data = await res.json();
-        if (data.success) setAuction(data.auction);
+        if (data.success) {
+          setAuction(data.auction);
+
+          // fetch creator info
+          if (data.auction.createdBy) {
+            const creatorRes = await fetch(`/api/auction/public/${data.auction.createdBy}`);
+            const creatorJson = await creatorRes.json();
+            if (creatorJson.success) setCreatorData(creatorJson.user);
+          }
+        }
       } catch (err) {
         console.error("Failed to fetch auction:", err);
       }
@@ -246,6 +270,39 @@ export default function AuctionDetailPage() {
               <Timer className="text-orange-500" /> Time Left: {timeLeft}
             </div>
           </div>
+
+          {creatorData && (
+            <div className="mt-6 flex items-center justify-between rounded-2xl border p-4 bg-white shadow-sm">
+              <div className="flex items-center space-x-4">
+                {creatorData.image ? (
+                  <Image
+                    src={creatorData.image}
+                    alt={creatorData.name}
+                    width={60}
+                    height={60}
+                    className="rounded-full object-cover border shadow"
+                  />
+                ) : (
+                  <div className="w-14 h-14 rounded-full bg-emerald-400 text-white flex items-center justify-center font-bold text-lg">
+                    {creatorData.name[0]}
+                  </div>
+                )}
+                <div>
+                  <p className="text-sm text-gray-600">Created by</p>
+                  <p className="text-lg font-bold text-emerald-600 uppercase">
+                    {creatorData.name}
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => window.location.href = `/public-profile/${creatorData._id}`}
+                className="rounded-full px-4 py-2"
+              >
+                View Public Profile
+              </Button>
+            </div>
+          )}
 
           {!isClosed && (
             <div className="pt-4 space-y-4">
