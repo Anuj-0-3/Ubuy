@@ -5,8 +5,7 @@ import { motion } from "framer-motion";
 import { BellIcon, CheckCircleIcon, XCircleIcon, GavelIcon, InfoIcon, Trash2Icon } from "lucide-react";
 import axios from "axios";
 import Link from 'next/link';
-
-
+import NotificationSkeleton from "@/components/Skeleton/NotificationSkeleton";
 interface Notification {
   _id: string;
   type: "bid" | "win" | "close" | "admin" | "general";
@@ -17,7 +16,7 @@ interface Notification {
 
 export default function NotificationPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-
+  const [loading, setLoading] = useState(true);
 
   //function for deleting a notification
   const handleDelete = async (id: string) => {
@@ -30,31 +29,28 @@ export default function NotificationPage() {
   };
 
   // Fetch notifications from the API when the component mounts
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const res = await axios.get("/api/notification");
-        setNotifications(res.data.notifications);
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          console.error("Failed to load notifications:", error.response?.data || error.message);
-        } else {
-          console.error("Failed to load notifications:", error);
-        }
-      }
-
-    };
-
+  const fetchNotifications = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get("/api/notification");
+      setNotifications(res.data.notifications);
+    } catch (error) {
+      console.error("Failed to load notifications:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+   useEffect(() => {
     fetchNotifications();
   }, []);
 
   const getIcon = (type: Notification["type"]) => {
     switch (type) {
       case "bid":
-        return  <div className="flex flex-col items-center">
+        return <div className="flex flex-col items-center">
           <GavelIcon className="text-indigo-600" />
           <p className="text-sm sm:text-base text-indigo-600 ">Bid</p>
-          </div>
+        </div>
       case "win":
         return <div className="flex flex-col items-center">
           <CheckCircleIcon className="text-green-600" />
@@ -113,7 +109,9 @@ export default function NotificationPage() {
       </motion.div>
 
       <div className="space-y-4">
-        {notifications.length === 0 ? (
+        {loading ? (
+          <NotificationSkeleton />
+        ) : notifications.length === 0 ? (
           <div className="text-center text-gray-500">No notifications yet</div>
         ) : (
           notifications.map((note, index) => (
@@ -122,9 +120,8 @@ export default function NotificationPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className={`flex xs:flex-row items-center justify-center gap-2 xs:gap-4 bg-white p-3 xs:p-4 rounded-lg shadow hover:shadow-md transition-all ${
-                note.isRead ? "opacity-60" : ""
-              }`}
+              className={`flex xs:flex-row items-center justify-center gap-2 xs:gap-4 bg-white p-3 xs:p-4 rounded-lg shadow hover:shadow-md transition-all ${note.isRead ? "opacity-60" : ""
+                }`}
             >
               <div className="p-2 bg-emerald-100 flex items-center justify-center rounded-full">{getIcon(note.type)}</div>
               <div className="flex-1 ">

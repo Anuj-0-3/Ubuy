@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import AuctionCard from "@/components/AuctionCard";
 import Filters from "@/components/Filters";
 import FilterDrawer from "@/components/FilterDrawer";
-import { Loader2, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import AuctionCardSkeleton from "./Skeleton/AuctionCardSkeleton";
 
 const ITEMS_PER_PAGE = 9;
 
@@ -55,7 +56,7 @@ const CategoryAuctionsPage: React.FC<CategoryAuctionsProps> = ({ category }) => 
 
   useEffect(() => {
     fetchAuctions();
-  }, );
+  },);
 
   const filteredAuctions = auctions
     .filter((a) =>
@@ -127,7 +128,11 @@ const CategoryAuctionsPage: React.FC<CategoryAuctionsProps> = ({ category }) => 
           </div>
 
           {loading ? (
-            <Loader2 className="animate-spin text-emerald-500 mx-auto" size={40} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <AuctionCardSkeleton key={i} />
+              ))}
+            </div>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

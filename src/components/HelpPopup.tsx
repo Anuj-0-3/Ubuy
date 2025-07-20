@@ -1,22 +1,8 @@
 'use client';
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { HelpCircle, X } from "lucide-react";
-
-const faqData = {
-  Bidding: [
-    { q: "How do I place a bid?", a: "Click on 'Start Bidding', enter your amount, and confirm." },
-    { q: "Can I cancel my bid?", a: "No, bids are final. Contact support for exceptions." },
-  ],
-  Selling: [
-    { q: "How do I sell an item?", a: "Click 'Sell an Item', fill in details, and upload photos." },
-    { q: "Is there a listing fee?", a: "Listing is free. A platform fee applies after the sale." },
-  ],
-  Account: [
-    { q: "Do I need an account to bid?", a: "Yes, please sign in or create an account to start bidding." },
-    { q: "How do I reset my password?", a: "Go to 'Sign In' and click 'Forgot Password'. Follow instructions." },
-  ],
-};
+import faqData from "@/app/data/faqData"; 
 
 type FaqCategory = keyof typeof faqData;
 
@@ -29,49 +15,77 @@ type Message = {
 
 export default function HelpChatBot() {
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    { type: "bot", text: "Hi! 👋 What do you need help with?" },
-  ]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("helpChatMessages");
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
   const [selectedCategory, setSelectedCategory] = useState<FaqCategory | null>(null);
   const [currentStep, setCurrentStep] = useState<"category" | "question" | "reset">("category");
+  const [, setIsLoading] = useState(false);
+  const chatRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (open) {
+      const initial: Message[] = [{ type: "bot", text: "Hi! 👋 What do you need help with?" }];
+      setMessages(initial);
+      setCurrentStep("category");
+      setSelectedCategory(null);
+      localStorage.setItem("helpChatMessages", JSON.stringify(initial));
+    }
+  }, [open]);
+
+  useEffect(() => {
+    localStorage.setItem("helpChatMessages", JSON.stringify(messages));
+    const timeout = setTimeout(() => {
+      chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" });
+    }, 100);
+    return () => clearTimeout(timeout);
+  }, [messages]);
 
   const handleCategorySelect = (category: string) => {
-    setMessages((prev) => [
-      ...prev,
+    const newMessages: Message[] = [
+      ...messages,
       { type: "user", text: category },
       { type: "bot", text: `Great! Here are some common questions about ${category}:` },
-    ]);
+    ];
+    setMessages(newMessages);
     setSelectedCategory(category as FaqCategory);
     setCurrentStep("question");
   };
 
   const handleQuestionClick = (question: string, answer: string, index: number) => {
-    setMessages((prev) => [
-      ...prev,
+    const newMessages: Message[] = [
+      ...messages,
       { type: "user", text: question, category: selectedCategory!, questionIndex: index },
-      { type: "bot", text: answer },
-    ]);
-    setTimeout(() => {
-      resetToMainMenu();
-    }, 600);
-  };
+      { type: "bot", text: "Typing..." },
+    ];
+    setMessages(newMessages);
+    setIsLoading(true);
 
-  const resetToMainMenu = () => {
-    setMessages((prev) => [
-      ...prev,
-      { type: "bot", text: "🔙 Back to Main Menu", questionIndex: -1 }
-    ]);
-    setCurrentStep("reset");
+    setTimeout(() => {
+      const updatedMessages: Message[] = [...newMessages];
+      updatedMessages.pop();
+      updatedMessages.push({ type: "bot", text: answer });
+      updatedMessages.push({ type: "bot", text: "🔙 Back to Main Menu", questionIndex: -1 });
+      setMessages(updatedMessages);
+      setCurrentStep("reset");
+      setIsLoading(false);
+    }, 800);
   };
 
   const handleBackClick = () => {
-    setMessages([{ type: "bot", text: "Hi! 👋 What do you need help with?" }]);
+    const initial: Message[] = [{ type: "bot", text: "Hi! 👋 What do you need help with?" }];
+    setMessages(initial);
     setCurrentStep("category");
     setSelectedCategory(null);
+    localStorage.setItem("helpChatMessages", JSON.stringify(initial));
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 right-6 z-50 sm:bottom-4 sm:right-4" aria-live="polite">
       {!open ? (
         <button
           onClick={() => setOpen(true)}
@@ -84,34 +98,33 @@ export default function HelpChatBot() {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-xl shadow-xl p-4 w-[340px] max-h-[70vh] flex flex-col overflow-hidden"
+          role="dialog"
+          aria-labelledby="help-chat-header"
+          className="bg-white rounded-xl shadow-xl p-4 w-[300px] sm:w-[90vw] max-w-sm max-h-[70vh] flex flex-col overflow-hidden"
+
         >
           {/* Header */}
           <div className="flex justify-between items-center mb-2">
-            <h2 className="text-md font-bold text-emerald-700">Assistant</h2>
+            <h2 id="help-chat-header" className="text-md font-bold text-emerald-700">
+              Assistant
+            </h2>
             <button
-              onClick={() => {
-                setOpen(false);
-                setTimeout(() => {
-                  setMessages([{ type: "bot", text: "Hi! 👋 What do you need help with?" }]);
-                  setCurrentStep("category");
-                  setSelectedCategory(null);
-                }, 200);
-              }}
+              onClick={() => setOpen(false)}
               className="text-gray-400 hover:text-gray-600"
+              aria-label="Close help chatbot"
             >
               <X size={18} />
             </button>
           </div>
 
-          {/* Chat window */}
-          <div className="flex-1 overflow-y-auto space-y-3 px-1 pb-2">
+          {/* Chat Window */}
+          <div ref={chatRef} className="flex-1 overflow-y-auto space-y-3 px-1 pb-2">
             {messages.map((msg, idx) => (
               <div
                 key={idx}
-                className={`max-w-[85%] px-3 py-2 rounded-lg text-sm ${
+                className={`max-w-[85%] px-3 py-2 rounded-lg text-sm cursor-default ${
                   msg.type === "bot"
-                    ? "bg-gray-100 text-gray-800 self-start"
+                    ? `bg-gray-100 text-gray-800 self-start ${msg.text.includes("Back") ? "hover:bg-gray-200 cursor-pointer" : ""}`
                     : "bg-emerald-600 text-white self-end ml-auto"
                 }`}
                 onClick={() => {
@@ -124,7 +137,7 @@ export default function HelpChatBot() {
               </div>
             ))}
 
-            {/* Show categories if on "category" step */}
+            {/* Categories */}
             {currentStep === "category" && (
               <div className="space-y-2 mt-2">
                 {Object.keys(faqData).map((cat) => (
@@ -139,14 +152,14 @@ export default function HelpChatBot() {
               </div>
             )}
 
-            {/* Show questions if on "question" step */}
+            {/* Questions */}
             {currentStep === "question" && selectedCategory && (
               <div className="space-y-2 mt-2">
                 {faqData[selectedCategory].map((faq, idx) => (
                   <button
                     key={idx}
                     onClick={() => handleQuestionClick(faq.q, faq.a, idx)}
-                    className="w-full text-left px-3 py-2 rounded-md bg-gray-50 border border-gray-200 hover:bg-gray-100 text-sm"
+                    className="w-full text-left px-3 py-2 rounded-md bg-gray-50 border border-gray-200 hover:bg-gray-100 text-sm transition-colors duration-100"
                   >
                     {faq.q}
                   </button>
@@ -159,4 +172,3 @@ export default function HelpChatBot() {
     </div>
   );
 }
-

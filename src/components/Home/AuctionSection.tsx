@@ -1,6 +1,5 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { motion } from "framer-motion";
@@ -9,6 +8,7 @@ import Image from "next/image";
 import { Auction } from "@/hooks/useAuctions";
 import "swiper/css";
 import "swiper/css/navigation";
+import AuctionCardSkeleton from "../Skeleton/AuctionCardSkeleton";
 
 export const AuctionSection = ({ auctions, loading }: { auctions: Auction[]; loading: boolean }) => {
   const activeAuctions = auctions.filter((a) => a.status !== "closed");
@@ -33,7 +33,11 @@ export const AuctionSection = ({ auctions, loading }: { auctions: Auction[]; loa
         </h2>
 
         {loading ? (
-          <Loader2 className="animate-spin text-emerald-500" size={40} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 w-full max-w-6xl mx-auto">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <AuctionCardSkeleton key={i} />
+            ))}
+          </div>
         ) : activeAuctions.length === 0 ? (
           <p className="text-gray-500">No live auctions available.</p>
         ) : (

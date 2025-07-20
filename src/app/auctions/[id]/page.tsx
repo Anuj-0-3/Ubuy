@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Loader2, IndianRupee, Timer, Tag, X } from "lucide-react";
+import {  IndianRupee, Timer, Tag, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import Image from "next/image";
 import BiddersTable from "@/components/BiddersTable";
 import { getSession } from "next-auth/react";
 import Pusher from "pusher-js";
+import AuctionDetailSkeleton from "@/components/Skeleton/AuctionDetailSkeleton";
 
 type Bidder = {
   _id: string;
@@ -183,11 +184,7 @@ export default function AuctionDetailPage() {
   }, [auction]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Loader2 className="animate-spin h-12 w-12 text-blue-500" />
-      </div>
-    );
+    return <AuctionDetailSkeleton />;
   }
 
   if (!auction) {

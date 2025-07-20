@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Image from "next/image";
 import Link from "next/link";
 import { getRemainingTime } from "@/utils/time";
+import AuctionCardSkeleton from "@/components/Skeleton/AuctionCardSkeleton";
 
 interface Auction {
   _id: string;
@@ -109,12 +109,16 @@ export default function WishlistPage() {
       </div>
 
       {loading ? (
-        <Loader2 className="animate-spin text-emerald-500" size={40} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-sm sm:w-full px-8 sm:px-4 max-w-6xl">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <AuctionCardSkeleton key={i} />
+          ))}
+        </div>
       ) : wishlist.length === 0 ? (
         <p className="text-gray-500">No items in your wishlist yet.</p>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-sm sm:w-full px-8 sm:px-4 max-w-6xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full px-4 sm:px-6 lg:px-4 max-w-6xl mx-auto">
             {paginatedWishlist.map((auction) => (
               <Card
                 key={auction._id}

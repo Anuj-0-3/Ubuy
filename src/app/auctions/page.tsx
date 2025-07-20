@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import AuctionCard from "@/components/AuctionCard";
 import Filters from "@/components/Filters";
 import FilterDrawer from "@/components/FilterDrawer";
-import { Loader2, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import AuctionCardSkeleton from "@/components/Skeleton/AuctionCardSkeleton";
 
 const ITEMS_PER_PAGE = 9;
 
@@ -17,9 +18,9 @@ type Auction = {
   status: "active" | "closed";
   category: string;
   currentPrice: number;
-  images: string[]; 
+  images: string[];
   startingPrice: number;
-  endTime: string; 
+  endTime: string;
 };
 
 export default function AllAuctionsPage() {
@@ -119,7 +120,11 @@ export default function AllAuctionsPage() {
           </div>
 
           {loading ? (
-            <Loader2 className="animate-spin text-emerald-500 mx-auto" size={40} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <AuctionCardSkeleton key={i} />
+              ))}
+            </div>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

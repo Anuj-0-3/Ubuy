@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import Filters from "@/components/Filters";
 import FilterDrawer from "@/components/FilterDrawer";
+import AuctionCardSkeleton from "@/components/Skeleton/AuctionCardSkeleton";
 
 interface Auction {
   _id: string;
@@ -138,9 +139,9 @@ export default function BiddedAuctionsPage() {
             categoryFilter={categoryFilter}
             setCategoryFilter={setCategoryFilter}
             priceRange={0}
-            setPriceRange={() => {}}
+            setPriceRange={() => { }}
             quickPriceFilter=""
-            setQuickPriceFilter={() => {}}
+            setQuickPriceFilter={() => { }}
             setSearch={setSearch}
             setSortOption={setSortOption}
           />
@@ -175,7 +176,11 @@ export default function BiddedAuctionsPage() {
           </div>
 
           {loading ? (
-            <Loader2 className="animate-spin text-emerald-500 mx-auto" size={40} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <AuctionCardSkeleton key={i} />
+              ))}
+            </div>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -264,9 +269,9 @@ export default function BiddedAuctionsPage() {
           categoryFilter={categoryFilter}
           setCategoryFilter={setCategoryFilter}
           priceRange={0}
-          setPriceRange={() => {}}
+          setPriceRange={() => { }}
           quickPriceFilter=""
-          setQuickPriceFilter={() => {}}
+          setQuickPriceFilter={() => { }}
           setSearch={setSearch}
           setSortOption={setSortOption}
         />

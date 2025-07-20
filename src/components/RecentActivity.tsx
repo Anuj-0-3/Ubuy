@@ -79,7 +79,7 @@ export default function RecentActivity() {
     }, []);
 
     return (
-        <section className="bg-white border-2 border-gray-200 shadow-lg rounded-xl p-6 mb-6">
+        <section className="bg-white border-2 border-gray-200 shadow-lg rounded-xl p-6 sm:p-10">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -95,7 +95,7 @@ export default function RecentActivity() {
                 <p className="text-center text-red-500">{error}</p>
             ) : activities.length === 0 ? (
                 <div className="flex flex-col items-center text-gray-500 mt-4">
-                    <PackageOpenIcon className="w-10 h-10 text-gray-400 mb-2" aria-hidden="true" />
+                    <PackageOpenIcon className="w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 text-gray-400 mb-2" aria-hidden="true" />
                     <p>No recent activity. Participate in auctions to see updates here.</p>
                 </div>
             ) : (

@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Head from "next/head";
 import AuctionCard from "@/components/AuctionCard";
+import AuctionCardSkeleton from "@/components/Skeleton/AuctionCardSkeleton";
 
 export interface Auction {
   _id: string;
@@ -65,7 +65,11 @@ const MyAuctionsPage = () => {
         </div>
 
         {loading ? (
-          <Loader2 className="animate-spin text-emerald-500" size={40} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 w-full max-w-6xl">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <AuctionCardSkeleton key={i} />
+            ))}
+          </div>
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 w-full max-w-6xl">
