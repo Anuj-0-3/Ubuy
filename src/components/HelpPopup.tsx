@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { HelpCircle, X } from "lucide-react";
-import faqData from "@/app/data/faqData"; 
+import faqData from "@/app/data/faqData";
 
 type FaqCategory = keyof typeof faqData;
 
@@ -87,13 +87,19 @@ export default function HelpChatBot() {
   return (
     <div className="fixed bottom-6 right-6 z-50 sm:bottom-4 sm:right-4" aria-live="polite">
       {!open ? (
-        <button
-          onClick={() => setOpen(true)}
-          className="bg-emerald-600 text-white p-3 rounded-full shadow-lg hover:bg-emerald-700"
-          aria-label="Open help chatbot"
-        >
-          <HelpCircle size={24} />
-        </button>
+        <div className="relative group">
+          <button
+            onClick={() => setOpen(true)}
+            className="bg-emerald-600 text-white p-3 rounded-full shadow-lg hover:bg-emerald-700"
+            aria-label="Open help chatbot"
+          >
+            <HelpCircle size={24} />
+          </button>
+          {/* Tooltip */}
+          <div className="absolute bottom-2 mt-2 right-2 -translate-x-1/2 px-3 py-1 bg-emerald-600 text-white text-xs rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+            Help Assistant
+          </div>
+        </div>
       ) : (
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -122,11 +128,10 @@ export default function HelpChatBot() {
             {messages.map((msg, idx) => (
               <div
                 key={idx}
-                className={`max-w-[85%] px-3 py-2 rounded-lg text-sm cursor-default ${
-                  msg.type === "bot"
-                    ? `bg-gray-100 text-gray-800 self-start ${msg.text.includes("Back") ? "hover:bg-gray-200 cursor-pointer" : ""}`
-                    : "bg-emerald-600 text-white self-end ml-auto"
-                }`}
+                className={`max-w-[85%] px-3 py-2 rounded-lg text-sm cursor-default ${msg.type === "bot"
+                  ? `bg-gray-100 text-gray-800 self-start ${msg.text.includes("Back") ? "hover:bg-gray-200 cursor-pointer" : ""}`
+                  : "bg-emerald-600 text-white self-end ml-auto"
+                  }`}
                 onClick={() => {
                   if (msg.text === "🔙 Back to Main Menu") {
                     handleBackClick();

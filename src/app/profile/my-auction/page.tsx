@@ -65,7 +65,7 @@ const MyAuctionsPage = () => {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 w-full max-w-6xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-sm sm:w-full px-8 sm:px-4 max-w-6xl">
             {Array.from({ length: 6 }).map((_, i) => (
               <AuctionCardSkeleton key={i} />
             ))}
