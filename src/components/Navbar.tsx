@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import NotificationDropdown from './NotificationDropdown';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 type Notification = {
   _id: string;
@@ -22,41 +23,47 @@ function Navbar() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const { data: session } = useSession();
+  const pathname = usePathname();
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
+  const fetchNotifications = async () => {
+    try {
+      const res = await axios.get("/api/notification");
+      setNotifications(res.data.notifications);
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchInitialNotifications = async () => {
-      if (session) {
-        try {
-          const res = await axios.get("/api/notification");
-          setNotifications(res.data.notifications);
-        } catch (error) {
-          console.error("Failed to fetch notifications:", error);
-        }
-      }
-    };
-    fetchInitialNotifications();
+    if (session) fetchNotifications();
   }, [session]);
 
   const handleToggleNotifications = async () => {
     if (!notificationsOpen && session) {
       try {
         await axios.get("/api/notification/read");
-        const res = await axios.get("/api/notification");
-        setNotifications(res.data.notifications);
+        await fetchNotifications();
       } catch (error) {
         console.error("Error marking/fetching notifications:", error);
       }
     }
-    setNotificationsOpen(!notificationsOpen);
+    setNotificationsOpen(prev => !prev);
   };
+
+  const isActive = (href: string) => pathname === href;
+
+  const navLinkClass = (href: string) =>
+    `inline-block transition-all duration-150 hover:underline hover:underline-offset-4 ${
+      isActive(href) ? 'font-semibold underline underline-offset-4' : ''
+    }`;
 
   return (
     <nav className="fixed top-0 left-0 w-full px-8 sm:px-16 z-50 p-6 shadow-md bg-emerald-600 text-white">
       <div className="container mx-auto flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold">
-          <h1 className='sm:text-4xl text-3xl font-bold text-slate-100 font-sans'>U-Buy</h1>
+        <Link href="/" className="text-xl font-bold" aria-label="Home">
+          <h1 className="sm:text-4xl text-3xl font-bold text-slate-100 font-sans">U-Buy</h1>
         </Link>
 
         {/* Mobile Navigation */}
@@ -65,6 +72,7 @@ function Navbar() {
             <button
               onClick={handleToggleNotifications}
               className="relative p-2 hover:bg-emerald-700 rounded-full group"
+              aria-label="Toggle notifications"
             >
               <Bell className="text-white w-6 h-6" />
               {unreadCount > 0 && (
@@ -72,34 +80,36 @@ function Navbar() {
                   {unreadCount}
                 </span>
               )}
-              {/* Tooltip */}
               <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-emerald-600 text-white text-xs rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
                 Notifications
               </div>
-
             </button>
           )}
-          <button className="text-white" onClick={() => setIsOpen(!isOpen)} aria-label="Menu modal">
+          <button
+            className="text-white"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label={isOpen ? 'Close menu' : 'Open menu'}
+          >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex text-base  items-center space-x-8">
+        <div className="hidden md:flex text-base items-center space-x-8">
           {session ? (
             <>
-              <Link href="/auctions" className="hover:text-slate-100">Auctions</Link>
-              <Link href="/create-auction" className="hover:text-slate-100">Create Auction</Link>
-              <Link href="/bidded-auctions" className="hover:text-slate-100">Bidded Auctions</Link>
-              <Link href="/profile" className="hover:text-slate-100">Profile</Link>
+              <Link href="/auctions" className={navLinkClass('/auctions')}>Auctions</Link>
+              <Link href="/create-auction" className={navLinkClass('/create-auction')}>Create Auction</Link>
+              <Link href="/bidded-auctions" className={navLinkClass('/bidded-auctions')}>Bidded Auctions</Link>
+              <Link href="/profile" className={navLinkClass('/profile')}>Profile</Link>
             </>
           ) : (
             <>
               <Link href="/sign-in">
-                <Button className="bg-slate-100 text-emerald-600" variant='outline'>Login</Button>
+                <Button className="bg-slate-100 text-emerald-600" variant="outline">Login</Button>
               </Link>
               <Link href="/sign-up">
-                <Button className="bg-slate-100 text-emerald-600" variant='outline'>Sign-Up</Button>
+                <Button className="bg-slate-100 text-emerald-600" variant="outline">Sign-Up</Button>
               </Link>
             </>
           )}
@@ -107,6 +117,7 @@ function Navbar() {
             <button
               onClick={handleToggleNotifications}
               className="relative p-2 hover:bg-emerald-700 rounded-full group"
+              aria-label="Toggle notifications"
             >
               <Bell className="text-white w-6 h-6" />
               {unreadCount > 0 && (
@@ -114,7 +125,6 @@ function Navbar() {
                   {unreadCount}
                 </span>
               )}
-              {/* Tooltip */}
               <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-emerald-600 text-white text-xs rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
                 Notifications
               </div>
@@ -135,24 +145,29 @@ function Navbar() {
         animate={{ x: isOpen ? 0 : '100%' }}
         transition={{ type: 'tween', duration: 0.3 }}
         className="fixed top-0 right-0 h-full w-64 bg-emerald-700 text-white flex flex-col p-6 space-y-4 md:hidden z-50"
+        aria-label="Mobile navigation drawer"
       >
-        <button className="self-end mb-4" onClick={() => setIsOpen(false)} aria-label="Close modal">
+        <button
+          className="self-end mb-4"
+          onClick={() => setIsOpen(false)}
+          aria-label="Close drawer"
+        >
           <X size={24} />
         </button>
         {session ? (
           <>
-            <Link href="/auctions" onClick={() => setIsOpen(false)}>Auctions</Link>
-            <Link href="/create-auction" onClick={() => setIsOpen(false)}>Create Auction</Link>
-            <Link href="/bidded-auctions" onClick={() => setIsOpen(false)}>Bidded Auctions</Link>
-            <Link href="/profile" onClick={() => setIsOpen(false)}>Profile</Link>
+            <Link href="/auctions" onClick={() => setIsOpen(false)} className={navLinkClass('/auctions')}>Auctions</Link>
+            <Link href="/create-auction" onClick={() => setIsOpen(false)} className={navLinkClass('/create-auction')}>Create Auction</Link>
+            <Link href="/bidded-auctions" onClick={() => setIsOpen(false)} className={navLinkClass('/bidded-auctions')}>Bidded Auctions</Link>
+            <Link href="/profile" onClick={() => setIsOpen(false)} className={navLinkClass('/profile')}>Profile</Link>
           </>
         ) : (
           <>
             <Link href="/sign-in" onClick={() => setIsOpen(false)}>
-              <Button className="bg-slate-100 w-full text-emerald-600" variant='outline'>Login</Button>
+              <Button className="bg-slate-100 w-full text-emerald-600" variant="outline">Login</Button>
             </Link>
             <Link href="/sign-up" onClick={() => setIsOpen(false)}>
-              <Button className="bg-slate-100 w-full text-emerald-600" variant='outline'>Sign-Up</Button>
+              <Button className="bg-slate-100 w-full text-emerald-600" variant="outline">Sign-Up</Button>
             </Link>
           </>
         )}
@@ -168,7 +183,3 @@ function Navbar() {
 }
 
 export default Navbar;
-
-
-
-
