@@ -177,7 +177,7 @@ const ProfilePage = () => {
           {session ? (
             <>
               <CardHeader className="flex flex-col items-center text-center">
-                <div className="relative w-32 h-32 sm:w-40 sm:h-40 mb-4">
+                <div className="relative w-32 h-32 sm:w-40 sm:h-40 mb-4 hover:scale-105 transition-transform duration-300 ease-in-out">
                   {profile?.image ? (
                     <Image
                       src={profile.image}
@@ -204,7 +204,6 @@ const ProfilePage = () => {
                     <span className="text-xs text-white hidden sm:inline">Upload Photo</span>
                   </div>
                 </div>
-
                 <p className="text-gray-600 text-sm">
                   Joined: <span className="font-semibold">{createdAtFormatted}</span>
                 </p>
@@ -215,7 +214,7 @@ const ProfilePage = () => {
                       <h2 className="text-lg sm:text-xl font-semibold text-gray-800">{name || "Your Name"}</h2>
                       <button
                         onClick={() => setIsEditingName(true)}
-                        className="text-gray-500 hover:text-emerald-600"
+                        className="text-gray-500 cursor-pointer hover:text-emerald-600 transition-transform transform hover:scale-110 duration-300"
                       >
                         <Pencil className="w-5 h-5" />
                       </button>
@@ -227,7 +226,7 @@ const ProfilePage = () => {
                       onChange={(e) => setName(e.target.value)}
                       onBlur={() => setIsEditingName(false)}
                       autoFocus
-                      className="text-base font-semibold text-center border-b border-emerald-400 bg-transparent focus:outline-none"
+                      className="text-base font-semibold text-center border-b border-emerald-400 bg-transparent focus:outline-none transition-all duration-300 ease-in-out transform hover:scale-105"
                     />
                   )}
                 </div>
@@ -242,7 +241,7 @@ const ProfilePage = () => {
                 <Button
                   onClick={handleUpdateProfile}
                   disabled={isUpdating}
-                  className="w-5/12 sm:w-1/3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full"
+                  className="w-5/12 cursor-pointer sm:w-1/3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transform transition-all duration-200 hover:scale-105"
                 >
                   {isUpdating ? "Updating..." : "Update Profile"}
                 </Button>
@@ -250,7 +249,7 @@ const ProfilePage = () => {
                 <Button
                   onClick={() => signOut()}
                   variant="destructive"
-                  className="w-5/12 sm:w-1/3 rounded-full"
+                  className="w-5/12 cursor-pointer sm:w-1/3 rounded-full transform transition-all duration-200 hover:scale-105"
                 >
                   <LogOut className="w-5 h-5" />
                   Sign Out
@@ -272,8 +271,10 @@ const ProfilePage = () => {
             </div>
           )}
         </Card>
-        <div className="flex-grow">
-          <RecentActivity />
+        <div className="flex-grow overflow-auto scrollbar-hidden">
+          <div className="scroll-smooth">
+            <RecentActivity />
+          </div>
         </div>
       </div>
 
@@ -333,7 +334,7 @@ const ProfilePage = () => {
                     }}
                     className="mt-2 rounded-3xl bg-emerald-100 flex items-center gap-2 text-sm"
                   >
-                    <ClipboardCheckIcon  className="w-4 h-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6" />
+                    <ClipboardCheckIcon className="w-4 h-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6" />
                     Copy Link
                   </Button>
                 </div>
