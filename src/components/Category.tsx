@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import AuctionCard from "@/components/AuctionCard";
 import Filters from "@/components/Filters";
 import FilterDrawer from "@/components/FilterDrawer";
@@ -30,72 +30,121 @@ interface CategoryAuctionsProps {
 
 const CategoryAuctionsPage: React.FC<CategoryAuctionsProps> = ({ category }) => {
   const [auctions, setAuctions] = useState<Auction[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "closed">("all");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [priceRange, setPriceRange] = useState(0);
   const [quickPriceFilter, setQuickPriceFilter] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [, setSortOption] = useState("endingSoon");
 
-  const fetchAuctions = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(`/api/auction/bycategory?category=${encodeURIComponent(category)}`);
-      const data = await res.json();
-      setAuctions(data);
-    } catch (err) {
-      console.error("Error fetching category auctions", err);
-      toast.error("Failed to load auctions for this category.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const lastFetchedCategoryRef = useRef<string | null>(null);
 
   useEffect(() => {
-    fetchAuctions();
-  },);
+    if (!category) {
+      setAuctions([]);
+      return;
+    }
 
-  const filteredAuctions = auctions
-    .filter((a) =>
-      (a.title?.toLowerCase() || "").includes(search.toLowerCase()) ||
-      (a.description?.toLowerCase() || "").includes(search.toLowerCase())
-    )
-    .filter((a) => statusFilter === "all" || a.status === statusFilter)
-    .filter((a) => categoryFilter === "All" || a.category === categoryFilter)
-    .filter((a) => {
-      if (quickPriceFilter === "under500") return a.currentPrice <= 500;
-      if (quickPriceFilter === "500to1000") return a.currentPrice > 500 && a.currentPrice <= 1000;
-      if (quickPriceFilter === "above1000") return a.currentPrice > 1000;
-      return a.currentPrice <= priceRange || priceRange === 0;
-    });
+    // In React 18 StrictMode (dev), effects run twice on mount.
+    // This guard ensures we fetch at most ONCE per category value.
+    if (lastFetchedCategoryRef.current === category) return;
+    lastFetchedCategoryRef.current = category;
+
+    const ac = new AbortController();
+
+    (async () => {
+      try {
+        setLoading(true);
+
+        const res = await fetch(
+          `/api/auction/bycategory?category=${encodeURIComponent(category)}`,
+          { signal: ac.signal }
+        );
+
+        if (!res.ok) {
+          let msg = `Failed to load auctions (status ${res.status})`;
+          try {
+            const body = await res.json();
+            if (body?.error) msg = body.error;
+          } catch { }
+          throw new Error(msg);
+        }
+
+        const data = await res.json();
+        setAuctions(Array.isArray(data) ? data : (data?.data ?? []));
+      } catch (err: unknown) {
+        if (typeof err === "object" && err !== null && "name" in err && (err).name === "AbortError") return;
+        console.error("Error fetching category auctions", err);
+        toast.error((err as Error)?.message || "Failed to load auctions for this category.");
+        setAuctions([]);
+      } finally {
+        setLoading(false);
+      }
+    })();
+
+    return () => ac.abort();
+  }, [category]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, statusFilter, categoryFilter, priceRange, quickPriceFilter]);
+
+  const filteredAuctions = useMemo(() => {
+    const q = search.trim().toLowerCase();
+
+    return auctions
+      .filter((a) =>
+        q
+          ? (a.title?.toLowerCase() || "").includes(q) ||
+          (a.description?.toLowerCase() || "").includes(q)
+          : true
+      )
+      .filter((a) => (statusFilter === "all" ? true : a.status === statusFilter))
+      .filter((a) => (categoryFilter === "All" ? true : a.category === categoryFilter))
+      .filter((a) => {
+        if (quickPriceFilter === "under500") return a.currentPrice <= 500;
+        if (quickPriceFilter === "500to1000") return a.currentPrice > 500 && a.currentPrice <= 1000;
+        if (quickPriceFilter === "above1000") return a.currentPrice > 1000;
+        return priceRange === 0 ? true : a.currentPrice <= priceRange;
+      });
+  }, [auctions, search, statusFilter, categoryFilter, priceRange, quickPriceFilter]);
 
   const totalPages = Math.ceil(filteredAuctions.length / ITEMS_PER_PAGE);
-  const currentAuctions = filteredAuctions.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+
+  const currentAuctions = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredAuctions.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredAuctions, currentPage]);
+
+  const setStatusFilterAsString = (v: string) =>
+    setStatusFilter(v as "all" | "active" | "closed");
+
+  const setCategoryFilterAsString = (v: string) => setCategoryFilter(v);
+  const setPriceRangeAsNumber = (n: number) => setPriceRange(n);
+  const setQuickPriceFilterAsString = (v: string) => setQuickPriceFilter(v);
+  const setSearchAsString = (v: string) => setSearch(v);
+  const setSortOptionAsString = (v: string) => setSortOption(v);
 
   return (
     <div className="w-full mx-auto px-6 sm:px-12 py-10">
-
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sidebar Filters (Desktop) */}
         <aside className="hidden lg:block p-4 space-y-4">
           <h3 className="text-lg font-semibold">Filters</h3>
           <Filters
             statusFilter={statusFilter}
-            setStatusFilter={setStatusFilter}
+            setStatusFilter={setStatusFilterAsString}
             categoryFilter={categoryFilter}
-            setCategoryFilter={setCategoryFilter}
+            setCategoryFilter={setCategoryFilterAsString}
             priceRange={priceRange}
-            setPriceRange={setPriceRange}
+            setPriceRange={setPriceRangeAsNumber}
             quickPriceFilter={quickPriceFilter}
-            setQuickPriceFilter={setQuickPriceFilter}
-            setSearch={setSearch}
-            setSortOption={setSortOption}
+            setQuickPriceFilter={setQuickPriceFilterAsString}
+            setSearch={setSearchAsString}
+            setSortOption={setSortOptionAsString}
           />
         </aside>
 
@@ -104,7 +153,7 @@ const CategoryAuctionsPage: React.FC<CategoryAuctionsProps> = ({ category }) => 
           {/* Search Bar */}
           <div className="mb-6">
             <div className="relative w-full">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                 <Search className="w-5 h-5" />
               </span>
               <Input
@@ -146,15 +195,23 @@ const CategoryAuctionsPage: React.FC<CategoryAuctionsProps> = ({ category }) => 
               </div>
 
               {/* Pagination */}
-              <div className="flex justify-center mt-10 space-x-4">
-                <Button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
-                  Previous
-                </Button>
-                <span className="text-gray-700">{`Page ${currentPage} of ${totalPages}`}</span>
-                <Button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
-                  Next
-                </Button>
-              </div>
+              {totalPages > 1 && (
+                <div className="flex justify-center mt-10 space-x-4">
+                  <Button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </Button>
+                  <span className="text-gray-700">{`Page ${currentPage} of ${totalPages}`}</span>
+                  <Button
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
             </>
           )}
         </main>
@@ -164,15 +221,15 @@ const CategoryAuctionsPage: React.FC<CategoryAuctionsProps> = ({ category }) => 
       <FilterDrawer isOpen={showFilters} onClose={() => setShowFilters(false)}>
         <Filters
           statusFilter={statusFilter}
-          setStatusFilter={setStatusFilter}
+          setStatusFilter={setStatusFilterAsString}
           categoryFilter={categoryFilter}
-          setCategoryFilter={setCategoryFilter}
+          setCategoryFilter={setCategoryFilterAsString}
           priceRange={priceRange}
-          setPriceRange={setPriceRange}
+          setPriceRange={setPriceRangeAsNumber}
           quickPriceFilter={quickPriceFilter}
-          setQuickPriceFilter={setQuickPriceFilter}
-          setSearch={setSearch}
-          setSortOption={setSortOption}
+          setQuickPriceFilter={setQuickPriceFilterAsString}
+          setSearch={setSearchAsString}
+          setSortOption={setSortOptionAsString}
         />
       </FilterDrawer>
     </div>

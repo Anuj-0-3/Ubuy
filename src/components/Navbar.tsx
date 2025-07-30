@@ -6,17 +6,9 @@ import { Button } from './ui/button';
 import { Menu, X, Bell } from "lucide-react";
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import NotificationDropdown from './NotificationDropdown';
+import NotificationDropdown, { type Notification } from './NotificationDropdown';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-type Notification = {
-  _id: string;
-  type: string;
-  message: string;
-  isRead: boolean;
-  createdAt: string;
-};
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,6 +33,7 @@ function Navbar() {
   }, [session]);
 
   const handleToggleNotifications = async () => {
+    // When opening, mark as read then refresh
     if (!notificationsOpen && session) {
       try {
         await axios.get("/api/notification/read");
@@ -66,7 +59,7 @@ function Navbar() {
           <h1 className="sm:text-4xl text-3xl font-bold text-slate-100 font-sans">U-Buy</h1>
         </Link>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Controls */}
         <div className="md:hidden flex items-center space-x-4">
           {session && (
             <button
@@ -113,6 +106,7 @@ function Navbar() {
               </Link>
             </>
           )}
+
           {session && (
             <button
               onClick={handleToggleNotifications}
@@ -129,12 +123,6 @@ function Navbar() {
                 Notifications
               </div>
             </button>
-          )}
-          {notificationsOpen && (
-            <NotificationDropdown
-              notifications={notifications}
-              onClose={() => setNotificationsOpen(false)}
-            />
           )}
         </div>
       </div>
@@ -171,13 +159,13 @@ function Navbar() {
             </Link>
           </>
         )}
-        {notificationsOpen && (
-          <NotificationDropdown
-            notifications={notifications}
-            onClose={() => setNotificationsOpen(false)}
-          />
-        )}
       </motion.div>
+      {notificationsOpen && session && (
+        <NotificationDropdown
+          notifications={notifications}
+          onClose={() => setNotificationsOpen(false)}
+        />
+      )}
     </nav>
   );
 }
