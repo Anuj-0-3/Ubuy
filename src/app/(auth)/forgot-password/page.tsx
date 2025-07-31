@@ -71,7 +71,6 @@ export default function ForgotPasswordPage() {
 
   return (
    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-100">
-  {/* Blurred Background Image */}
   <Image
     src="/authbg.png"
     alt="Blurred background"
@@ -79,7 +78,6 @@ export default function ForgotPasswordPage() {
     className="object-cover blur-xl brightness-75 z-0"
   />
 
-  {/* Glassmorphic Card */}
   <div className="relative z-10 w-full max-w-md bg-gray-100 backdrop-blur-md shadow-2xl rounded-2xl px-8 py-10 sm:px-10 sm:py-12 mx-4">
     
     {/* Heading */}
@@ -110,7 +108,7 @@ export default function ForgotPasswordPage() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full bg-emerald-500 text-white py-2 text-sm rounded-md hover:bg-emerald-600">
+          <Button type="submit" className="w-full hover:cursor-pointer bg-emerald-500 text-white py-2 text-sm rounded-md hover:bg-emerald-600">
             Send Reset Code
           </Button>
         </form>
@@ -145,7 +143,7 @@ export default function ForgotPasswordPage() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full bg-emerald-500 text-white py-2 text-sm rounded-md hover:bg-emerald-600">
+            <Button type="submit" className="w-full hover:cursor-pointer bg-emerald-500 text-white py-2 text-sm rounded-md hover:bg-emerald-600">
               Verify Code
             </Button>
           </form>

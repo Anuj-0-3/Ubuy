@@ -123,14 +123,14 @@ export const HeroSection = ({ session }: HeroSectionProps) => {
             ) : (
               <>
                 <Link href="/sign-in">
-                  <Button className="bg-white hover:cursor-pointer text-emerald-700 hover:scale-105 hover:shadow-lg transition-transform duration-200">
+                  <Button className="bg-emerald-800 hover:cursor-pointer text-base p-2 sm:p-4 hover:scale-105 hover:shadow-lg transition-transform duration-200">
                     Login to Bid
                   </Button>
                 </Link>
                 <Link href="/sign-up">
                   <Button
                     variant="outline"
-                    className="text-white hover:cursor-pointer border-white hover:scale-105 hover:shadow-md hover:bg-white hover:text-emerald-700 transition-all duration-200"
+                    className="text-emerald-600 hover:cursor-pointer border-white hover:bg-gray-300 hover:text-emerald-800 hover:scale-105 hover:shadow-md transition-all duration-200"
                   >
                     Sign Up
                   </Button>

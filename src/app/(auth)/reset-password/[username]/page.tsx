@@ -125,7 +125,7 @@ export default function ResetPasswordPage() {
             {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full bg-emerald-500 text-white py-2 text-sm rounded-md hover:bg-emerald-600"
+              className="w-full hover:cursor-pointer bg-emerald-500 text-white py-2 text-sm rounded-md hover:bg-emerald-600"
             >
               Reset Password
             </Button>

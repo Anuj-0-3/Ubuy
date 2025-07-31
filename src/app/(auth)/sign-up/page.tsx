@@ -155,7 +155,7 @@ const Page = () => {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-emerald-500 text-white py-2 rounded-md text-sm hover:bg-emerald-600"
+                className="w-full bg-emerald-500 hover:cursor-pointer text-white py-2 rounded-md text-sm hover:bg-emerald-600"
               >
                 {isSubmitting ? "Creating account..." : "Sign Up"}
               </Button>
@@ -166,7 +166,7 @@ const Page = () => {
           <Button
             type="button"
             onClick={() => signIn("google")}
-            className="w-full flex items-center justify-center border border-gray-300 bg-white text-gray-800 rounded-md py-2 text-sm hover:bg-gray-100 mt-4" // added margin top here
+            className="w-full hover:cursor-pointer flex items-center justify-center border border-gray-300 bg-white text-gray-800 rounded-md py-2 text-sm hover:bg-gray-100 mt-4" // added margin top here
           >
             <FcGoogle size={20} /> Sign in with Google
           </Button>
@@ -174,7 +174,7 @@ const Page = () => {
           {/* Sign-in Link */}
           <div className="text-center mt-6 text-sm text-gray-500">
             Already have an account?{" "}
-            <Link href="/sign-in" className="text-emerald-600 font-medium hover:underline">
+            <Link href="/sign-in" className="text-emerald-600 hover:cursor-pointer font-medium hover:underline">
               Sign In
             </Link>
           </div>

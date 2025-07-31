@@ -99,10 +99,10 @@ function Navbar() {
           ) : (
             <>
               <Link href="/sign-in">
-                <Button className="bg-slate-100 text-emerald-600" variant="outline">Login</Button>
+                <Button className="bg-emerald-800 hover:cursor-pointer text-base p-2 sm:p-4 hover:scale-105 hover:shadow-lg transition-transform duration-200" >Login</Button>
               </Link>
               <Link href="/sign-up">
-                <Button className="bg-slate-100 text-emerald-600" variant="outline">Sign-Up</Button>
+                <Button className="text-emerald-600 hover:cursor-pointer border-white hover:bg-gray-300 hover:text-emerald-800 hover:scale-105 hover:shadow-md transition-all duration-200" variant='outline' >Sign-Up</Button>
               </Link>
             </>
           )}
@@ -152,10 +152,10 @@ function Navbar() {
         ) : (
           <>
             <Link href="/sign-in" onClick={() => setIsOpen(false)}>
-              <Button className="bg-slate-100 w-full text-emerald-600" variant="outline">Login</Button>
+              <Button className="bg-slate-100 hover:cursor-pointer w-full text-emerald-600" variant="outline">Login</Button>
             </Link>
             <Link href="/sign-up" onClick={() => setIsOpen(false)}>
-              <Button className="bg-slate-100 w-full text-emerald-600" variant="outline">Sign-Up</Button>
+              <Button className="bg-slate-100 hover:cursor-pointer w-full text-emerald-600" variant="outline">Sign-Up</Button>
             </Link>
           </>
         )}

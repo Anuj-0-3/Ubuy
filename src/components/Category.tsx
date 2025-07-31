@@ -47,9 +47,6 @@ const CategoryAuctionsPage: React.FC<CategoryAuctionsProps> = ({ category }) => 
       setAuctions([]);
       return;
     }
-
-    // In React 18 StrictMode (dev), effects run twice on mount.
-    // This guard ensures we fetch at most ONCE per category value.
     if (lastFetchedCategoryRef.current === category) return;
     lastFetchedCategoryRef.current = category;
 
