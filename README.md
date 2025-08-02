@@ -3,7 +3,7 @@
 ![Next.js](https://img.shields.io/badge/Next.js-15.2.2-blue.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)
 ![MongoDB](https://img.shields.io/badge/Database-MongoDB-green.svg)
-![License](https://img.shields.io/badge/license-MIT-lightgrey.svg)
+
 
 **Ubuy** is a full-stack, real-time auction platform where users can bid, win, and list unique items. Featuring real-time bidding with Socket.IO, secure payments via Cashfree, and a sleek, responsive UI — Ubuy provides a modern, production-ready auction experience.
 
@@ -29,7 +29,7 @@
 
 ## 📸 Screenshots
 
-> _Screenshots go here. Replace placeholders with real images in `/screenshots` folder._
+> _Screenshots go here. 
 
 | Homepage | Auction Detail | Dashboard |
 |----------|----------------|-----------|
@@ -60,6 +60,6 @@
 ### 1️⃣ Clone & Install
 
 ```bash
-git clone https://github.com/yourusername/ubuy-auction-platform.git
-cd ubuy-auction-platform
+git clone https://github.com/Anuj-0-3/Ubuy.git
+cd Ubuy
 npm install
