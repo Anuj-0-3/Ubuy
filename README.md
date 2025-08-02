@@ -63,8 +63,10 @@
 git clone https://github.com/Anuj-0-3/Ubuy.git
 cd Ubuy
 npm install
-
+```
+---
 ## 👨‍💻 Developer
 
 **Anuj Singh**  
-🔗 [GitHub – @Anuj-0-3](https://github.com/Anuj-0-3)
+[![GitHub](https://img.shields.io/badge/GitHub-@Anuj--0--3-181717?style=flat&logo=github)](https://github.com/Anuj-0-3)  
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-anujsinghdevx-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/anujsinghdevx/)
