@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🛒 Ubuy – Real-Time Auction Platform
 
-## Getting Started
+![Next.js](https://img.shields.io/badge/Next.js-15.2.2-blue.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)
+![MongoDB](https://img.shields.io/badge/Database-MongoDB-green.svg)
+![License](https://img.shields.io/badge/license-MIT-lightgrey.svg)
 
-First, run the development server:
+**Ubuy** is a full-stack, real-time auction platform where users can bid, win, and list unique items. Featuring real-time bidding with Socket.IO, secure payments via Cashfree, and a sleek, responsive UI — Ubuy provides a modern, production-ready auction experience.
+
+---
+
+## 🚀 Live Features
+
+- 🔁 **Real-Time Bidding** via Socket.IO
+- 💰 **Cashfree Payment Integration**
+- 🔐 **Full Authentication** with Google and Credentials (NextAuth)
+- 🎞️ **Live Auction Carousel** (Swiper.js)
+- 📦 **Auction Lifecycle**: Create → Bid → Win → Pay
+- 🧑‍💼 **Role-Based Access**: User & Admin/Auctioneer
+- 🛑 **Owner-Only Close Option** for auctions
+- 📲 **Responsive Design** with microinteractions
+- 🎨 **Framer Motion Animations & Lucide Icons**
+- 📧 **Newsletter Subscription** with SMTP Email support
+- 🌩️ **Cloudinary Uploads** for auction images
+- 🧠 **Form Validation** with React Hook Form & Zod
+- 🧑‍💻 **Admin Dashboard** for auction moderation and stats
+
+---
+
+## 📸 Screenshots
+
+> _Screenshots go here. Replace placeholders with real images in `/screenshots` folder._
+
+| Homepage | Auction Detail | Dashboard |
+|----------|----------------|-----------|
+| ![Home](./screenshots/home.png) | ![Detail](./screenshots/detail.png) | ![Dashboard](./screenshots/dashboard.png) |
+
+---
+
+## 🧱 Tech Stack
+
+| Layer       | Tools & Libraries                                      |
+|-------------|--------------------------------------------------------|
+| Frontend    | Next.js 15 • TypeScript • Tailwind CSS • ShadCN UI     |
+| Backend     | Node.js • Next API Routes • Socket.IO                  |
+| Database    | MongoDB • Mongoose ORM                                 |
+| Auth        | NextAuth.js (Google + Credentials)                     |
+| Realtime    | Pusher • Socket.IO                                     |
+| UI/UX       | Framer Motion • Lucide Icons • Swiper.js               |
+| Forms       | React Hook Form • Zod • @hookform/resolvers            |
+| Media       | Multer • Cloudinary                                    |
+| Email       | Nodemailer + SMTP                                      |
+| CAPTCHA     | Cloudflare Turnstile (via react-turnstile)            |
+| Payments    | Cashfree                                               |
+
+---
+
+## 🧪 Getting Started
+
+### 1️⃣ Clone & Install
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+git clone https://github.com/yourusername/ubuy-auction-platform.git
+cd ubuy-auction-platform
+npm install
