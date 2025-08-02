@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
-import { Loader2, Hammer, Trophy, Gavel, MedalIcon } from "lucide-react";
+import { Hammer, Trophy, Gavel, MedalIcon } from "lucide-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import BadgesPageSkeleton from "@/components/Skeleton/BadgesPageSkeleton";
 
 interface Stats {
   totalBids: number;
@@ -185,9 +186,7 @@ export default function BadgesPage() {
           </CardHeader>
           <CardContent>
             {loading ? (
-              <div className="flex justify-center items-center py-10">
-                <Loader2 className="animate-spin h-8 w-8 text-emerald-500" />
-              </div>
+              <BadgesPageSkeleton />
             ) : (
               <>
                 <BadgeSection

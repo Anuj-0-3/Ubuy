@@ -149,13 +149,13 @@ export default function PublicProfilePage() {
         <div className="flex flex-col items-center bg-gray-50 px-4 sm:px-6 py-8 min-h-screen">
             <Card className="w-full max-w-2xl bg-white shadow-xl rounded-2xl">
                 <CardHeader className="flex flex-col items-center text-center">
-                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 mb-4 rounded-full overflow-hidden shadow-md">
+                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 mb-4 hover:scale-105 transition-transform duration-300 ease-in-out">
                         {profileImage ? (
                             <Image
                                 src={profileImage}
                                 alt={username}
                                 fill
-                                className="object-cover"
+                                className="object-cover w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-emerald-400 shadow-md"
                             />
                         ) : (
                             <div className="flex items-center justify-center w-full h-full bg-emerald-400 text-white font-bold text-4xl sm:text-6xl">
@@ -166,7 +166,6 @@ export default function PublicProfilePage() {
                     <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{username}</h1>
                     <p className="text-sm sm:text-base text-gray-600">Member since: <span className="font-semibold">{formattedDate}</span></p>
                 </CardHeader>
-
                 <CardContent className="p-4 sm:p-6">
                     <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 text-center">Auction Stats</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">

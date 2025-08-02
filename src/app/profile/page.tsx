@@ -329,12 +329,34 @@ export default function ProfilePage() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-3 justify-items-center">
-            {auctionBadge > 0 && <BadgeIcon level={auctionBadge} prefix="auction" />}
-            {winBadge > 0 && <BadgeIcon level={winBadge} prefix="win" />}
-            {bidBadge > 0 && <BadgeIcon level={bidBadge} prefix="bid" />}
-          </div>
-
+          {auctionBadge + winBadge + bidBadge > 0 ? (
+            <div className="grid grid-cols-3 justify-items-center mt-4">
+              {auctionBadge > 0 && <BadgeIcon level={auctionBadge} prefix="auction" />}
+              {winBadge > 0 && <BadgeIcon level={winBadge} prefix="win" />}
+              {bidBadge > 0 && <BadgeIcon level={bidBadge} prefix="bid" />}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center mt-4 space-y-3 text-center text-gray-500">
+              <Image
+                src="/badges/placeholder.png"
+                alt="No badges earned"
+                width={64}
+                height={64}
+                className="grayscale opacity-40"
+              />
+              <p className="text-sm font-medium">No badges yet!</p>
+              <p className="text-xs text-gray-400 max-w-xs">
+                Start creating auctions, placing bids, and winning to unlock your first badge!
+              </p>
+              <Link
+                href="/auctions"
+                className="inline-flex items-center px-4 py-2 bg-emerald-500 text-white text-sm rounded-full hover:bg-emerald-600 transition"
+              >
+                <Gavel className="w-4 h-4 mr-2" />
+                Explore Auctions
+              </Link>
+            </div>
+          )}
           {hasMultipleBadges && (
             <div className="mt-6 text-center">
               <Button variant="outline" onClick={() => setShowAllBadges(!showAllBadges)} className="text-sm">

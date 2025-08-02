@@ -41,6 +41,14 @@ export default function Footer() {
             </li>
             <li>
               <Link
+                href="/badges"
+                className="hover:text-white hover:underline underline-offset-4 transition duration-200"
+              >
+                Badges
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/about"
                 className="hover:text-white hover:underline underline-offset-4 transition duration-200"
               >
