@@ -221,7 +221,7 @@ export default function ProfilePage() {
                       className="object-cover w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-emerald-400 shadow-md"
                     />
                   ) : (
-                    <div className="flex items-center justify-center w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-emerald-400 text-white font-bold text-4xl sm:text-7xl border-4 border-emerald-400 shadow-md">
+                    <div className="flex items-center justify-center w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-emerald-400 text-white font-bold text-4xl sm:text-7xl border-4 border-emerald-600 shadow-md">
                       {session.user.name?.charAt(0).toUpperCase() || "U"}
                     </div>
                   )}
@@ -325,15 +325,15 @@ export default function ProfilePage() {
           <h3 className="text-xl font-bold mb-2 text-center">Achievements & Badges</h3>
           <div className="text-center ">
             <Button variant="outline" onClick={() => window.location.href = "/badges"} className="text-sm text-emerald-600 border-emerald-500">
-              <MedalIcon className="w-5 h-5 mr-2 text-emerald-600" /> Explore Full Badge System
+              <MedalIcon className="text-emerald-600 w-5 h-5 sm:w-6 sm:h-6 mr-2" /> Explore Full Badge System
             </Button>
           </div>
 
           {auctionBadge + winBadge + bidBadge > 0 ? (
             <div className="grid grid-cols-3 justify-items-center mt-4">
+              {bidBadge > 0 && <BadgeIcon level={bidBadge} prefix="bid" />}
               {auctionBadge > 0 && <BadgeIcon level={auctionBadge} prefix="auction" />}
               {winBadge > 0 && <BadgeIcon level={winBadge} prefix="win" />}
-              {bidBadge > 0 && <BadgeIcon level={bidBadge} prefix="bid" />}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center mt-4 space-y-3 text-center text-gray-500">

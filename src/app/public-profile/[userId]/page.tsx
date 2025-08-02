@@ -158,7 +158,7 @@ export default function PublicProfilePage() {
                                 className="object-cover w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-emerald-400 shadow-md"
                             />
                         ) : (
-                            <div className="flex items-center justify-center w-full h-full bg-emerald-400 text-white font-bold text-4xl sm:text-6xl">
+                            <div className="flex items-center justify-center w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-emerald-400 text-white font-bold text-4xl sm:text-7xl border-4 border-emerald-600 shadow-md">
                                 {username.charAt(0).toUpperCase()}
                             </div>
                         )}
@@ -181,17 +181,16 @@ export default function PublicProfilePage() {
                             onClick={() => window.location.href = "/badges"}
                             className="text-sm text-emerald-600 border-emerald-500 hover:bg-emerald-50 transition"
                         >
-                            <MedalIcon className="text-emerald-600 w-5 h-5 mr-2" />
+                            <MedalIcon className="text-emerald-600 w-5 h-5 sm:w-6 sm:h-6 mr-2" />
                             Explore Full Badge System
                         </Button>
                     </div>
 
                     <div className="grid grid-cols-3 justify-items-center">
+                        {bidBadge > 0 && <BadgeIcon level={bidBadge} prefix="bid" />}
                         {auctionBadge > 0 && <BadgeIcon level={auctionBadge} prefix="auction" />}
                         {winBadge > 0 && <BadgeIcon level={winBadge} prefix="win" />}
-                        {bidBadge > 0 && <BadgeIcon level={bidBadge} prefix="bid" />}
                     </div>
-
                     {hasMultipleBadges && (
                         <div className="mt-6 text-center">
                             <Button
